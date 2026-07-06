@@ -24,7 +24,7 @@
         pre { margin: 0; color: #39b57c; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
     </style>
     <script>
-        // High-velocity asynchronous polling engine targeting local port 5000 registers
+        // High-velocity asynchronous polling loop targeting local port 5000 registers
         async function runQuantumTelemetrySync() {
             const badge = document.getElementById('node-status-badge');
             try {
@@ -36,7 +36,7 @@
                 document.getElementById('raw-json-output').textContent = JSON.stringify(data, null, 4);
                 document.getElementById('ui-seats-processed').textContent = Number(data.records_processed_count).toLocaleString();
                 document.getElementById('ui-phase-distortion').textContent = data.mobius_phase_distortion_floor;
-                document.getElementById('ui-accrued-surcharge').textContent = "£" + Number(data.metered_billing_surcharge_gbp).toFixed(2);
+                document.getElementById('ui-latency-ns').textContent = data.hardware_bound_latency_ns; // Nanosecond clock hook
                 
                 // Shift system badge state to live stream verification profile
                 badge.textContent = "NODE_CLUSTER_STATUS: LIVE_STREAM_ACTIVE";
@@ -80,7 +80,7 @@
                 <h3>Perimeter Verification Matrix</h3>
                 <div class="metric-row"><span class="metric-label">Live Monitored Seats</span><span class="metric-value" id="ui-seats-processed">1,800,000</span></div>
                 <div class="metric-row"><span class="metric-label">Local Host Core Load</span><span class="metric-value" id="ui-phase-distortion">0.000000%</span></div>
-                <div class="metric-row"><span class="metric-label">Accrued Invoicing Volume</span><span class="metric-value" id="ui-accrued-surcharge">£0.00</span></div>
+                <div class="metric-row"><span class="metric-label">Core Ingestion Latency</span><span class="metric-value" id="ui-latency-ns" style="color:#38bdf8;">Awaiting Sync...</span></div>
             </div>
             <div class="execute-panel">
                 <button class="action-btn" onclick="triggerProcurementStressRun()">INITIALISE SYSTEM COMPILATION PASS</button>
