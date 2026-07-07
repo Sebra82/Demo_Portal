@@ -26,8 +26,7 @@
         pre { margin: 0; color: #39b57c; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
     </style>
     <script>
-        // High-velocity sandbox computing simulation engine loop
-        let dynamicSeatCounter = 1800031;
+        let dynamicSeatCounter = 1800059;
 
         function runQuantumTelemetrySync() {
             const badge = document.getElementById('node-status-badge');
@@ -50,7 +49,6 @@
                     "hardware_bound_latency_ns": calculatedLatency + " ns"
                 };
 
-                // Map target parameters cleanly to verified DOM element nodes
                 document.getElementById('raw-json-output').textContent = JSON.stringify(simulatedPayload, null, 4);
                 document.getElementById('ui-seats-processed').textContent = dynamicSeatCounter.toLocaleString();
                 document.getElementById('ui-phase-distortion').textContent = calculatedCpuLoad + "%";
