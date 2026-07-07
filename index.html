@@ -8,7 +8,7 @@
         .dashboard-container { max-width: 1200px; margin: 0 auto; background: #0d1117; border: 1px solid #30363d; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); overflow: hidden; }
         .portal-header { background: #161b22; padding: 24px 32px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
         .portal-header h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.5px; color: #58a6ff; }
-        .status-badge { background: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.4); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; font-family: monospace; transition: all 0.2s ease; }
+        .status-badge { background: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.4); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 32px; }
         .meta-card { background: #161b22; border: 1px solid #21262d; padding: 20px; border-radius: 8px; }
         .meta-card h3 { margin-top: 0; margin-bottom: 16px; font-size: 14px; text-transform: uppercase; color: #8b949e; letter-spacing: 0.5px; }
@@ -17,10 +17,13 @@
         .metric-label { color: #8b949e; }
         .metric-value { font-family: monospace; font-weight: 600; color: #c9d1d9; }
         .execute-panel { grid-column: span 2; background: #161b22; border: 1px solid #30363d; padding: 24px; border-radius: 8px; text-align: center; }
-        .action-btn { background-color: #238636; color: #ffffff; border: 1px solid rgba(240,246,252,0.1); border-radius: 6px; padding: 12px 32px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; font-family: inherit; }
+        .action-btn { background-color: #238636; color: #ffffff; border: 1px solid rgba(240,246,252,0.1); border-radius: 6px; padding: 12px 32px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; margin-right: 12px; }
         .action-btn:hover { background-color: #2ea043; }
-        .terminal-stream { margin-top: 24px; background: #010409; border: 1px solid #30363d; border-radius: 6px; padding: 20px; text-align: left; display: block; }
-        .terminal-header { color: #8b949e; font-size: 11px; margin-bottom: 12px; font-family: monospace; border-bottom: 21262d; padding-bottom: 8px; }
+        .storefront-btn { background-color: #1f6feb; color: #ffffff; border: 1px solid rgba(31,111,235,0.4); border-radius: 6px; padding: 12px 32px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+        .storefront-btn:hover { background-color: #388bfd; }
+        .terminal-stream { margin-top: 24px; background: #010409; border: 1px solid #30363d; border-radius: 6px; padding: 20px; text-align: left; display: none; }
+        .terminal-stream.active { display: block; }
+        .terminal-header { color: #8b949e; font-size: 11px; margin-bottom: 12px; font-family: monospace; border-bottom: 1px solid #21262d; padding-bottom: 8px; }
         pre { margin: 0; color: #39b57c; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
     </style>
     <script>
@@ -69,7 +72,7 @@
 
         function triggerProcurementStressRun() {
             const streamBlock = document.getElementById('secure-telemetry-payload');
-            streamBlock.style.display = (streamBlock.style.display === 'none') ? 'block' : 'none';
+            streamBlock.classList.toggle('active');
         }
     </script>
 </head>
@@ -94,6 +97,7 @@
             </div>
             <div class="execute-panel">
                 <button class="action-btn" onclick="triggerProcurementStressRun()">INITIALISE SYSTEM COMPILATION PASS</button>
+                <button class="storefront-btn">STOREFRONT</button>
                 <div class="terminal-stream" id="secure-telemetry-payload">
                     <div class="terminal-header">LIVE INSTANTANEOUS TRANSACTION DATA DESCRIPTOR payload // API_INGEST_STREAM (SIMULATED PIPELINE)</div>
                     <pre id="raw-json-output">Awaiting initial sandbox simulation frames...</pre>
