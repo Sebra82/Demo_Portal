@@ -8,7 +8,7 @@
         .dashboard-container { max-width: 1200px; margin: 0 auto; background: #0d1117; border: 1px solid #30363d; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); overflow: hidden; }
         .portal-header { background: #161b22; padding: 24px 32px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
         .portal-header h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.5px; color: #58a6ff; }
-        .status-badge { background: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.4); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-badge { background: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.4); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; font-family: monospace; transition: all 0.2s ease; }
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 32px; }
         .meta-card { background: #161b22; border: 1px solid #21262d; padding: 20px; border-radius: 8px; }
         .meta-card h3 { margin-top: 0; margin-bottom: 16px; font-size: 14px; text-transform: uppercase; color: #8b949e; letter-spacing: 0.5px; }
@@ -17,62 +17,64 @@
         .metric-label { color: #8b949e; }
         .metric-value { font-family: monospace; font-weight: 600; color: #c9d1d9; }
         .execute-panel { grid-column: span 2; background: #161b22; border: 1px solid #30363d; padding: 24px; border-radius: 8px; text-align: center; }
-        .action-btn { background-color: #238636; color: #ffffff; border: 1px solid rgba(240,246,252,0.1); border-radius: 6px; padding: 12px 32px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .action-btn { background-color: #238636; color: #ffffff; border: 1px solid rgba(240,246,252,0.1); border-radius: 6px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; font-family: inherit; margin: 0 8px; text-decoration: none; display: inline-block; }
         .action-btn:hover { background-color: #2ea043; }
-        .storefront-btn { background-color: #1f6feb; color: #ffffff; border: 1px solid rgba(31,111,235,0.4); border-radius: 6px; padding: 12px 32px; font-size: 14px; font-weight: 600; cursor: pointer; }
-        .storefront-btn:hover { background-color: #388bfd; }
-        .terminal-stream { margin-top: 24px; background: #010409; border: 1px solid #30363d; border-radius: 6px; padding: 20px; text-align: left; display: none; }
-        .terminal-stream.active { display: block; }
-        .terminal-header { color: #8b949e; font-size: 11px; margin-bottom: 12px; font-family: monospace; border-bottom: 1px solid #21262d; padding-bottom: 8px; }
+        .store-btn { background-color: #1f6feb; border-color: rgba(240,246,252,0.1); }
+        .store-btn:hover { background-color: #388bfd; }
+        .terminal-stream { margin-top: 24px; background: #010409; border: 1px solid #30363d; border-radius: 6px; padding: 20px; text-align: left; display: block; }
+        .terminal-header { color: #8b949e; font-size: 11px; margin-bottom: 12px; font-family: monospace; border-bottom: 21262d; padding-bottom: 8px; }
         pre { margin: 0; color: #39b57c; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
     </style>
     <script>
-        // 📐 PITCHOOM SANDBOX SIMULATOR CORE
-        // Emulates high-velocity thread ingestion matrices natively without calling local ports
-        let dynamicSeatCounter = 1800000;
+        // High-velocity sandbox computing simulation engine loop
+        let dynamicSeatCounter = 1800031;
 
         function runQuantumTelemetrySync() {
             const badge = document.getElementById('node-status-badge');
-            
-            // Generate simulated hardware register mutations deterministically
-            const calculatedCpuLoad = (Math.random() * (4.25 - 1.15) + 1.15).toFixed(6);
-            const calculatedLatency = (Math.random() * (3.50035 - 3.50000) + 3.50000).toFixed(5);
-            dynamicSeatCounter += Math.floor(Math.random() * 3);
-            const simulatedSurcharge = (dynamicSeatCounter * 0.036).toFixed(2);
+            try {
+                const calculatedCpuLoad = (Math.random() * (4.25 - 1.15) + 1.15).toFixed(6);
+                const calculatedLatency = (Math.random() * (3.50035 - 3.50000) + 3.50000).toFixed(5);
+                dynamicSeatCounter += Math.floor(Math.random() * 2);
+                const simulatedSurcharge = (dynamicSeatCounter * 0.036).toFixed(2);
 
-            const simulatedPayload = {
-                "status": "PASS",
-                "runtime_latency_seconds": parseFloat((calculatedLatency / 1e9).toFixed(11)),
-                "compute_throughput_velocity_ops_sec": Math.floor(1e9 / calculatedLatency),
-                "memory_leakage_buildup_mb": 0.00,
-                "mobius_phase_distortion_floor": calculatedCpuLoad + "%",
-                "float_register_decay_delta": 3.1415926535e-14,
-                "records_processed_count": dynamicSeatCounter,
-                "metered_billing_surcharge_gbp": parseFloat(simulatedSurcharge),
-                "automated_income_assignment": "SUCCESS_STRIPE_METERED_RECORD_FIRED",
-                "hardware_bound_latency_ns": calculatedLatency + " ns"
-            };
+                const simulatedPayload = {
+                    "status": "PASS",
+                    "runtime_latency_seconds": parseFloat((calculatedLatency / 1e9).toFixed(11)),
+                    "compute_throughput_velocity_ops_sec": Math.floor(1e9 / calculatedLatency),
+                    "memory_leakage_buildup_mb": 0.00,
+                    "mobius_phase_distortion_floor": calculatedCpuLoad + "%",
+                    "float_register_decay_delta": 3.1415926535e-14,
+                    "records_processed_count": dynamicSeatCounter,
+                    "metered_billing_surcharge_gbp": parseFloat(simulatedSurcharge),
+                    "automated_income_assignment": "SUCCESS_STRIPE_METERED_RECORD_FIRED",
+                    "hardware_bound_latency_ns": calculatedLatency + " ns"
+                };
 
-            // Inject the mock variables straight into your layout DOM elements
-            document.getElementById('raw-json-output').textContent = JSON.stringify(simulatedPayload, null, 4);
-            document.getElementById('ui-seats-processed').textContent = dynamicSeatCounter.toLocaleString();
-            document.getElementById('ui-phase-distortion').textContent = calculatedCpuLoad + "%";
-            document.getElementById('ui-latency-ns').textContent = calculatedLatency + " ns";
+                // Map target parameters cleanly to verified DOM element nodes
+                document.getElementById('raw-json-output').textContent = JSON.stringify(simulatedPayload, null, 4);
+                document.getElementById('ui-seats-processed').textContent = dynamicSeatCounter.toLocaleString();
+                document.getElementById('ui-phase-distortion').textContent = calculatedCpuLoad + "%";
+                document.getElementById('ui-latency-ns').textContent = calculatedLatency + " ns";
+                document.getElementById('ui-accrued-volume').textContent = '£' + Number(simulatedSurcharge).toLocaleString(undefined, {minimumFractionDigits: 2});
 
-            // Instantly toggle the interface status to a live state
-            badge.textContent = "NODE_CLUSTER_STATUS: LIVE_STREAM_ACTIVE";
-            badge.style.background = "rgba(52,211,153,0.15)";
-            badge.style.color = "#34d399";
-            badge.style.borderColor = "rgba(52,211,153,0.4)";
+                badge.textContent = "NODE_CLUSTER_STATUS: LIVE_STREAM_ACTIVE";
+                badge.style.background = "rgba(52,211,153,0.15)";
+                badge.style.color = "#34d399";
+                badge.style.borderColor = "rgba(52,211,153,0.4)";
+            } catch (error) {
+                badge.textContent = "NODE_CLUSTER_STATUS: CORE_ENGINE_FAULT";
+                badge.style.background = "rgba(244,63,94,0.15)";
+                badge.style.color = "#f43f5e";
+                badge.style.borderColor = "rgba(244,63,94,0.4)";
+            }
         }
-
-        // Loop the UI layout update updates dynamically every 2000ms
+        
         setInterval(runQuantumTelemetrySync, 2000);
         window.onload = runQuantumTelemetrySync;
 
         function triggerProcurementStressRun() {
             const streamBlock = document.getElementById('secure-telemetry-payload');
-            streamBlock.classList.toggle('active');
+            streamBlock.style.display = (streamBlock.style.display === 'none') ? 'block' : 'none';
         }
     </script>
 </head>
@@ -93,11 +95,13 @@
                 <h3>Perimeter Verification Matrix</h3>
                 <div class="metric-row"><span class="metric-label">Live Monitored Seats</span><span class="metric-value" id="ui-seats-processed">Querying...</span></div>
                 <div class="metric-row"><span class="metric-label">Local Host Core Load</span><span class="metric-value" id="ui-phase-distortion">0.000000%</span></div>
-                <div class="metric-row"><span class="metric-label">Core Ingestion Latency</span><span class="metric-value" id="ui-latency-ns" style="color:#38bdf8;">Syncing...</span></div>
+                <div class="metric-row"><span class="metric-label">Accrued Invoicing Volume</span><span class="metric-value" id="ui-accrued-volume" style="color:#f59e0b;">£0.00</span></div>
             </div>
             <div class="execute-panel">
                 <button class="action-btn" onclick="triggerProcurementStressRun()">INITIALISE SYSTEM COMPILATION PASS</button>
+                <a href="sebquantum_storefront.html" class="action-btn store-btn">VIEW COMMERCIAL STOREFRONT</a>
                 <div class="terminal-stream" id="secure-telemetry-payload">
+                    <div class="metric-row" style="border-bottom:none;padding:0;margin-bottom:12px;"><span class="metric-label">Core Ingestion Latency</span><span class="metric-value" id="ui-latency-ns" style="color:#38bdf8;">Syncing...</span></div>
                     <div class="terminal-header">LIVE INSTANTANEOUS TRANSACTION DATA DESCRIPTOR payload // API_INGEST_STREAM (SIMULATED PIPELINE)</div>
                     <pre id="raw-json-output">Awaiting initial sandbox simulation frames...</pre>
                 </div>
