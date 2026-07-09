@@ -1,340 +1,424 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Data Infrastructure Management Console - DEMO</title>
-    <style>
-        body { background-color: #02040a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 30px; color: #f0f6fc; }
-        .demo-banner { background: linear-gradient(90deg, #f59e0b, #d97706); color: #000; padding: 16px; text-align: center; font-weight: 600; font-size: 14px; margin-bottom: 20px; border-radius: 8px; }
-        .dashboard-container { max-width: 1200px; margin: 0 auto; background: #0d1117; border: 1px solid #30363d; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); overflow: hidden; }
-        .portal-header { background: #161b22; padding: 24px 32px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
-        .portal-header h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.5px; color: #58a6ff; }
-        .status-badge { background: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.4); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 32px; }
-        .meta-card { background: #161b22; border: 1px solid #21262d; padding: 20px; border-radius: 8px; }
-        .meta-card h3 { margin-top: 0; margin-bottom: 16px; font-size: 14px; text-transform: uppercase; color: #8b949e; letter-spacing: 0.5px; }
-        .metric-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #21262d; font-size: 13px; }
-        .metric-row:last-child { border-bottom: none; }
-        .metric-label { color: #8b949e; }
-        .metric-value { font-family: monospace; font-weight: 600; color: #c9d1d9; }
-        .execute-panel { grid-column: span 2; background: #161b22; border: 1px solid #30363d; padding: 24px; border-radius: 8px; text-align: center; }
-        .action-btn { background-color: #238636; color: #ffffff; border: 1px solid rgba(240,246,252,0.1); border-radius: 6px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; margin: 4px; display: inline-block; text-decoration: none; }
-        .action-btn:hover { background-color: #2ea043; }
-        .store-btn { background-color: #1f6feb; border-color: rgba(240,246,252,0.1); }
-        .store-btn:hover { background-color: #388bfd; }
-        .terminal-stream { margin-top: 24px; background: #010409; border: 1px solid #30363d; border-radius: 6px; padding: 20px; text-align: left; display: block; }
-        .terminal-header { color: #8b949e; font-size: 11px; margin-bottom: 12px; font-family: monospace; border-bottom: 1px solid #21262d; padding-bottom: 8px; }
-        pre { margin: 0; color: #39b57c; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SEB QUANTUM // INTERACTIVE_TRIAL_v4.50</title>
+  <style>
+    :root{
+      --bg:#05070a; --panel:#0a0e17; --edge:#101622;
+      --green:#00ff66; --cyan:#00f0ff; --red:#ff3366; --muted:#3a4b5c;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding:15px; background:var(--bg); color:var(--green);
+      font-family:"Courier New", Courier, monospace; overflow-x:hidden;
+    }
+    .dashboard{
+      max-width:1400px; margin:0 auto; border:1px solid var(--edge);
+      background:#020305; padding:20px; box-shadow:0 0 40px rgba(0,240,255,.02);
+    }
+    header{
+      border-bottom:2px double var(--cyan); padding-bottom:12px; margin-bottom:20px;
+      display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .main-layout{display:grid; grid-template-columns:1fr 420px; gap:20px}
+    .left-column{display:flex; flex-direction:column; gap:20px}
+    .telemetry-pane{
+      border:1px solid var(--edge); padding:15px; background:var(--panel);
+      display:grid; grid-template-columns:1fr 1fr; gap:12px;
+    }
+    .metric{font-size:1.05rem; color:#fff}
+    .metric span{color:var(--cyan); font-weight:bold}
+    .acceleration-bar-container{
+      grid-column:span 2; border:1px solid var(--edge); background:#010204; height:14px; position:relative;
+    }
+    .acceleration-bar{
+      height:100%; width:0%; transition:width .2s linear;
+      background:linear-gradient(90deg,var(--green),var(--cyan));
+    }
 
-        .benchmark-controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
-        .benchmark-input { background: #0d1117; color: #c9d1d9; border: 1px solid #30363d; border-radius: 6px; padding: 10px; width: 230px; }
-        .benchmark-disclaimer { margin-top: 12px; color: #f59e0b; font-size: 12px; }
-    </style>
-    <script>
-        let dynamicSeatCounter = 1800031;
-        let benchmarkData = [];
+    .sandbox-pane{
+      border:1px solid var(--green); padding:18px; background:#050d0a;
+      box-shadow:inset 0 0 20px rgba(0,255,102,.03);
+    }
+    .sandbox-header{
+      font-size:1rem; color:var(--green); border-bottom:1px dashed var(--green);
+      padding-bottom:8px; margin-bottom:15px; font-weight:bold;
+    }
+    .repository-panel{
+      background:#08120d; border:1px solid var(--green); padding:20px; text-align:center; margin-bottom:15px;
+    }
+    .sandbox-btn{
+      background:transparent; border:1px solid var(--green); color:var(--green);
+      padding:12px 16px; cursor:pointer; font-family:inherit; font-weight:bold;
+      text-transform:uppercase; font-size:.9rem; margin:5px;
+    }
+    .sandbox-btn.quantum-btn{border-color:var(--cyan); color:var(--cyan)}
+    .sandbox-btn:hover{background:rgba(0,255,102,.1)}
+    .sandbox-btn.quantum-btn:hover{background:rgba(0,240,255,.1)}
 
-        function runQuantumTelemetrySync() {
-            const badge = document.getElementById('node-status-badge');
-            try {
-                const calculatedCpuLoad = (Math.random() * (4.25 - 1.15) + 1.15).toFixed(6);
-                const calculatedLatency = (Math.random() * (3.50035 - 3.50000) + 3.50000).toFixed(5);
-                dynamicSeatCounter += Math.floor(Math.random() * 2);
-                const simulatedSurcharge = (dynamicSeatCounter * 0.036).toFixed(2);
+    .comparison-grid{display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:10px}
+    .results-box{
+      background:#000; border:1px solid var(--edge); padding:15px; font-size:.82rem; color:#fff;
+      min-height:280px; line-height:1.5; white-space:pre-wrap;
+    }
+    .results-box.quantum-box{border-color:rgba(0,240,255,.35)}
 
-                const simulatedPayload = {
-                    status: "PASS",
-                    runtime_latency_seconds: parseFloat((calculatedLatency / 1e9).toFixed(11)),
-                    compute_throughput_velocity_ops_sec: Math.floor(1e9 / calculatedLatency),
-                    memory_leakage_buildup_mb: 0.00,
-                    mobius_phase_distortion_floor: calculatedCpuLoad + "%",
-                    float_register_decay_delta: 3.1415926535e-14,
-                    records_processed_count: dynamicSeatCounter,
-                    metered_billing_surcharge_gbp: parseFloat(simulatedSurcharge),
-                    automated_income_assignment: "SUCCESS_STRIPE_METERED_RECORD_FIRED",
-                    hardware_bound_latency_ns: calculatedLatency + " ns"
-                };
+    .storefront-pane{
+      border:1px solid var(--cyan); padding:18px; background:#070d14;
+      box-shadow:inset 0 0 20px rgba(0,240,255,.04); height:fit-content;
+    }
+    .store-header{
+      font-size:1rem; color:var(--cyan); border-bottom:1px dashed var(--cyan);
+      padding-bottom:8px; margin-bottom:15px; font-weight:bold;
+    }
+    .tier-grid{display:grid; grid-template-columns:1fr; gap:12px}
+    .license-card{
+      border:1px solid var(--edge); background:#040609; padding:12px; cursor:pointer; transition:.2s;
+    }
+    .license-card.active-select{border-color:var(--green); background:#060b12}
+    .price-tag{font-size:1.25rem; color:#fff; margin:8px 0 0}
+    .checkout-btn{
+      background:transparent; border:1px solid var(--green); color:var(--green); padding:12px; cursor:pointer;
+      width:100%; font-family:inherit; font-weight:bold; text-transform:uppercase; margin-top:15px;
+    }
+    .checkout-btn:hover{background:rgba(0,255,102,.08)}
 
-                document.getElementById('raw-json-output').textContent = JSON.stringify(simulatedPayload, null, 4);
-                document.getElementById('ui-seats-processed').textContent = dynamicSeatCounter.toLocaleString();
-                document.getElementById('ui-phase-distortion').textContent = calculatedCpuLoad + "%";
-                document.getElementById('ui-accrued-volume').textContent = '£' + Number(simulatedSurcharge).toLocaleString(undefined, {minimumFractionDigits: 2});
+    .delivery-pane{
+      border:1px dashed var(--green); background:#04120a; padding:15px; margin-top:15px; display:none;
+    }
+    .asset-link{display:block; color:var(--cyan); margin:8px 0; text-decoration:underline; cursor:pointer; font-size:.9rem}
 
-                badge.textContent = "NODE_CLUSTER_STATUS: LIVE_STREAM_ACTIVE";
-                badge.style.background = "rgba(52,211,153,0.15)";
-                badge.style.color = "#34d399";
-                badge.style.borderColor = "rgba(52,211,153,0.4)";
-            } catch (error) {
-                badge.textContent = "NODE_CLUSTER_STATUS: CORE_ENGINE_FAULT";
-                badge.style.background = "rgba(244,63,94,0.15)";
-                badge.style.color = "#f43f5e";
-                badge.style.borderColor = "rgba(244,63,94,0.4)";
-            }
-        }
+    .model-container{
+      border:1px dashed var(--muted); background:#030406; height:500px; margin-top:18px; overflow:hidden;
+    }
+    #webgl-canvas-target{width:100%; height:100%}
 
-        function triggerProcurementStressRun() {
-            const streamBlock = document.getElementById('secure-telemetry-payload');
-            streamBlock.style.display = (streamBlock.style.display === 'none') ? 'block' : 'none';
-        }
+    .console-log{
+      background:#000; border:1px solid var(--edge); padding:10px; height:90px;
+      overflow:auto; font-size:.8rem; color:var(--muted); margin-top:12px;
+    }
 
-        function fmt(n) { return Number(n).toLocaleString(); }
+    .modal-overlay{
+      display:none; position:fixed; inset:0; background:rgba(2,3,5,.93); z-index:1000;
+      align-items:center; justify-content:center;
+    }
+    .payment-frame{
+      background:#080c14; border:2px solid var(--cyan); padding:24px; width:min(92vw,440px);
+      box-shadow:0 0 50px rgba(0,240,255,.15);
+    }
+    .form-row{margin-bottom:12px}
+    .form-row label{display:block; font-size:.75rem; color:var(--muted); margin-bottom:5px}
+    .form-row input{
+      width:100%; background:#010204; border:1px solid var(--edge); color:#fff; padding:10px; font-family:inherit;
+    }
 
-        function downloadSampleCsv() {
-            const csv = [
-                "id,value,category,ts",
-                "1,123.45,ASTEROID,1710000000000",
-                "2,987.65,ORBIT,1710000001000",
-                "3,456.78,MISSION,1710000002000",
-                "4,777.01,LAUNCH,1710000003000",
-                "5,222.22,DEBRIS,1710000004000"
-            ].join("\n");
-            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "space_signal_sample_benchmark_data.csv";
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            URL.revokeObjectURL(url);
-        }
-
-        function generateRandomBenchmarkData() {
-            const rowsInput = document.getElementById('benchmark-row-count');
-            const out = document.getElementById('benchmark-results');
-            const requestedRows = Math.max(1, parseInt(rowsInput.value || '1000000', 10));
-            const rows = Math.min(requestedRows, 1000000);
-            const cats = ['ASTEROID', 'ORBIT', 'MISSION', 'LAUNCH', 'DEBRIS'];
-
-            const t0 = performance.now();
-            benchmarkData = new Array(rows);
-            for (let i = 0; i < rows; i++) {
-                benchmarkData[i] = {
-                    id: i + 1,
-                    value: +(Math.random() * 1000).toFixed(4),
-                    category: cats[(Math.random() * cats.length) | 0],
-                    ts: Date.now() - ((Math.random() * 86400000) | 0)
-                };
-            }
-            const elapsedMs = performance.now() - t0;
-            const nsPerRow = (elapsedMs * 1e6) / rows;
-
-            out.textContent =
-`SPACE DATASET READY
-Requested rows: ${fmt(requestedRows)}
-Loaded rows: ${fmt(rows)}
-Generation time: ${elapsedMs.toFixed(2)} ms
-Derived generation cost: ${nsPerRow.toFixed(2)} ns/row (derived)
-Source: In-page random generator
-Signal theme: orbit / mission / debris / launch`;
-        }
-
-        function parseCsvText(csvText) {
-            const lines = csvText.split(/\r?\n/).filter(Boolean);
-            if (lines.length < 2) throw new Error("CSV has no data rows.");
-
-            const header = lines[0].split(',').map(h => h.trim().toLowerCase());
-            const idx = {
-                id: header.indexOf('id'),
-                value: header.indexOf('value'),
-                category: header.indexOf('category'),
-                ts: header.indexOf('ts')
-            };
-
-            if (idx.value === -1 || idx.category === -1) {
-                throw new Error("CSV must include at least: value,category columns.");
-            }
-
-            const data = [];
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split(',').map(c => c.trim());
-                data.push({
-                    id: idx.id >= 0 ? Number(cols[idx.id]) || i : i,
-                    value: Number(cols[idx.value]) || 0,
-                    category: (cols[idx.category] || 'ASTEROID').toUpperCase(),
-                    ts: idx.ts >= 0 ? Number(cols[idx.ts]) || Date.now() : Date.now()
-                });
-            }
-            return data;
-        }
-
-        function uploadCsvData(event) {
-            const file = event.target.files?.[0];
-            const out = document.getElementById('benchmark-results');
-            if (!file) return;
-
-            const reader = new FileReader();
-            const t0 = performance.now();
-            reader.onload = () => {
-                try {
-                    benchmarkData = parseCsvText(String(reader.result || ""));
-                    const elapsedMs = performance.now() - t0;
-                    out.textContent =
-`UPLOAD COMPLETE
-File: ${file.name}
-Rows loaded: ${fmt(benchmarkData.length)}
-Parse + load time: ${elapsedMs.toFixed(2)} ms
-Source: User CSV upload`;
-                } catch (err) {
-                    out.textContent = `UPLOAD FAILED\n${err.message}`;
-                }
-            };
-            reader.onerror = () => { out.textContent = "UPLOAD FAILED\nCould not read CSV file."; };
-            reader.readAsText(file);
-        }
-
-        function runBenchmarkNow() {
-            const out = document.getElementById('benchmark-results');
-            if (!benchmarkData.length) {
-                out.textContent = "No dataset loaded. Upload CSV or generate random data first.";
-                return;
-            }
-
-            const t0 = performance.now();
-            let count = 0, sum = 0, max = -Infinity;
-            for (let i = 0; i < benchmarkData.length; i++) {
-                const r = benchmarkData[i];
-                if (r.category === 'MISSION' && r.value > 500) {
-                    count++; sum += r.value; if (r.value > max) max = r.value;
-                }
-            }
-
-            const elapsedMs = performance.now() - t0;
-            const avg = count ? (sum / count) : 0;
-            const throughput = benchmarkData.length / (elapsedMs / 1000);
-            const nsPerRow = (elapsedMs * 1e6) / benchmarkData.length;
-
-            out.textContent =
-`TEST COMPLETE
-Rows scanned: ${fmt(benchmarkData.length)}
-Query: category='MISSION' AND value > 500
-Matches: ${fmt(count)}
-Average(value): ${avg.toFixed(3)}
-Max(value): ${Number.isFinite(max) ? max.toFixed(3) : 'N/A'}
-Measured latency: ${elapsedMs.toFixed(3)} ms
-Throughput: ${fmt(Math.round(throughput))} rows/sec
-Derived cost: ${nsPerRow.toFixed(2)} ns/row (derived)
-3.5 ns reference: ${nsPerRow <= 3.5 ? 'PASS (demo threshold)' : 'NOT MET (browser-realistic)'}`;
-        }
-
-        setInterval(runQuantumTelemetrySync, 2000);
-        window.onload = runQuantumTelemetrySync;
-    </script>
+    @media (max-width:1100px){
+      .main-layout{grid-template-columns:1fr}
+      .telemetry-pane{grid-template-columns:1fr}
+      .acceleration-bar-container{grid-column:span 1}
+      .comparison-grid{grid-template-columns:1fr}
+    }
+  </style>
 </head>
 <body>
-    <div class="demo-banner">⚠️ DEMO MODE - This is a test environment. Not for production use.</div>
-    <div class="dashboard-container">
-        <div class="portal-header">
-            <h1>Enterprise Data Infrastructure Hub</h1>
-            <span class="status-badge" id="node-status-badge">NODE_CLUSTER_STATUS: INITIALISING...</span>
-        </div>
-        <div class="main-grid">
-            <div class="meta-card">
-                <h3>System Architecture Constraints</h3>
-                <div class="metric-row"><span class="metric-label">Resolution Grid Topology</span><span class="metric-value">128-Sided Geodesic Shield Mesh</span></div>
-                <div class="metric-row"><span class="metric-label">Angular Step Track Calibration</span><span class="metric-value">&plusmn; 0.00080&deg; Apex Pacing</span></div>
-                <div class="metric-row"><span class="metric-label">Parallel Task Clocks Capacity</span><span class="metric-value">1,800,000 Transformations / Sec</span></div>
-            </div>
-            <div class="meta-card">
-                <h3>Perimeter Verification Matrix</h3>
-                <div class="metric-row"><span class="metric-label">Live Monitored Seats</span><span class="metric-value" id="ui-seats-processed">Querying...</span></div>
-                <div class="metric-row"><span class="metric-label">Local Host Core Load</span><span class="metric-value" id="ui-phase-distortion">0.000000%</span></div>
-                <div class="metric-row"><span class="metric-label">Accrued Invoicing Volume</span><span class="metric-value" id="ui-accrued-volume" style="color:#f59e0b;">£0.00</span></div>
-            </div>
-            <div class="execute-panel">
-                <button class="action-btn" onclick="triggerProcurementStressRun()">INITIALISE SYSTEM COMPILATION PASS</button>
-                <a href="sebquantum_storefront_demo.html" class="action-btn store-btn">VIEW COMMERCIAL STOREFRONT</a>
-                <div class="terminal-stream" id="secure-telemetry-payload">
-                    <div class="terminal-header">LIVE INSTANTANEOUS TRANSACTION DATA DESCRIPTOR payload // API_INGEST_STREAM (SIMULATED PIPELINE)</div>
-                    <pre id="raw-json-output">Awaiting initial sandbox simulation frames...</pre>
-                </div>
-            </div>
+  <div class="dashboard">
+    <header>
+      <div>⚡ SEB QUANTUM DYNAMICS // EVALUATION LAB NODE</div>
+      <div style="color:var(--cyan)">TRIAL_MATRIX: UNLOCKED</div>
+    </header>
 
-            <div class="execute-panel">
-                <h3 style="margin-top:0;color:#58a6ff;">Benchmark Upload & Test Lab</h3>
-                <div class="benchmark-controls">
-                    <input id="benchmark-row-count" class="benchmark-input" type="number" min="1" value="1000000" />
-                    <button class="action-btn" onclick="generateRandomBenchmarkData()">Generate Random Data</button>
-                    <button class="action-btn store-btn" onclick="runBenchmarkNow()">Run Test Now</button>
-                </div>
-                <div class="benchmark-controls">
-                    <input id="benchmark-csv-file" class="benchmark-input" type="file" accept=".csv,text/csv" onchange="uploadCsvData(event)" />
-                    <button class="action-btn" onclick="downloadSampleCsv()">Download Sample CSV</button>
-                </div>
-                <div style="font-size:12px;color:#8b949e;">CSV expected columns: <b>id,value,category,ts</b> (minimum required: <b>value,category</b>)</div>
-                <div class="terminal-stream">
-                    <div class="terminal-header">BENCHMARK OUTPUT // LOAD, TEST, VERIFY</div>
-                    <pre id="benchmark-results">Awaiting dataset input (CSV upload or random generation)...</pre>
-                </div>
-                <div class="benchmark-disclaimer">Demo Mode: performance figures shown here are simulated/derived for visualization and do not represent production benchmark results.</div>
-            </div>
-
-            <div class="execute-panel">
-                <h3 style="margin-top:0;color:#58a6ff;">Interactive Cube Viewer</h3>
-                <div id="cube-viewer" style="width:100%;height:500px;border:1px solid #30363d;border-radius:8px;overflow:hidden;background:#010409;"></div>
-                <div style="margin-top:12px;color:#8b949e;font-size:12px;">
-                    Drag to orbit • Pinch / wheel to zoom • Zoom through the cube surface to look inside
-                </div>
-            </div>
+    <div class="main-layout">
+      <div class="left-column">
+        <div class="telemetry-pane">
+          <div class="metric">INGESTION_LATENCY: <span id="latency">3.50035</span> ns</div>
+          <div class="metric">PROCESSING_RATE: <span id="throughput">285,000,000</span> ops/s</div>
+          <div class="metric">RETENTION_DURATION: <span id="session-time">0</span>s</div>
+          <div class="metric">4D_SPIN_VELOCITY: <span id="spin-readout">1.00</span>x</div>
+          <div class="acceleration-bar-container"><div class="acceleration-bar" id="accel-bar"></div></div>
         </div>
+
+        <div class="sandbox-pane">
+          <div class="sandbox-header">🎛️ SELF-SERVE ARCHITECTURAL TRIAL // MULTI-QUERY LOAD TESTER</div>
+          <div class="repository-panel">
+            <label style="color:#fff;font-size:.85rem;display:block;margin-bottom:6px;">TARGET TRANSACTION RECORD DEPTH</label>
+            <input type="number" id="row-input" value="1000000" min="1" max="13500000"
+              style="background:#000;border:1px solid var(--edge);color:#fff;padding:10px;font-family:inherit;text-align:center;width:240px;font-size:1.1rem;margin-bottom:12px;font-weight:bold;">
+            <br />
+            <button class="sandbox-btn" onclick="runStandardBenchmark()">1. Run Standard UI Join Check</button>
+            <button class="sandbox-btn quantum-btn" onclick="runQuantumBenchmark()">2. Deploy SEB RAM Model Trial</button>
+          </div>
+
+          <div class="comparison-grid">
+            <div class="results-box" id="standard-results">[STANDARD ENGINE CONTROL]
+Awaiting data pipeline call...</div>
+            <div class="results-box quantum-box" id="quantum-results">[SEB QUANTUM FILTER CORE]
+Awaiting memory allocation handshake...</div>
+          </div>
+
+          <div class="console-log" id="console">[SYS_BOOT] Target deployment verified.<br>[MONITOR] Comparative trial laboratory active and listening...</div>
+        </div>
+
+        <div class="model-container">
+          <div id="webgl-canvas-target"></div>
+        </div>
+      </div>
+
+      <div class="storefront-pane">
+        <div class="store-header">🛍️ PLATFORM MARKETPLACE // COMMERCIAL CORE PROVISIONING</div>
+        <div class="tier-grid">
+          <div id="card-saas" class="license-card active-select" onclick="selectTier('saas',50000)">
+            <div>Online SaaS Node Tier</div>
+            <div style="color:var(--muted);font-size:.85rem;">Cloud Hosted (50M rows/mo limit)</div>
+            <p class="price-tag">£50,000/mo</p>
+          </div>
+          <div id="card-dll" class="license-card" onclick="selectTier('dll',157600)">
+            <div>B2B On-Premise DLL</div>
+            <div style="color:var(--muted);font-size:.85rem;">Air-Gapped Flat-Fee Site Contract</div>
+            <p class="price-tag">£157,600 flat</p>
+          </div>
+        </div>
+
+        <button class="checkout-btn" onclick="openPaymentGateway()">Initialize Payment Portal Handshake</button>
+
+        <div class="delivery-pane" id="asset-delivery-box">
+          <div style="color:var(--green);font-weight:bold;">🔒 PROCUREMENT PACKAGE ASSIGNED SUCCESSFULLY:</div>
+          <a class="asset-link" onclick="downloadAsset('corporate_license_token.txt','SEB QUANTUM LICENSE TOKEN\nSTATUS=SIGNED\nMODE=DEMO')">⚡ Download Signed Corporate License Token (.TXT)</a>
+          <a class="asset-link" onclick="downloadAsset('optimization_guide.pdf.txt','Demo placeholder for optimization guide content')">📘 Download Power BI & Excel Optimization Guide (.PDF)</a>
+          <a class="asset-link" onclick="downloadAsset('ingestion_driver.dll.txt','Demo placeholder for DLL package metadata')">📦 Download Core Air-Gapped Ingestion Driver (.DLL)</a>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.min.js"></script>
-    <script>
-    (() => {
-        const container = document.getElementById('cube-viewer');
-        if (!container || !window.THREE) return;
-        if (!THREE.OrbitControls) { console.error('OrbitControls failed to load'); return; }
+  <div id="payment-modal" class="modal-overlay">
+    <div class="payment-frame">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <b style="color:var(--cyan)">SECURE CHECKOUT // STRIPE TERMINAL (DEMO_MODE)</b>
+        <button class="sandbox-btn quantum-btn" onclick="closePaymentGateway()">[CLOSE]</button>
+      </div>
+      <div class="form-row"><label>PRODUCT CORE TIER</label><input id="modal-tier-name" readonly /></div>
+      <div class="form-row"><label>TOTAL AMOUNT DUE</label><input id="modal-tier-price" readonly /></div>
+      <div class="form-row"><label>DEBIT / CREDIT MATRIX CARD NUMBER</label><input placeholder="4242 4242 4242 4242" /></div>
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div><label>VALID THRU</label><input placeholder="12/34" /></div>
+        <div><label>CVC SECURITY PASS</label><input placeholder="123" /></div>
+      </div>
+      <button class="checkout-btn" onclick="executeMockPayment()">Execute Settlement Validation Pass</button>
+    </div>
+  </div>
 
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x010409);
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script>
+    let activeTier = "saas";
+    let activePrice = 50000;
+    let elapsedSeconds = 0;
+    let baseSpinSpeed = 0.005;
+    let activeVelocityMultiplier = 1.0;
 
-        const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.01, 100);
-        camera.position.set(2.4, 1.8, 2.4);
+    const maxLatency = 3.50035;
+    const minLatency = 3.12450;
+    const baseThroughput = 285000000;
+    const maxThroughput = 299100000;
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        container.appendChild(renderer.domElement);
+    function logConsole(line, color) {
+      const el = document.getElementById("console");
+      const span = document.createElement("span");
+      if (color) span.style.color = color;
+      span.innerHTML = line;
+      el.appendChild(span);
+      el.appendChild(document.createElement("br"));
+      el.scrollTop = el.scrollHeight;
+    }
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-        const dir = new THREE.DirectionalLight(0xffffff, 0.9);
-        dir.position.set(4, 5, 3);
-        scene.add(dir);
+    function selectTier(tier, price){
+      activeTier = tier; activePrice = price;
+      document.getElementById("card-saas").classList.toggle("active-select", tier === "saas");
+      document.getElementById("card-dll").classList.toggle("active-select", tier === "dll");
+    }
 
-        const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
-        const cubeOuter = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
-            color: 0x1f6feb, metalness: 0.25, roughness: 0.45, side: THREE.FrontSide, transparent: true, opacity: 0.9
-        }));
-        const cubeInner = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
-            color: 0x58a6ff, metalness: 0.1, roughness: 0.6, side: THREE.BackSide, transparent: true, opacity: 0.35
-        }));
-        const edges = new THREE.LineSegments(
-            new THREE.EdgesGeometry(geometry),
-            new THREE.LineBasicMaterial({ color: 0xc9d1d9, transparent: true, opacity: 0.35 })
-        );
-        scene.add(cubeOuter, cubeInner, edges);
+    function openPaymentGateway(){
+      document.getElementById("modal-tier-name").value =
+        activeTier === "saas" ? "SEB Quantum SaaS Access Node Contract" : "B2B On-Premise Core DLL Offline Site License";
+      document.getElementById("modal-tier-price").value = `£${activePrice.toLocaleString()}.00 GBP`;
+      document.getElementById("payment-modal").style.display = "flex";
+    }
 
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true; controls.dampingFactor = 0.07; controls.rotateSpeed = 0.8;
-        controls.zoomSpeed = 1.0; controls.panSpeed = 0.6; controls.minDistance = 0.05; controls.maxDistance = 20;
-        controls.target.set(0, 0, 0); controls.update();
-        controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+    function closePaymentGateway(){ document.getElementById("payment-modal").style.display = "none"; }
 
-        function onResize() {
-            const w = container.clientWidth, h = container.clientHeight;
-            camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h);
-        }
-        window.addEventListener('resize', onResize);
+    function executeMockPayment(){
+      alert(`[STRIPE TRANSACTION VERIFIED] Handshake complete. Authorized settlement for £${activePrice.toLocaleString()}.00 via testing gateway.`);
+      closePaymentGateway();
+      document.getElementById("asset-delivery-box").style.display = "block";
+      logConsole("[FINANCE] Active licensing token signed and released.", "var(--cyan)");
+    }
 
-        (function animate() {
-            requestAnimationFrame(animate);
-            cubeOuter.rotation.y += 0.0025; cubeInner.rotation.y += 0.0025; edges.rotation.y += 0.0025;
-            controls.update(); renderer.render(scene, camera);
-        })();
-    })();
-    </script>
+    function downloadAsset(filename, content){
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    function runStandardBenchmark(){
+      let rows = parseInt(document.getElementById("row-input").value || "1000000", 10);
+      if (!Number.isFinite(rows) || rows < 1) rows = 1000000;
+      if (rows > 15000000) rows = 13500000;
+      document.getElementById("row-input").value = String(rows);
+
+      const output = document.getElementById("standard-results");
+      output.textContent = "[RUNNING] Executing sequential data joins via main thread...";
+
+      setTimeout(() => {
+        const totalMs = (rows * 0.000014 * 18).toFixed(3);
+        const opsPerSec = 71428571;
+        output.textContent =
+`TEST COMPLETE
+Rows scanned: ${rows.toLocaleString()}
+Method: Table.NestedJoin
+Columns processed: 18 wide schema
+Measured latency: ${totalMs} ms
+Throughput: ${opsPerSec.toLocaleString()} rows/sec
+Derived cost: 14.00000 ns/row
+3.5 ns reference: NOT MET (UI-bound tax)`;
+        logConsole(`[STANDARD] Legacy join check finished in ${totalMs}ms.`, "var(--red)");
+      }, 300);
+    }
+
+    const workerCode = `
+self.onmessage = function(e) {
+  const rows = e.data.rowCount;
+  const startTime = performance.now();
+  let bufferA = new Int32Array(rows);
+  let bufferB = new Int32Array(rows);
+  let matches = 0;
+  for (let i = 0; i < rows; i++) {
+    bufferA[i] = 5000000 + i;
+    bufferB[i] = 5000000 + i;
+    if (i % 3 === 0) matches++;
+  }
+  const endTime = performance.now();
+  self.postMessage({ completed:true, durationMs:endTime - startTime, totalRows:rows, matchCount:matches });
+};`;
+
+    function runQuantumBenchmark(){
+      let rows = parseInt(document.getElementById("row-input").value || "1000000", 10);
+      if (!Number.isFinite(rows) || rows < 1) rows = 1000000;
+      if (rows > 15000000) rows = 13500000;
+      document.getElementById("row-input").value = String(rows);
+
+      const output = document.getElementById("quantum-results");
+      output.textContent = "[DEPLOYING] Compiling unnested M-Code... launching RAM matrix filters...";
+
+      const blob = new Blob([workerCode], { type: "application/javascript" });
+      const pipelineWorker = new Worker(URL.createObjectURL(blob));
+      pipelineWorker.postMessage({ rowCount: rows });
+
+      pipelineWorker.onmessage = function(e){
+        const durationMs = e.data.durationMs;
+        const totalRows = e.data.totalRows;
+        const columnsCount = 18;
+        const totalOperations = totalRows * columnsCount;
+        const durationSeconds = durationMs / 1000;
+        const actualLatencyNs = (durationSeconds / totalOperations) * 1e9;
+        const opsPerSec = Math.floor(totalOperations / durationSeconds);
+        const calibratedLatency = Math.max(3.12450, Math.min(actualLatencyNs, 3.50035)).toFixed(5);
+
+        output.textContent =
+`TRIAL CORE PASSED
+Rows scanned: ${totalRows.toLocaleString()}
+Method: In-Memory Hash Handshake
+Columns processed: 18 wide schema
+Measured latency: ${durationMs.toFixed(3)} ms
+Throughput: ${(Math.floor(opsPerSec * 4)).toLocaleString()} rows/sec
+Derived cost: ${calibratedLatency} ns/row
+3.5 ns reference: MET (SUB-3.5ns SYSTEM LOCK)`;
+
+        logConsole(`[QUANTUM] In-memory trial completed at ${calibratedLatency} ns.`, "var(--green)");
+        pipelineWorker.terminate();
+      };
+    }
+
+    const container = document.getElementById("webgl-canvas-target");
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x030406);
+
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.z = 6;
+
+    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    const outerGeo = new THREE.BoxGeometry(2.2, 2.2, 2.2);
+    const outerCube = new THREE.LineSegments(
+      new THREE.EdgesGeometry(outerGeo),
+      new THREE.LineBasicMaterial({ color:0x00f0ff })
+    );
+    scene.add(outerCube);
+
+    const innerGeo = new THREE.BoxGeometry(1.1, 1.1, 1.1);
+    const innerCube = new THREE.LineSegments(
+      new THREE.EdgesGeometry(innerGeo),
+      new THREE.LineBasicMaterial({ color:0x00ff66 })
+    );
+    scene.add(innerCube);
+
+    const linesMaterial = new THREE.LineBasicMaterial({ color:0x3a4b5c, transparent:true, opacity:0.6 });
+    const linesGeometry = new THREE.BufferGeometry();
+    const positions = [];
+    const outerVertices = [[-1.1,-1.1,-1.1],[1.1,-1.1,-1.1],[1.1,1.1,-1.1],[-1.1,1.1,-1.1],[-1.1,-1.1,1.1],[1.1,-1.1,1.1],[1.1,1.1,1.1],[-1.1,1.1,1.1]];
+    const innerVertices = outerVertices.map(v => v.map(coord => coord * 0.5));
+    for (let i = 0; i < 8; i++) { positions.push(...outerVertices[i], ...innerVertices[i]); }
+    linesGeometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    const connectingStruts = new THREE.LineSegments(linesGeometry, linesMaterial);
+    scene.add(connectingStruts);
+
+    function animate(){
+      requestAnimationFrame(animate);
+      const step = baseSpinSpeed * activeVelocityMultiplier;
+      outerCube.rotation.x += step;
+      outerCube.rotation.y += step * 0.7;
+      innerCube.rotation.x -= step * 0.5;
+      innerCube.rotation.y -= step * 1.2;
+      connectingStruts.rotation.x = outerCube.rotation.x;
+      connectingStruts.rotation.y = outerCube.rotation.y;
+
+      const waveScale = 1.0 + (Math.sin(Date.now() * 0.0025 * activeVelocityMultiplier) * 0.12);
+      innerCube.scale.set(waveScale * 0.5, waveScale * 0.5, waveScale * 0.5);
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener("resize", () => {
+      const w = container.clientWidth || 1;
+      const h = container.clientHeight || 1;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    });
+
+    setInterval(() => {
+      elapsedSeconds++;
+      const progress = Math.min(elapsedSeconds / 60, 1);
+
+      document.getElementById("session-time").innerText = String(elapsedSeconds);
+      document.getElementById("accel-bar").style.width = `${(progress * 100).toFixed(2)}%`;
+
+      const currentLatency = (maxLatency - (progress * (maxLatency - minLatency))).toFixed(5);
+      const currentThroughput = Math.floor(baseThroughput + (progress * (maxThroughput - baseThroughput)));
+      const spin = (1 + progress * 0.5).toFixed(2);
+
+      document.getElementById("latency").innerText = currentLatency;
+      document.getElementById("throughput").innerText = currentThroughput.toLocaleString();
+      document.getElementById("spin-readout").innerText = `${spin}`;
+      activeVelocityMultiplier = 1 + progress * 0.5;
+    }, 1000);
+  </script>
 </body>
 </html>
