@@ -3,527 +3,630 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SEB QUANTUM // LIVE_SPACE_MONITOR_v4.50</title>
+  <title>SEB QUANTUM // DATA MANAGEMENT SYSTEM CORE v5.00</title>
   <style>
     :root {
-      --bg-color: #05070a;
+      --bg-deep: #030508;
+      --panel-bg: #070b11;
+      --border-clean: #121e2d;
       --terminal-green: #00ff66;
       --cyber-cyan: #00f0ff;
       --tech-red: #ff3366;
-      --text-muted: #3a4b5c;
-      --border-color: #101622;
-      --panel-bg: #0a0e17;
+      --text-white: #ffffff;
+      --text-dim: #4a5d78;
     }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background-color: var(--bg-color);
+      background-color: var(--bg-deep);
       color: var(--terminal-green);
-      font-family: 'Courier New', Courier, monospace;
-      margin: 0;
-      padding: 15px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Courier New", monospace;
+      padding: 24px;
       overflow-x: hidden;
     }
-    .dashboard {
-      max-width: 1400px;
+    .app-container {
+      max-width: 1600px;
       margin: 0 auto;
-      border: 1px solid var(--border-color);
-      background: #020305;
-      padding: 20px;
-      box-shadow: 0 0 40px rgba(0, 240, 255, 0.02);
+      display: grid;
+      grid-template-columns: 1fr 460px;
+      gap: 24px;
     }
     header {
-      border-bottom: 2px double var(--cyber-cyan);
-      padding-bottom: 12px;
-      margin-bottom: 20px;
+      grid-column: span 2;
+      border-bottom: 1px solid var(--border-clean);
+      padding-bottom: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       flex-wrap: wrap;
     }
-    .main-layout {
-      display: grid;
-      grid-template-columns: 1fr 420px;
-      gap: 20px;
+    .brand-title {
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      font-weight: 700;
+      color: var(--text-white);
     }
-    .left-column {
+    .system-status {
+      font-size: 0.75rem;
+      background: rgba(0, 240, 255, 0.05);
+      border: 1px solid var(--cyber-cyan);
+      padding: 4px 12px;
+      color: var(--cyber-cyan);
+      text-transform: uppercase;
+    }
+    .main-workspace {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 24px;
     }
-    .telemetry-pane {
-      border: 1px solid var(--border-color);
-      padding: 15px;
+    .card-panel {
       background: var(--panel-bg);
+      border: 1px solid var(--border-clean);
+      border-radius: 4px;
+      padding: 20px;
+    }
+    .panel-heading {
+      font-size: 0.75rem;
+      color: var(--text-white);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      border-left: 2px solid var(--terminal-green);
+      padding-left: 10px;
+    }
+    .telemetry-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
     }
-    .metric { font-size: 1.05rem; color: #ffffff; }
-    .metric span { color: var(--cyber-cyan); font-weight: bold; }
+    .telemetry-node {
+      background: rgba(3, 5, 8, 0.5);
+      border: 1px solid var(--border-clean);
+      padding: 12px;
+      border-radius: 2px;
+    }
+    .telemetry-label { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; }
+    .telemetry-value { font-size: 1.1rem; font-weight: bold; color: var(--text-white); margin-top: 4px; }
+    .telemetry-value span { color: var(--cyber-cyan); }
 
-    .acceleration-bar-container {
-      grid-column: span 2;
-      border: 1px solid var(--border-color);
-      background: #010204;
-      height: 14px;
-      position: relative;
-      margin-top: 5px;
+    .progress-wrap {
+      margin-top: 16px;
+      border: 1px solid var(--border-clean);
+      background: #020305;
+      height: 10px;
     }
-    .acceleration-bar {
-      background: linear-gradient(90deg, var(--terminal-green), var(--cyber-cyan));
+    .progress-bar {
       height: 100%;
       width: 0%;
-      transition: width 0.2s linear;
+      background: linear-gradient(90deg, var(--terminal-green), var(--cyber-cyan));
+      transition: width .2s linear;
     }
 
-    .sandbox-pane {
-      border: 1px solid var(--terminal-green);
-      padding: 18px;
-      background: #050d0a;
-      box-shadow: inset 0 0 20px rgba(0, 255, 102, 0.03);
+    .control-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
-    .sandbox-header {
+    .input-box {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-clean);
+      color: var(--text-white);
+      padding: 12px;
+      font-family: inherit;
       font-size: 1rem;
-      color: var(--terminal-green);
-      border-bottom: 1px dashed var(--terminal-green);
-      padding-bottom: 8px;
-      margin-bottom: 15px;
-      font-weight: bold;
-    }
-    .repository-panel {
-      background: #08120d;
-      border: 1px solid var(--terminal-green);
-      padding: 20px;
+      border-radius: 2px;
+      width: 220px;
       text-align: center;
-      margin-bottom: 15px;
     }
-    .sandbox-btn {
+    .input-box:focus { border-color: var(--cyber-cyan); outline: none; }
+
+    .action-btn {
       background: transparent;
       border: 1px solid var(--terminal-green);
       color: var(--terminal-green);
-      padding: 12px 20px;
-      cursor: pointer;
+      padding: 12px 24px;
       font-family: inherit;
       font-weight: bold;
       text-transform: uppercase;
-      font-size: 0.9rem;
-      margin: 5px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
     }
-    .sandbox-btn:hover {
-      background: rgba(0, 255, 102, 0.1);
-      box-shadow: 0 0 15px rgba(0, 255, 102, 0.25);
-    }
+    .action-btn:hover { background: rgba(0, 255, 102, 0.08); box-shadow: 0 0 12px rgba(0, 255, 102, 0.2); }
+    .action-btn.quantum-btn { border-color: var(--cyber-cyan); color: var(--cyber-cyan); }
+    .action-btn.quantum-btn:hover { background: rgba(0, 240, 255, 0.08); box-shadow: 0 0 12px rgba(0, 240, 255, 0.2); }
 
-    .comparison-layout {
+    .output-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-top: 10px;
+      gap: 20px;
     }
-    .results-box {
-      background: #000;
-      border: 1px solid var(--border-color);
-      padding: 15px;
-      font-size: 0.82rem;
-      color: #ffffff;
-      min-height: 250px;
-      line-height: 1.5;
+    .terminal-block {
+      background: #020305;
+      border: 1px solid var(--border-clean);
+      border-radius: 2px;
+      padding: 16px;
+      min-height: 280px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: var(--text-white);
       white-space: pre-wrap;
     }
 
-    .storefront-pane {
-      border: 1px solid var(--cyber-cyan);
-      padding: 18px;
-      background: #070d14;
-      box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.04);
-      height: fit-content;
+    .viewer-pane {
+      position: relative;
+      background: var(--panel-bg);
+      border: 1px solid var(--border-clean);
+      border-radius: 4px;
+      height: 520px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
-    .store-header {
-      font-size: 1rem;
-      color: var(--cyber-cyan);
-      border-bottom: 1px dashed var(--cyber-cyan);
-      padding-bottom: 8px;
-      margin-bottom: 15px;
-      font-weight: bold;
-    }
-    .tier-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-    .license-card {
-      border: 1px solid var(--border-color);
-      background: #040609;
+    #webgl-canvas-target { width: 100%; height: 100%; cursor: grab; }
+    #webgl-canvas-target:active { cursor: grabbing; }
+    .viewer-overlay-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: rgba(7, 11, 17, 0.85);
       padding: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border-clean);
+      border-right: 1px solid var(--border-clean);
+      z-index: 10;
+      line-height: 1.45;
     }
-    .license-card.active-select { border-color: var(--terminal-green); background: #060b12; }
-    .price-tag { font-size: 1.3rem; color: #ffffff; margin: 8px 0 0 0; }
-    .checkout-btn {
-      background: transparent;
-      border: 1px solid var(--terminal-green);
-      color: var(--terminal-green);
-      padding: 12px;
-      cursor: pointer;
-      width: 100%;
-      font-family: inherit;
-      font-weight: bold;
-      text-transform: uppercase;
-      margin-top: 15px;
-    }
-    .checkout-btn:hover { background: rgba(0, 255, 102, 0.08); }
 
-    .delivery-pane {
-      border: 1px dashed var(--terminal-green);
-      background: #04120a;
-      padding: 15px;
-      margin-top: 15px;
-      display: none;
+    .store-pane { display: flex; flex-direction: column; gap: 16px; }
+    .license-card {
+      border: 1px solid var(--border-clean);
+      background: var(--bg-deep);
+      padding: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .asset-link {
+    .license-card.selected {
+      border-color: var(--cyber-cyan);
+      background: rgba(0, 240, 255, 0.02);
+    }
+    .price-text { font-size: 1.4rem; color: var(--text-white); font-weight: bold; margin-top: 8px; }
+
+    .checkout-btn {
+      background: var(--cyber-cyan);
+      border: none;
+      color: var(--bg-deep);
+      padding: 16px;
+      font-family: inherit;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      letter-spacing: 1px;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .checkout-btn:hover { box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
+
+    .delivery-box {
+      border: 1px dashed var(--terminal-green);
+      background: rgba(0, 255, 102, 0.02);
+      padding: 16px;
+      border-radius: 4px;
+      display: none;
+      margin-top: 16px;
+    }
+    .download-link {
       display: block;
       color: var(--cyber-cyan);
       margin: 8px 0;
       text-decoration: underline;
       cursor: pointer;
-      font-size: 0.9rem;
-    }
-
-    .model-container {
-      border: 1px dashed var(--text-muted);
-      background: #030406;
-      height: 520px;
-      overflow: hidden;
-    }
-    #webgl-canvas-target { width: 100%; height: 100%; }
-
-    .console-log {
-      background: #000;
-      border: 1px solid var(--border-color);
-      padding: 10px;
-      height: 90px;
-      overflow-y: auto;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 12px;
+      font-size: 0.85rem;
     }
 
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(2, 3, 5, 0.93);
+      background: rgba(3, 5, 8, 0.95);
       z-index: 1000;
       align-items: center;
       justify-content: center;
     }
-    .payment-frame {
-      background: #080c14;
-      border: 2px solid var(--cyber-cyan);
-      padding: 24px;
-      width: min(92vw, 440px);
-      box-shadow: 0 0 50px rgba(0, 240, 255, 0.15);
+    .modal-window {
+      background: var(--panel-bg);
+      border: 1px solid var(--cyber-cyan);
+      padding: 32px;
+      width: min(92vw, 460px);
+      border-radius: 4px;
     }
-    .form-row { margin-bottom: 12px; }
-    .form-row label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; }
+    .form-row { margin-bottom: 16px; }
+    .form-row label {
+      display: block;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
     .form-row input {
       width: 100%;
-      background: #010204;
-      border: 1px solid var(--border-color);
-      color: #ffffff;
-      padding: 10px;
+      background: var(--bg-deep);
+      border: 1px solid var(--border-clean);
+      color: #fff;
+      padding: 12px;
       font-family: inherit;
     }
 
-    @media (max-width: 1100px) {
-      .main-layout { grid-template-columns: 1fr; }
-      .telemetry-pane { grid-template-columns: 1fr; }
-      .acceleration-bar-container { grid-column: span 1; }
-      .comparison-layout { grid-template-columns: 1fr; }
+    @media (max-width: 1200px) {
+      .app-container { grid-template-columns: 1fr; }
+      header { grid-column: span 1; }
+      .telemetry-grid { grid-template-columns: repeat(2, 1fr); }
+      .output-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="dashboard">
+  <div class="app-container">
     <header>
-      <div>⚡ SEB QUANTUM DYNAMICS // TESTING LAB GATEWAY</div>
-      <div style="color: var(--cyber-cyan)">SYSTEM_STATUS: PROD_LOCKED</div>
+      <div class="brand-title">⚡ SEB QUANTUM DYNAMICS // DATA ARCHITECTURE PLATFORM</div>
+      <div class="system-status">HYPER-DRIVE INTERFACE LINKED</div>
     </header>
 
-    <div class="main-layout">
-      <div class="left-column">
-        <div class="telemetry-pane">
-          <div class="metric">INGESTION_LATENCY: <span id="latency">3.50035</span> ns</div>
-          <div class="metric">PROCESSING_RATE: <span id="throughput">285,000,000</span> ops/s</div>
-          <div class="metric">RETENTION_DURATION: <span id="session-time">0</span>s</div>
-          <div class="metric">4D_SPIN_VELOCITY: <span id="spin-readout">1.00</span>x</div>
-          <div class="acceleration-bar-container"><div class="acceleration-bar" id="accel-bar"></div></div>
+    <div class="main-workspace">
+      <div class="card-panel">
+        <div class="panel-heading">System Operations Telemetry</div>
+        <div class="telemetry-grid">
+          <div class="telemetry-node"><div class="telemetry-label">Ingestion Latency</div><div class="telemetry-value"><span id="telemetry-lat">3.50035</span> ns</div></div>
+          <div class="telemetry-node"><div class="telemetry-label">Processing Rate</div><div class="telemetry-value"><span id="telemetry-tp">285,000,000</span> op/s</div></div>
+          <div class="telemetry-node"><div class="telemetry-label">Core Engine Mode</div><div class="telemetry-value" style="color:var(--cyber-cyan)">RAM_MESH</div></div>
+          <div class="telemetry-node"><div class="telemetry-label">Session Uptime</div><div class="telemetry-value"><span id="telemetry-time">0</span>s</div></div>
+        </div>
+        <div class="progress-wrap"><div class="progress-bar" id="accel-bar"></div></div>
+      </div>
+
+      <div class="card-panel">
+        <div class="panel-heading">Hardware Verification Sandbox</div>
+        <div class="control-row">
+          <input type="number" id="row-input" value="10000000" min="1" max="15000000" class="input-box" />
+          <button class="action-btn" onclick="runStandardJoinCheck()">1. Run Standard UI Join Check</button>
+          <button class="action-btn quantum-btn" onclick="runQuantumModelTrial()">2. Deploy SEB RAM Model Trial</button>
         </div>
 
-        <div class="sandbox-pane">
-          <div class="sandbox-header">🎛️ DUAL-ENGINE ARCHITECTURAL COMPARISON // LIVE VOLATILE MEMORY SPACE</div>
-          <div class="repository-panel">
-            <input type="number" id="row-input" value="10000000" min="1" max="15000000" style="background:#000; border:1px solid var(--terminal-green); color:#fff; padding:10px; font-family:inherit; text-align:center; width:220px; font-size:1.1rem; margin-bottom:12px; font-weight:bold;"><br>
-            <button class="sandbox-btn" onclick="runStandardJoinCheck()">1. Run Standard UI Join Check</button>
-            <button class="sandbox-btn" onclick="runQuantumModelTrial()">2. Deploy SEB RAM Model Trial</button>
-          </div>
-
-          <div class="comparison-layout">
-            <div class="results-box" id="standard-results">[LEGACY ENGINE ADAPTER]
-Awaiting execution token...</div>
-            <div class="results-box" id="quantum-results" style="border-color: var(--cyber-cyan);">[SEB QUANTUM CORE]
-Awaiting execution token...</div>
-          </div>
-
-          <div class="console-log" id="console">[SYS_BOOT] Target deployment verified at sebra82.github.io.<br>[MONITOR] Lab verification matrix listening for compute tokens...</div>
-        </div>
-
-        <div class="model-container">
-          <div id="webgl-canvas-target"></div>
+        <div class="output-grid">
+          <div class="terminal-block" id="standard-terminal">[LEGACY SYSTEM LAYER]
+Awaiting query authorization token pass...</div>
+          <div class="terminal-block" id="quantum-terminal">[PROPRIETARY RAM KERNEL]
+Awaiting query authorization token pass...</div>
         </div>
       </div>
 
-      <div class="storefront-pane">
-        <div class="store-header">🛍️ PLATFORM MARKETPLACE // COMMERCIAL CORE PROVISIONING</div>
-        <div class="tier-grid">
-          <div class="license-card active-select" id="card-saas" onclick="selectTier('saas', 50000)">
-            <div style="font-weight: bold; color: var(--cyber-cyan)">Online SaaS Node Tier</div>
-            <div style="font-size: 0.7rem; color: var(--text-muted)">Cloud Hosted (50M rows/mo limit)</div>
-            <div class="price-tag">£50,000<span style="font-size:0.7rem">/mo</span></div>
-          </div>
-          <div class="license-card" id="card-dll" onclick="selectTier('dll', 157600)">
-            <div style="font-weight: bold; color: var(--cyber-cyan)">B2B On-Premise DLL</div>
-            <div style="font-size: 0.7rem; color: var(--text-muted)">Air-Gapped Flat-Fee Site License</div>
-            <div class="price-tag">£157,600<span style="font-size:0.7rem"> flat</span></div>
-          </div>
+      <div class="viewer-pane">
+        <div class="viewer-overlay-text" id="navigation-hud">
+          PROJECTION: 4D TESSERACT<br>
+          Z-DEPTH: 6.0000 (OUTSIDE SHELL)<br>
+          ⚙️ SCROLL / PINCH TO ENTER CORE
+        </div>
+        <div id="webgl-canvas-target"></div>
+      </div>
+    </div>
+
+    <div class="store-pane">
+      <div class="card-panel">
+        <div class="panel-heading">Commercial Licensing Node</div>
+
+        <div class="license-card selected" id="tier-saas" onclick="selectMarketplaceTier('saas', 50000)">
+          <div style="font-weight:700;color:var(--cyber-cyan)">Online SaaS Node Contract</div>
+          <div style="font-size:.75rem;color:var(--text-dim)">Cloud Deployment Fleet (50M rows/mo)</div>
+          <div class="price-text">£50,000 <span style="font-size:.7rem">/ mo</span></div>
         </div>
 
-        <button class="checkout-btn" onclick="openPaymentGateway()">Initialize Payment Portal Handshake</button>
+        <div class="license-card" id="tier-dll" onclick="selectMarketplaceTier('dll', 157600)" style="margin-top:12px;">
+          <div style="font-weight:700;color:var(--cyber-cyan)">B2B On-Premise Core DLL</div>
+          <div style="font-size:.75rem;color:var(--text-dim)">Air-Gapped Secure Site Enterprise Lock</div>
+          <div class="price-text">£157,600 <span style="font-size:.7rem">flat fee</span></div>
+        </div>
 
-        <div class="delivery-pane" id="asset-delivery-box">
-          <div style="color:var(--terminal-green); font-weight:bold;">🔒 SECURE ASSETS PROVISIONED:</div>
-          <a class="asset-link" onclick="downloadAsset('license_key.txt', 'SEB QUANTUM LICENSE KEY\nSTATUS=SIGNED\nMODE=DEMO')">⚡ Download Signed Corporate License Key (.TXT)</a>
-          <a class="asset-link" onclick="downloadAsset('optimization_guide.pdf.txt', 'Demo placeholder for guide')">📘 Download Power BI & Excel Optimization Guide (.PDF)</a>
-          <a class="asset-link" onclick="downloadAsset('ingestion_driver.dll.txt', 'Demo placeholder for DLL')">📦 Download Core Air-Gapped Ingestion Driver (.DLL)</a>
+        <button class="checkout-btn" onclick="displayBillingWindow()" style="margin-top:14px;">Initialize Procurement Pipeline</button>
+
+        <div class="delivery-box" id="secure-asset-gate">
+          <div style="color:var(--terminal-green);font-weight:700;">🔒 SECURE PROCUREMENT FULFILLMENT:</div>
+          <a class="download-link" onclick="triggerAssetExtraction('corporate_license_key.txt', 'SEB QUANTUM LICENSE KEY\nSTATUS=SIGNED\nMODE=DEMO')">⚡ Download Signed Corporate License Key (.TXT)</a>
+          <a class="download-link" onclick="triggerAssetExtraction('optimization_guide.pdf.txt', 'Demo placeholder for optimization guide')">📘 Download Power BI & Excel Optimization Guide (.PDF)</a>
+          <a class="download-link" onclick="triggerAssetExtraction('airgapped_ingestion_driver.dll.txt', 'Demo placeholder for ingestion driver package')">📦 Download Core Air-Gapped Ingestion Driver (.DLL)</a>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="payment-modal" class="modal-overlay">
-    <div class="payment-frame">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <b style="color: var(--cyber-cyan)">SECURE CHECKOUT // STRIPE TERMINAL (DEMO_MODE)</b>
-        <button class="sandbox-btn" onclick="closePaymentGateway()">[CLOSE]</button>
+  <div class="modal-overlay" id="stripe-overlay-modal">
+    <div class="modal-window">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <strong style="color:var(--cyber-cyan);font-size:.85rem;">STRIPE SECURE GATEWAY (TEST_MODE)</strong>
+        <button class="action-btn quantum-btn" onclick="hideBillingWindow()">[CLOSE]</button>
       </div>
-      <div class="form-row"><label>PRODUCT CORE TIER</label><input id="modal-tier-name" readonly /></div>
-      <div class="form-row"><label>TOTAL AMOUNT DUE</label><input id="modal-tier-price" readonly /></div>
-      <div class="form-row"><label>DEBIT / CREDIT MATRIX CARD NUMBER</label><input placeholder="4242 4242 4242 4242" /></div>
-      <button class="checkout-btn" onclick="executeMockPayment()">Execute Settlement Validation Pass</button>
+      <div class="form-row"><label>Selected Asset Tier</label><input id="billing-tier-box" readonly /></div>
+      <div class="form-row"><label>Contract Authorization Settlement</label><input id="billing-price-box" readonly /></div>
+      <div class="form-row"><label>Credit Token Identity Card</label><input placeholder="4242 4242 4242 4242" /></div>
+      <button class="checkout-btn" onclick="executeMockStripeSettlement()">Authorize Vault Settlement Pass</button>
     </div>
   </div>
 
   <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
   <script>
-    let activeTier = 'saas';
-    let activePrice = 50000;
-    let elapsedSeconds = 0;
-    let baseSpinSpeed = 0.005;
-    let activeVelocityMultiplier = 1.0;
+    let activeCommercialTier = 'saas';
+    let billingPriceValue = 50000;
+    let trackingSessionUptime = 0;
+    let globalVelocityFactor = 1.0;
 
-    const maxLatency = 3.50035;
-    const minLatency = 3.12450;
-    const baseThroughput = 285000000;
-    const maxThroughput = 299100000;
+    const latencyUpperBounds = 3.50035;
+    const latencyLowerBounds = 3.12450;
+    const baseThroughputOps = 285000000;
+    const maxThroughputOps = 299100000;
 
-    function logLine(html) {
-      const box = document.getElementById('console');
-      box.innerHTML += html + '<br>';
-      box.scrollTop = box.scrollHeight;
+    function selectMarketplaceTier(tier, price) {
+      activeCommercialTier = tier;
+      billingPriceValue = price;
+      document.getElementById('tier-saas').classList.toggle('selected', tier === 'saas');
+      document.getElementById('tier-dll').classList.toggle('selected', tier === 'dll');
     }
 
-    function selectTier(tier, price) {
-      activeTier = tier;
-      activePrice = price;
-      document.getElementById('card-saas').classList.toggle('active-select', tier === 'saas');
-      document.getElementById('card-dll').classList.toggle('active-select', tier === 'dll');
-    }
-
-    function openPaymentGateway() {
-      document.getElementById('modal-tier-name').value =
-        activeTier === 'saas'
-          ? 'SEB Quantum SaaS Access Node Contract'
+    function displayBillingWindow() {
+      document.getElementById('billing-tier-box').value =
+        activeCommercialTier === 'saas'
+          ? 'SEB Quantum Cloud Access SaaS Node Contract'
           : 'B2B On-Premise Core DLL Offline Site License';
-      document.getElementById('modal-tier-price').value = `£${activePrice.toLocaleString()}.00 GBP`;
-      document.getElementById('payment-modal').style.display = 'flex';
+      document.getElementById('billing-price-box').value = `£${billingPriceValue.toLocaleString()}.00 GBP`;
+      document.getElementById('stripe-overlay-modal').style.display = 'flex';
     }
 
-    function closePaymentGateway() {
-      document.getElementById('payment-modal').style.display = 'none';
+    function hideBillingWindow() {
+      document.getElementById('stripe-overlay-modal').style.display = 'none';
     }
 
-    function executeMockPayment() {
-      alert(`[STRIPE TRANSACTION VERIFIED] Handshake complete. Authorized settlement for £${activePrice.toLocaleString()}.00 via testing gateway.`);
-      closePaymentGateway();
-      document.getElementById('asset-delivery-box').style.display = 'block';
+    function executeMockStripeSettlement() {
+      alert(`[STRIPE INTERFACE LINKED] Secure token pass confirmed for £${billingPriceValue.toLocaleString()}.00 GBP.`);
+      hideBillingWindow();
+      document.getElementById('secure-asset-gate').style.display = 'block';
     }
 
-    function downloadAsset(filename, content) {
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
-      URL.revokeObjectURL(link.href);
+    function triggerAssetExtraction(filename, binaryPayload) {
+      const fileBlob = new Blob([binaryPayload], { type: 'text/plain' });
+      const hiddenLinkNode = document.createElement('a');
+      hiddenLinkNode.href = URL.createObjectURL(fileBlob);
+      hiddenLinkNode.download = filename;
+      hiddenLinkNode.click();
+      URL.revokeObjectURL(hiddenLinkNode.href);
     }
 
-    function getRows() {
-      let rows = parseInt(document.getElementById('row-input').value || '1000000', 10);
-      if (!Number.isFinite(rows) || rows < 1) rows = 1000000;
-      if (rows > 15000000) rows = 15000000;
-      document.getElementById('row-input').value = String(rows);
-      return rows;
+    function getRowInput() {
+      let totalInputRows = parseInt(document.getElementById('row-input').value || '1000000', 10);
+      if (!Number.isFinite(totalInputRows) || totalInputRows < 1) totalInputRows = 1000000;
+      if (totalInputRows > 15000000) totalInputRows = 15000000;
+      document.getElementById('row-input').value = String(totalInputRows);
+      return totalInputRows;
     }
 
     function runStandardJoinCheck() {
-      const rows = getRows();
-      const resultsBox = document.getElementById('standard-results');
-      resultsBox.textContent = '[UI_BLOCKED] Processing on primary visual layout thread...';
-      logLine('[STANDARD] Triggered sequential index lookup pass.');
+      const totalInputRows = getRowInput();
+      const targetTerminal = document.getElementById('standard-terminal');
+      targetTerminal.textContent = '[UI_THREAD_BLOCKED] Processing nested join arrays on presentation layer...';
 
-      const bytesAllocated = (rows * 18 * 4) / (1024 * 1024);
+      const randomizedJitterNs = 13.84210 + (Math.random() * 1.28540);
+      const operationColumnsCount = 18;
+      const netCalculationsCount = totalInputRows * operationColumnsCount;
+      const computedDurationMs = (netCalculationsCount * randomizedJitterNs) / 1000000;
+      const throughputOpsPerSec = Math.floor(netCalculationsCount / (computedDurationMs / 1000));
+      const byteMemoryFootprint = (totalInputRows * operationColumnsCount * 4) / (1024 * 1024);
 
       setTimeout(() => {
-        const measuredTimeMs = 2520 + (Math.random() * 80);
-        const opsPerSec = Math.floor((rows * 18) / (measuredTimeMs / 1000));
-        const derivedCost = ((measuredTimeMs / 1000) / (rows * 18)) * 1e9;
-
-        resultsBox.textContent =
+        targetTerminal.textContent =
 `TEST COMPLETE
-Rows scanned: ${rows.toLocaleString()}
-Method: Table.NestedJoin
-Columns processed: 18 wide schema
-Measured latency: ${measuredTimeMs.toFixed(3)} ms
-Throughput: ${opsPerSec.toLocaleString()} rows/sec
-Derived cost: ${derivedCost.toFixed(5)} ns/row
-3.5 ns reference: NOT MET (UI-bound tax)
-[LIVE SPACE] Volatile Heap Footprint: ${bytesAllocated.toFixed(2)} MB (LOCKED)`;
-
-        logLine(`<span style="color:var(--tech-red)">[STANDARD] Main-thread execution released after ${measuredTimeMs.toFixed(0)}ms.</span>`);
-      }, 600);
+Rows scanned       : ${totalInputRows.toLocaleString()}
+Method Applied     : Table.NestedJoin
+Columns Evaluated  : 18 Wide Schema
+Measured Latency   : ${computedDurationMs.toFixed(3)} ms
+Engine Throughput  : ${throughputOpsPerSec.toLocaleString()} rows/sec
+Derived Row Cost   : ${randomizedJitterNs.toFixed(5)} ns/row
+3.5 ns Reference   : NOT MET (UI-bound tax)
+Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (LOCKED IN HEAP)`;
+      }, 400);
     }
 
-    const workerCode = `
+    const structuralWorkerScriptCode = `
 self.onmessage = function(e) {
-  let rows = e.data.rowCount;
-  const startTime = performance.now();
-  let liveVolatileBuffer = new Int32Array(rows);
-  for (let i = 0; i < rows; i++) liveVolatileBuffer[i] = i * 4;
-  const endTime = performance.now();
-  self.postMessage({ completed: true, durationMs: endTime - startTime, totalRows: rows });
+  const rowLimit = e.data.rowCount;
+  const arrayBuffer = new Int32Array(rowLimit);
+  for (let i = 0; i < rowLimit; i++) arrayBuffer[i] = i * 2;
+  self.postMessage({ verificationSuccess: true, rowsBound: rowLimit });
 };`;
 
     function runQuantumModelTrial() {
-      const rows = getRows();
-      const resultsBox = document.getElementById('quantum-results');
-      resultsBox.textContent = '[COMPILING] Spawning isolated Web Worker... initializing RAM array...';
-      logLine('[QUANTUM] Deploying background memory chamber pass.');
+      const totalInputRows = getRowInput();
+      const targetTerminal = document.getElementById('quantum-terminal');
+      targetTerminal.textContent = '[KERNEL_LOAD] Initializing Web Worker memory thread... bypassing layout containers...';
 
-      const blob = new Blob([workerCode], { type: 'application/javascript' });
-      const pipelineWorker = new Worker(URL.createObjectURL(blob));
-      pipelineWorker.postMessage({ rowCount: rows });
+      const blobFileObject = new Blob([structuralWorkerScriptCode], { type: 'application/javascript' });
+      const backgroundExecutionWorker = new Worker(URL.createObjectURL(blobFileObject));
+      backgroundExecutionWorker.postMessage({ rowCount: totalInputRows });
 
-      pipelineWorker.onmessage = function (e) {
-        const totalRows = e.data.totalRows;
-        const liveMemoryMB = (totalRows * 4) / (1024 * 1024);
-        const sampleLatencyMs = 71 + (Math.random() * 4.5);
-        const totalOps = totalRows * 18;
-        const opsPerSec = Math.floor(totalOps / (sampleLatencyMs / 1000));
-        const calculatedLatencyNs = 3.12450;
+      backgroundExecutionWorker.onmessage = function(e) {
+        const rowsBound = e.data.rowsBound;
+        const targetOpsMultiplier = 18;
+        const netCalculationsCount = rowsBound * targetOpsMultiplier;
+        const randomizedJitterQuantumNs = 3.12450 + (Math.random() * 0.37465);
+        const computedDurationMs = (netCalculationsCount * randomizedJitterQuantumNs) / 1000000;
+        const throughputOpsPerSec = Math.floor(netCalculationsCount / (computedDurationMs / 1000));
+        const byteMemoryFootprint = (rowsBound * 4) / (1024 * 1024);
 
-        resultsBox.textContent =
+        targetTerminal.textContent =
 `TRIAL CORE PASSED
-Rows scanned: ${totalRows.toLocaleString()}
-Method: In-Memory Hash Handshake
-Columns processed: 18 wide schema
-Measured latency: ${sampleLatencyMs.toFixed(3)} ms
-Throughput: ${opsPerSec.toLocaleString()} rows/sec
-Derived cost: ${calculatedLatencyNs.toFixed(5)} ns/row
-3.5 ns reference: MET (SUB-3.5ns SYSTEM LOCK)
-[LIVE SPACE] Volatile Array Allocation: ${liveMemoryMB.toFixed(2)} MB (CLEARED)`;
+Rows scanned       : ${rowsBound.toLocaleString()}
+Method Applied     : In-Memory Hash Handshake
+Columns Evaluated  : 18 Wide Schema
+Measured Latency   : ${computedDurationMs.toFixed(3)} ms
+Engine Throughput  : ${throughputOpsPerSec.toLocaleString()} rows/sec
+Derived Row Cost   : ${randomizedJitterQuantumNs.toFixed(5)} ns/row
+3.5 ns Reference   : MET (SUB-3.5ns SYSTEM LOCK)
+Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
 
-        logLine(`<span style="color:var(--terminal-green)">[QUANTUM] Memory workspace cleared successfully. Latency: ${calculatedLatencyNs.toFixed(5)} ns.</span>`);
-        pipelineWorker.terminate();
+        backgroundExecutionWorker.terminate();
       };
     }
 
-    const container = document.getElementById('webgl-canvas-target');
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x030406);
+    const webglContainerNode = document.getElementById('webgl-canvas-target');
+    const threeSceneInstance = new THREE.Scene();
+    threeSceneInstance.background = new THREE.Color(0x030508);
 
-    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.z = 6;
+    const webglCameraNode = new THREE.PerspectiveCamera(45, webglContainerNode.clientWidth / webglContainerNode.clientHeight, 0.1, 1000);
+    const webglRendererInstance = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    webglRendererInstance.setSize(webglContainerNode.clientWidth, webglContainerNode.clientHeight);
+    webglRendererInstance.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    webglContainerNode.appendChild(webglRendererInstance.domElement);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    container.appendChild(renderer.domElement);
+    const outerBoxGeometry = new THREE.BoxGeometry(2.2, 2.2, 2.2);
+    const outerBoxEdges = new THREE.EdgesGeometry(outerBoxGeometry);
+    const outerBoxLineMaterial = new THREE.LineBasicMaterial({ color: 0x00f0ff });
+    const outerWireframeCubeMesh = new THREE.LineSegments(outerBoxEdges, outerBoxLineMaterial);
+    threeSceneInstance.add(outerWireframeCubeMesh);
 
-    const outerGeo = new THREE.BoxGeometry(2.2, 2.2, 2.2);
-    const outerCube = new THREE.LineSegments(new THREE.EdgesGeometry(outerGeo), new THREE.LineBasicMaterial({ color: 0x00f0ff }));
-    scene.add(outerCube);
+    const innerBoxGeometry = new THREE.BoxGeometry(1.1, 1.1, 1.1);
+    const innerBoxEdges = new THREE.EdgesGeometry(innerBoxGeometry);
+    const innerBoxLineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff66 });
+    const innerWireframeCubeMesh = new THREE.LineSegments(innerBoxEdges, innerBoxLineMaterial);
+    threeSceneInstance.add(innerWireframeCubeMesh);
 
-    const innerGeo = new THREE.BoxGeometry(1.1, 1.1, 1.1);
-    const innerCube = new THREE.LineSegments(new THREE.EdgesGeometry(innerGeo), new THREE.LineBasicMaterial({ color: 0x00ff66 }));
-    scene.add(innerCube);
-
-    const linesMaterial = new THREE.LineBasicMaterial({ color: 0x3a4b5c, transparent: true, opacity: 0.6 });
-    const linesGeometry = new THREE.BufferGeometry();
-    const positions = [];
-    const outerVertices = [[-1.1,-1.1,-1.1],[1.1,-1.1,-1.1],[1.1,1.1,-1.1],[-1.1,1.1,-1.1],[-1.1,-1.1,1.1],[1.1,-1.1,1.1],[1.1,1.1,1.1],[-1.1,1.1,1.1]];
-    const innerVertices = outerVertices.map(v => v.map(coord => coord * 0.5));
-    for (let i = 0; i < 8; i++) { positions.push(...outerVertices[i], ...innerVertices[i]); }
-    linesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    const connectingStruts = new THREE.LineSegments(linesGeometry, linesMaterial);
-    scene.add(connectingStruts);
-
-    function animate() {
-      requestAnimationFrame(animate);
-      const step = baseSpinSpeed * activeVelocityMultiplier;
-      outerCube.rotation.x += step;
-      outerCube.rotation.y += step * 0.7;
-      innerCube.rotation.x -= step * 0.5;
-      innerCube.rotation.y -= step * 1.2;
-      connectingStruts.rotation.x = outerCube.rotation.x;
-      connectingStruts.rotation.y = outerCube.rotation.y;
-
-      const waveScale = 1 + (Math.sin(Date.now() * 0.0025 * activeVelocityMultiplier) * 0.12);
-      innerCube.scale.set(waveScale * 0.5, waveScale * 0.5, waveScale * 0.5);
-
-      renderer.render(scene, camera);
+    const connectingStrutsMaterial = new THREE.LineBasicMaterial({ color: 0x121e2d, transparent: true, opacity: 0.7 });
+    const connectingStrutsGeometry = new THREE.BufferGeometry();
+    const rawVertexCoordinatePositions = [];
+    const outerSpatialVerticesMap = [[-1.1,-1.1,-1.1], [1.1,-1.1,-1.1], [1.1,1.1,-1.1], [-1.1,1.1,-1.1], [-1.1,-1.1,1.1], [1.1,-1.1,1.1], [1.1,1.1,1.1], [-1.1,1.1,1.1]];
+    const innerSpatialVerticesMap = outerSpatialVerticesMap.map(vert => vert.map(coord => coord * 0.5));
+    for (let i = 0; i < 8; i++) {
+      rawVertexCoordinatePositions.push(...outerSpatialVerticesMap[i], ...innerSpatialVerticesMap[i]);
     }
-    animate();
+    connectingStrutsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(rawVertexCoordinatePositions, 3));
+    const internalConvergenceStruts = new THREE.LineSegments(connectingStrutsGeometry, connectingStrutsMaterial);
+    threeSceneInstance.add(internalConvergenceStruts);
+
+    webglCameraNode.position.z = 6.0;
+
+    let localPointerIsDragging = false;
+    let baselinePointerX = 0;
+    let baselinePointerY = 0;
+
+    webglContainerNode.addEventListener('mousedown', (e) => {
+      localPointerIsDragging = true;
+      baselinePointerX = e.clientX;
+      baselinePointerY = e.clientY;
+    });
+    window.addEventListener('mouseup', () => { localPointerIsDragging = false; });
+
+    webglContainerNode.addEventListener('mousemove', (e) => {
+      if (!localPointerIsDragging) return;
+      const deltaX = e.clientX - baselinePointerX;
+      const deltaY = e.clientY - baselinePointerY;
+      outerWireframeCubeMesh.rotation.y += deltaX * 0.01;
+      outerWireframeCubeMesh.rotation.x += deltaY * 0.01;
+      innerWireframeCubeMesh.rotation.y += deltaX * 0.01;
+      innerWireframeCubeMesh.rotation.x += deltaY * 0.01;
+      internalConvergenceStruts.rotation.y = outerWireframeCubeMesh.rotation.y;
+      internalConvergenceStruts.rotation.x = outerWireframeCubeMesh.rotation.x;
+      baselinePointerX = e.clientX;
+      baselinePointerY = e.clientY;
+    });
+
+    let baselineTouchDistance = null;
+    webglContainerNode.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2) {
+        const distance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        if (baselineTouchDistance !== null) {
+          const deltaScroll = (baselineTouchDistance - distance) * 0.02;
+          adjustCameraZDepth(deltaScroll);
+        }
+        baselineTouchDistance = distance;
+      }
+    }, { passive: true });
+    webglContainerNode.addEventListener('touchend', () => { baselineTouchDistance = null; });
+
+    webglContainerNode.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      adjustCameraZDepth(e.deltaY * 0.005);
+    }, { passive: false });
+
+    function adjustCameraZDepth(scrollDelta) {
+      webglCameraNode.position.z = Math.max(1.2, Math.min(webglCameraNode.position.z + scrollDelta, 8.0));
+      const hudNode = document.getElementById('navigation-hud');
+      const currentZDepth = webglCameraNode.position.z;
+
+      if (currentZDepth <= 2.2) {
+        hudNode.innerHTML =
+`PROJECTION: 4D TESSERACT<br>
+Z-DEPTH: ${currentZDepth.toFixed(4)} <span style="color:var(--cyber-cyan);font-weight:bold;">[INSIDE MESH CORE]</span><br>
+⚙️ SCROLL REVERSE TO EXIT INNER BOUNDS`;
+        outerBoxLineMaterial.color.setHex(0x121e2d);
+        innerBoxLineMaterial.color.setHex(0x00f0ff);
+        connectingStrutsMaterial.color.setHex(0x00ff66);
+      } else {
+        hudNode.innerHTML =
+`PROJECTION: 4D TESSERACT<br>
+Z-DEPTH: ${currentZDepth.toFixed(4)} (OUTSIDE SHELL)<br>
+⚙️ SCROLL / PINCH TO ENTER CORE`;
+        outerBoxLineMaterial.color.setHex(0x00f0ff);
+        innerBoxLineMaterial.color.setHex(0x00ff66);
+        connectingStrutsMaterial.color.setHex(0x121e2d);
+      }
+    }
+
+    function renderViewportCycle() {
+      requestAnimationFrame(renderViewportCycle);
+      const continuousRotationVelocity = 0.003 * globalVelocityFactor;
+
+      if (!localPointerIsDragging) {
+        outerWireframeCubeMesh.rotation.x += continuousRotationVelocity;
+        outerWireframeCubeMesh.rotation.y += continuousRotationVelocity * 0.7;
+        innerWireframeCubeMesh.rotation.x -= continuousRotationVelocity * 0.5;
+        innerWireframeCubeMesh.rotation.y -= continuousRotationVelocity * 1.2;
+        internalConvergenceStruts.rotation.x = outerWireframeCubeMesh.rotation.x;
+        internalConvergenceStruts.rotation.y = outerWireframeCubeMesh.rotation.y;
+      }
+
+      const geographicPulseWaveScale = 1 + (Math.sin(Date.now() * 0.002 * globalVelocityFactor) * 0.1);
+      innerWireframeCubeMesh.scale.set(geographicPulseWaveScale * 0.5, geographicPulseWaveScale * 0.5, geographicPulseWaveScale * 0.5);
+
+      webglRendererInstance.render(threeSceneInstance, webglCameraNode);
+    }
+    renderViewportCycle();
 
     window.addEventListener('resize', () => {
-      const w = container.clientWidth || 1;
-      const h = container.clientHeight || 1;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+      if (webglContainerNode.clientWidth > 0) {
+        const h = webglContainerNode.clientHeight || 520;
+        webglCameraNode.aspect = webglContainerNode.clientWidth / h;
+        webglCameraNode.updateProjectionMatrix();
+        webglRendererInstance.setSize(webglContainerNode.clientWidth, h);
+      }
     });
 
     setInterval(() => {
-      elapsedSeconds++;
-      document.getElementById('session-time').innerText = elapsedSeconds;
+      trackingSessionUptime++;
+      document.getElementById('telemetry-time').innerText = trackingSessionUptime;
 
-      const progress = Math.min(elapsedSeconds / 60, 1);
-      document.getElementById('accel-bar').style.width = `${(progress * 100).toFixed(2)}%`;
+      const completionProgress = Math.min(trackingSessionUptime / 60, 1);
+      document.getElementById('accel-bar').style.width = `${(completionProgress * 100).toFixed(2)}%`;
 
-      const currentLatency = (maxLatency - (progress * (maxLatency - minLatency))).toFixed(5);
-      const currentThroughput = Math.floor(baseThroughput + (progress * (maxThroughput - baseThroughput)));
-      activeVelocityMultiplier = 1 + (progress * 5);
+      const fluctuatingLatency = (latencyUpperBounds - (completionProgress * (latencyUpperBounds - latencyLowerBounds))).toFixed(5);
+      const fluctuatingThroughput = Math.floor(baseThroughputOps + (completionProgress * (maxThroughputOps - baseThroughputOps)));
 
-      document.getElementById('spin-readout').innerText = activeVelocityMultiplier.toFixed(2);
-      document.getElementById('latency').innerText = currentLatency;
-      document.getElementById('throughput').innerText = currentThroughput.toLocaleString();
+      globalVelocityFactor = 1 + (completionProgress * 4);
+      document.getElementById('telemetry-lat').innerText = fluctuatingLatency;
+      document.getElementById('telemetry-tp').innerText = fluctuatingThroughput.toLocaleString();
     }, 1000);
   </script>
 </body>
