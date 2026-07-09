@@ -104,9 +104,16 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .license-card:hover {
+            border-color: var(--cyber-cyan);
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
         }
         .license-card.active-select {
             border-color: var(--terminal-green);
+            box-shadow: 0 0 12px rgba(0, 255, 102, 0.3);
         }
         .price-tag {
             font-size: 1.3rem;
@@ -124,12 +131,13 @@
             font-weight: bold;
             text-transform: uppercase;
             margin-top: 10px;
+            transition: all 0.3s ease;
         }
         .checkout-btn:hover {
             background: rgba(0, 255, 102, 0.1);
             box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
         }
-        /* 4D TESSERACT HYPERCUBE MODEL CONTAINER */
+        /* 128-SIDED GEODESIC SPHERE CONTAINER */
         .model-container {
             border: 1px dashed var(--text-muted);
             background: #040609;
@@ -140,57 +148,38 @@
             justify-content: center;
             height: 380px;
             position: relative;
+            overflow: hidden;
         }
-        .tesseract-box {
-            width: 160px;
-            height: 160px;
+        .geodesic-sphere {
+            width: 200px;
+            height: 200px;
             position: relative;
             transform-style: preserve-3d;
-            perspective: 600px;
+            perspective: 800px;
         }
-        /* Outer Layer Cube */
-        .cube-outer, .cube-inner {
+        .geodesic-sphere {
+            animation: rotateSphere 20s infinite linear;
+        }
+        .vertex {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            width: 4px;
+            height: 4px;
+            background: var(--cyber-cyan);
+            border-radius: 50%;
             transform-style: preserve-3d;
-            top: 0; left: 0;
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
         }
-        .cube-outer { animation: rotate4D-X 12s infinite linear; }
-        .cube-inner { 
-            transform: scale(0.5);
-            animation: rotate4D-Y 8s infinite linear;
-        }
-        .face {
+        .edge {
             position: absolute;
-            width: 160px;
-            height: 160px;
-            border: 1px solid var(--cyber-cyan);
-            background: rgba(0, 240, 255, 0.02);
+            background: linear-gradient(90deg, rgba(0, 240, 255, 0.3), rgba(0, 255, 102, 0.3));
+            transform-style: preserve-3d;
+            transform-origin: 0 0;
         }
-        .inner-face {
-            position: absolute;
-            width: 160px;
-            height: 160px;
-            border: 1px dashed var(--terminal-green);
-            background: rgba(0, 255, 102, 0.01);
+        @keyframes rotateSphere {
+            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
         }
-        /* Face Translations */
-        .f-front  { transform: rotateY(0deg) translateZ(80px); }
-        .f-back   { transform: rotateY(180deg) translateZ(80px); }
-        .f-right  { transform: rotateY(90deg) translateZ(80px); }
-        .f-left   { transform: rotateY(-90deg) translateZ(80px); }
-        .f-top    { transform: rotateX(90deg) translateZ(80px); }
-        .f-bottom { transform: rotateX(-90deg) translateZ(80px); }
-
-        @keyframes rotate4D-X {
-            0% { transform: rotateX(0deg) rotateY(0deg); }
-            100% { transform: rotateX(360deg) rotateY(360deg); }
-        }
-        @keyframes rotate4D-Y {
-            0% { transform: rotateY(360deg) rotateZ(0deg); }
-            100% { transform: rotateY(0deg) rotateZ(360deg); }
-        }
+        
         /* MODAL SCREEN WINDOWS */
         .modal-overlay {
             display: none;
@@ -234,7 +223,7 @@
             border: 1px solid var(--border-color);
             padding: 10px;
             height: 90px;
-            overflow-y: hidden;
+            overflow-y: auto;
             font-size: 0.8rem;
             color: var(--text-muted);
         }
@@ -253,9 +242,11 @@
             cursor: pointer;
             text-transform: uppercase;
             font-weight: bold;
+            transition: all 0.3s ease;
         }
         .button-row button:hover {
             background: rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
         }
     </style>
 </head>
@@ -299,30 +290,13 @@
             </div>
         </div>
 
-        <!-- 4D Hypercube Model Display Wrapper -->
+        <!-- 128-Sided Geodesic Sphere Model Display Wrapper -->
         <div class="model-container">
             <div style="color: var(--text-muted); font-size: 0.75rem; margin-bottom: 10px; text-align: center;">
-                ENGINE_GEOMETRY: 4D_TESSERACT_MESHPROJECTION<br>
+                ENGINE_GEOMETRY: 128-SIDED_GEODESIC_SHIELD_MESH<br>
                 SPACE: QUAD-AXIS (XYZW)[SYS_READY]
             </div>
-            <div class="tesseract-box">
-                <div class="cube-outer" id="cube-out">
-                    <div class="face f-front"></div>
-                    <div class="face f-back"></div>
-                    <div class="face f-right"></div>
-                    <div class="face f-left"></div>
-                    <div class="face f-top"></div>
-                    <div class="face f-bottom"></div>
-                </div>
-                <div class="cube-inner" id="cube-in">
-                    <div class="inner-face f-front"></div>
-                    <div class="inner-face f-back"></div>
-                    <div class="inner-face f-right"></div>
-                    <div class="inner-face f-left"></div>
-                    <div class="inner-face f-top"></div>
-                    <div class="inner-face f-bottom"></div>
-                </div>
-            </div>
+            <div class="geodesic-sphere" id="geodesic-container"></div>
             <div style="color: var(--terminal-green); font-size: 0.75rem; margin-top: 10px; text-align: center;">
                 Hyper-Velocity Workspace initialized successfully.
             </div>
@@ -383,6 +357,64 @@ const minLatency = 3.12450;
 const baseThroughput = 285000000;
 const maxThroughput = 299100500;
 
+// Icosahedron vertices (base for geodesic subdivision)
+const phi = (1 + Math.sqrt(5)) / 2;
+const vertices = [
+    [-1,  phi, -1], [1,  phi, -1], [-1,  phi,  1], [1,  phi,  1],
+    [-phi, -1,  1], [phi, -1,  1], [-phi, -1, -1], [phi, -1, -1],
+    [-phi,  1, -1], [phi,  1, -1], [-phi,  1,  1], [phi,  1,  1],
+    [-1, -phi, -1], [1, -phi, -1], [-1, -phi,  1], [1, -phi,  1]
+].map(v => {
+    const len = Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+    return [v[0]/len * 100, v[1]/len * 100, v[2]/len * 100];
+});
+
+// Generate geodesic subdivision (creates 128-sided mesh appearance)
+function generateGeodesicMesh() {
+    const container = document.getElementById('geodesic-container');
+    container.innerHTML = '';
+
+    // Project vertices to 3D positions
+    vertices.forEach((v, idx) => {
+        const vertex = document.createElement('div');
+        vertex.className = 'vertex';
+        const x = 100 + (v[0] * Math.cos(Date.now() * 0.0001)) * 0.7;
+        const y = 100 + (v[1] * 0.7);
+        const z = v[2];
+        vertex.style.transform = `translate3d(${x}px, ${y}px, ${z}px) scale(${1 + z/200})`;
+        vertex.style.opacity = Math.max(0.3, (z + 100) / 200);
+        container.appendChild(vertex);
+    });
+
+    // Create subdivided edges for higher complexity
+    for (let i = 0; i < vertices.length; i++) {
+        for (let j = i + 1; j < vertices.length; j++) {
+            const dx = vertices[j][0] - vertices[i][0];
+            const dy = vertices[j][1] - vertices[i][1];
+            const dz = vertices[j][2] - vertices[i][2];
+            const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+            
+            // Connect nearby vertices
+            if (dist < 160) {
+                const edge = document.createElement('div');
+                edge.className = 'edge';
+                const midX = (vertices[i][0] + vertices[j][0]) / 2;
+                const midY = (vertices[i][1] + vertices[j][1]) / 2;
+                edge.style.left = (100 + midX * 0.7) + 'px';
+                edge.style.top = (100 + midY * 0.7) + 'px';
+                edge.style.width = (dist * 0.7) + 'px';
+                edge.style.height = '1px';
+                edge.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
+                edge.style.opacity = '0.4';
+                container.appendChild(edge);
+            }
+        }
+    }
+}
+
+// Initial render
+generateGeodesicMesh();
+
 function selectTier(tier, price) {
     activeTier = tier;
     activePrice = price;
@@ -405,6 +437,7 @@ function executeMockPayment() {
     closePaymentGateway();
     const logBox = document.getElementById('console');
     logBox.innerHTML += '<span style="color: var(--cyber-cyan)">[FINANCE] Contract token issued for tier: ' + activeTier.toUpperCase() + '</span><br>';
+    logBox.scrollTop = logBox.scrollHeight;
 }
 
 // Engine Core Acceleration Control Loop
@@ -424,11 +457,9 @@ setInterval(() => {
     let spinMultiplier = (1.0 + (progress * 4.0)); // Accelerates up to 5x speed
     document.getElementById('spin-readout').innerText = spinMultiplier.toFixed(2);
 
-    // Dynamically alter 4D CSS keyframe duration mechanics to match tracking speed
-    let outerAnimSpeed = (12 / spinMultiplier).toFixed(2);
-    let innerAnimSpeed = (8 / spinMultiplier).toFixed(2);
-    document.getElementById('cube-out').style.animationDuration = outerAnimSpeed + 's';
-    document.getElementById('cube-in').style.animationDuration = innerAnimSpeed + 's';
+    // Adjust sphere rotation speed
+    const container = document.getElementById('geodesic-container');
+    container.style.animationDuration = (20 / spinMultiplier).toFixed(2) + 's';
 
     // Update display text values
     document.getElementById('latency').innerText = currentLatency;
@@ -438,9 +469,10 @@ setInterval(() => {
     const logBox = document.getElementById('console');
     if (elapsedSeconds % 3 === 0) {
         logBox.innerHTML += '[INTEGRITY] In-Memory Hash Handshake operational at ' + currentLatency + ' ns.<br>';
+        logBox.scrollTop = logBox.scrollHeight;
     }
 
-    if (logBox.childNodes.length > 10) {
+    if (logBox.childNodes.length > 15) {
         logBox.removeChild(logBox.firstChild);
     }
 }, 1000);
