@@ -336,9 +336,9 @@ Awaiting query authorization token pass...</div>
 
         <div class="delivery-box" id="secure-asset-gate">
           <div style="color:var(--terminal-green);font-weight:700;">🔒 SECURE PROCUREMENT FULFILLMENT:</div>
-          <a class="download-link" onclick="triggerAssetExtraction('corporate_license_key.txt', 'SEB QUANTUM LICENSE KEY\nSTATUS=SIGNED\nMODE=DEMO')">⚡ Download Signed Corporate License Key (.TXT)</a>
-          <a class="download-link" onclick="triggerAssetExtraction('optimization_guide.pdf.txt', 'Demo placeholder for optimization guide')">📘 Download Power BI & Excel Optimization Guide (.PDF)</a>
-          <a class="download-link" onclick="triggerAssetExtraction('airgapped_ingestion_driver.dll.txt', 'Demo placeholder for ingestion driver package')">📦 Download Core Air-Gapped Ingestion Driver (.DLL)</a>
+          <a class="download-link" onclick="downloadAssetFromBackend('license_key.txt')">⚡ Download Signed Corporate License Key (.TXT)</a>
+          <a class="download-link" onclick="downloadAssetFromBackend('optimization_guide.pdf')">📘 Download Power BI & Excel Optimization Guide (.PDF)</a>
+          <a class="download-link" onclick="downloadAssetFromBackend('ingestion_driver.dll')">📦 Download Core Air-Gapped Ingestion Driver (.DLL)</a>
         </div>
       </div>
     </div>
@@ -363,6 +363,10 @@ Awaiting query authorization token pass...</div>
     let billingPriceValue = 50000;
     let trackingSessionUptime = 0;
     let globalVelocityFactor = 1.0;
+
+    // Replace this after wrangler deploy with your actual workers.dev URL
+    const BACKEND_URL = "https://seb-quantum-api.<your-subdomain>.workers.dev";
+    let activeLicenseToken = null;
 
     const latencyUpperBounds = 3.50035;
     const latencyLowerBounds = 3.12450;
@@ -389,19 +393,46 @@ Awaiting query authorization token pass...</div>
       document.getElementById('stripe-overlay-modal').style.display = 'none';
     }
 
-    function executeMockStripeSettlement() {
-      alert(`[STRIPE INTERFACE LINKED] Secure token pass confirmed for £${billingPriceValue.toLocaleString()}.00 GBP.`);
-      hideBillingWindow();
-      document.getElementById('secure-asset-gate').style.display = 'block';
+    async function createCheckoutToken(tier, amount) {
+      const response = await fetch(`${BACKEND_URL}/api/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier, amount })
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.token) {
+        throw new Error(data.error || "Checkout failed");
+      }
+
+      activeLicenseToken = data.token;
+      return data.token;
     }
 
-    function triggerAssetExtraction(filename, binaryPayload) {
-      const fileBlob = new Blob([binaryPayload], { type: 'text/plain' });
-      const hiddenLinkNode = document.createElement('a');
-      hiddenLinkNode.href = URL.createObjectURL(fileBlob);
-      hiddenLinkNode.download = filename;
-      hiddenLinkNode.click();
-      URL.revokeObjectURL(hiddenLinkNode.href);
+    function downloadAssetFromBackend(fileName) {
+      if (!activeLicenseToken) {
+        alert("Please complete checkout first.");
+        return;
+      }
+
+      const url = `${BACKEND_URL}/api/download?file=${encodeURIComponent(fileName)}&token=${encodeURIComponent(activeLicenseToken)}`;
+      const a = document.createElement("a");
+      a.href = url;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    async function executeMockStripeSettlement() {
+      try {
+        await createCheckoutToken(activeCommercialTier, billingPriceValue);
+        alert(`[STRIPE INTERFACE LINKED] Secure token pass confirmed for £${billingPriceValue.toLocaleString()}.00 GBP.`);
+        hideBillingWindow();
+        document.getElementById('secure-asset-gate').style.display = 'block';
+      } catch (error) {
+        alert(`[CHECKOUT ERROR] ${error.message}`);
+      }
     }
 
     function getRowInput() {
