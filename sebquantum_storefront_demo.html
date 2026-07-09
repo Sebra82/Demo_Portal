@@ -154,6 +154,11 @@
             display: block;
             background: #040609;
             border-radius: 4px;
+            cursor: grab;
+            touch-action: none;
+        }
+        canvas.is-dragging {
+            cursor: grabbing;
         }
         
         /* MODAL SCREEN WINDOWS */
@@ -324,12 +329,141 @@ let elapsedSeconds = 0;
 let rotationX = 0;
 let rotationY = 0;
 let spinMultiplier = 1.0;
+let autoSpinMultiplier = 1.0;
+let manualSpinAdjustment = 0;
+let isDragging = false;
+let isHovering = false;
+let interactionMoved = false;
+let dragPointerType = null;
+let dragStartX = 0;
+let dragStartY = 0;
+let lastPointerX = 0;
+let lastPointerY = 0;
+let interactionFlash = 0;
+let pulseStartTime = 0;
+let lastFrameTime = 0;
 
 // Core Pacing Benchmarks
 const maxLatency = 3.50035;
 const minLatency = 3.12450;
 const baseThroughput = 285000000;
 const maxThroughput = 299100500;
+const canvas = document.getElementById('geodesic-canvas');
+const ctx = canvas.getContext('2d');
+const spinReadout = document.getElementById('spin-readout');
+const sphereThemes = [
+    { edge: [0, 240, 255], vertex: [0, 255, 102] },
+    { edge: [191, 0, 255], vertex: [255, 0, 191] },
+    { edge: [255, 102, 0], vertex: [255, 51, 0] },
+    { edge: [255, 215, 0], vertex: [255, 170, 0] }
+];
+const highlightColours = { edge: [120, 255, 255], vertex: [255, 255, 255] };
+const themeCycleDuration = 5000;
+const dragThreshold = 6;
+const rotationSensitivity = 0.012;
+
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+}
+
+function mixChannel(start, end, amount) {
+    return start + (end - start) * amount;
+}
+
+function mixColour(start, end, amount) {
+    return start.map((channel, index) => mixChannel(channel, end[index], amount));
+}
+
+function toRgba(colour, alpha) {
+    return `rgba(${colour.map(value => Math.round(value)).join(', ')}, ${alpha})`;
+}
+
+function smoothStep(value) {
+    return value * value * (3 - (2 * value));
+}
+
+function updateSpinMultiplier() {
+    spinMultiplier = clamp(autoSpinMultiplier + manualSpinAdjustment, 0.2, 8.0);
+    spinReadout.innerText = spinMultiplier.toFixed(2);
+}
+
+function getThemeColours(now) {
+    const cyclePosition = now / themeCycleDuration;
+    const currentIndex = Math.floor(cyclePosition) % sphereThemes.length;
+    const nextIndex = (currentIndex + 1) % sphereThemes.length;
+    const transition = smoothStep(cyclePosition % 1);
+    const baseEdge = mixColour(sphereThemes[currentIndex].edge, sphereThemes[nextIndex].edge, transition);
+    const baseVertex = mixColour(sphereThemes[currentIndex].vertex, sphereThemes[nextIndex].vertex, transition);
+    const flashStrength = Math.max(interactionFlash, getPulseStrength(now) * 0.9);
+    return {
+        edge: mixColour(baseEdge, highlightColours.edge, flashStrength),
+        vertex: mixColour(baseVertex, highlightColours.vertex, flashStrength)
+    };
+}
+
+function getPulseStrength(now) {
+    if (!pulseStartTime) {
+        return 0;
+    }
+    const elapsed = now - pulseStartTime;
+    if (elapsed >= 550) {
+        pulseStartTime = 0;
+        return 0;
+    }
+    return Math.sin((elapsed / 550) * Math.PI);
+}
+
+function triggerInteractionFlash(strength = 1) {
+    interactionFlash = Math.max(interactionFlash, strength);
+}
+
+function triggerPulse() {
+    pulseStartTime = performance.now();
+    triggerInteractionFlash(1);
+}
+
+function beginDrag(clientX, clientY, pointerType) {
+    isDragging = true;
+    interactionMoved = false;
+    dragPointerType = pointerType;
+    dragStartX = clientX;
+    dragStartY = clientY;
+    lastPointerX = clientX;
+    lastPointerY = clientY;
+    canvas.classList.add('is-dragging');
+    triggerInteractionFlash(0.9);
+}
+
+function updateDrag(clientX, clientY) {
+    if (!isDragging) {
+        return;
+    }
+    const deltaX = clientX - lastPointerX;
+    const deltaY = clientY - lastPointerY;
+    const totalDeltaX = clientX - dragStartX;
+    const totalDeltaY = clientY - dragStartY;
+    if (!interactionMoved && ((totalDeltaX * totalDeltaX) + (totalDeltaY * totalDeltaY)) >= (dragThreshold * dragThreshold)) {
+        interactionMoved = true;
+    }
+    rotationY += deltaX * rotationSensitivity;
+    rotationX += deltaY * rotationSensitivity;
+    lastPointerX = clientX;
+    lastPointerY = clientY;
+}
+
+function endDrag(cancelled = false) {
+    if (!isDragging) {
+        return;
+    }
+    const shouldPulse = !interactionMoved && !cancelled;
+    isDragging = false;
+    dragPointerType = null;
+    interactionMoved = false;
+    canvas.classList.remove('is-dragging');
+    if (shouldPulse) {
+        triggerPulse();
+    }
+}
 
 // Generate 128-sided geodesic sphere using subdivision
 class GeodesicSphere {
@@ -428,16 +562,17 @@ function projectTo2D(vertex, rotX, rotY) {
     return { x: x2 * 80, y: y1 * 80, z: z2 };
 }
 
-function drawGeodesicSphere() {
-    const canvas = document.getElementById('geodesic-canvas');
-    const ctx = canvas.getContext('2d');
+function drawGeodesicSphere(now) {
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    
+    const themeColours = getThemeColours(now);
+    const pulseStrength = getPulseStrength(now);
+    const hoverGlowBoost = isHovering && !isDragging ? 1.25 : 1;
+     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#030406';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+     
     // Draw edges first (behind vertices)
     ctx.strokeStyle = 'rgba(0, 240, 255, 0.2)';
     ctx.lineWidth = 0.5;
@@ -450,7 +585,7 @@ function drawGeodesicSphere() {
         const depth2 = (p2.z + 1) / 2;
         
         if (depth1 > 0.1 && depth2 > 0.1) {
-            ctx.strokeStyle = `rgba(0, 240, 255, ${0.1 + depth1 * 0.3})`;
+            ctx.strokeStyle = toRgba(themeColours.edge, 0.12 + (((depth1 + depth2) / 2) * 0.28));
             ctx.beginPath();
             ctx.moveTo(centerX + p1.x, centerY + p1.y);
             ctx.lineTo(centerX + p2.x, centerY + p2.y);
@@ -468,23 +603,87 @@ function drawGeodesicSphere() {
     
     for (const { p, depth } of vertexData) {
         if (depth > 0) {
-            const size = 2 + depth * 2;
+            const size = (2 + (depth * 2)) * (1 + (pulseStrength * 0.45));
             const opacity = 0.3 + depth * 0.7;
-            
+             
             // Glow effect
-            ctx.fillStyle = `rgba(0, 240, 255, ${opacity * 0.3})`;
+            ctx.fillStyle = toRgba(themeColours.edge, opacity * 0.26 * hoverGlowBoost);
             ctx.beginPath();
-            ctx.arc(centerX + p.x, centerY + p.y, size * 3, 0, Math.PI * 2);
+            ctx.arc(centerX + p.x, centerY + p.y, size * (3 + (pulseStrength * 1.2)) * hoverGlowBoost, 0, Math.PI * 2);
             ctx.fill();
-            
+             
             // Vertex
-            ctx.fillStyle = `rgba(0, 255, 102, ${opacity})`;
+            ctx.fillStyle = toRgba(themeColours.vertex, opacity);
             ctx.beginPath();
             ctx.arc(centerX + p.x, centerY + p.y, size, 0, Math.PI * 2);
             ctx.fill();
         }
     }
 }
+
+canvas.addEventListener('mouseenter', () => {
+    isHovering = true;
+});
+
+canvas.addEventListener('mouseleave', () => {
+    isHovering = false;
+});
+
+canvas.addEventListener('mousedown', (event) => {
+    event.preventDefault();
+    beginDrag(event.clientX, event.clientY, 'mouse');
+});
+
+window.addEventListener('mousemove', (event) => {
+    if (dragPointerType === 'mouse') {
+        updateDrag(event.clientX, event.clientY);
+    }
+});
+
+window.addEventListener('mouseup', () => {
+    if (dragPointerType === 'mouse') {
+        endDrag();
+    }
+});
+
+canvas.addEventListener('touchstart', (event) => {
+    if (event.touches.length !== 1) {
+        return;
+    }
+    const touch = event.touches[0];
+    isHovering = true;
+    beginDrag(touch.clientX, touch.clientY, 'touch');
+    event.preventDefault();
+}, { passive: false });
+
+window.addEventListener('touchmove', (event) => {
+    if (dragPointerType !== 'touch' || event.touches.length !== 1) {
+        return;
+    }
+    const touch = event.touches[0];
+    updateDrag(touch.clientX, touch.clientY);
+    event.preventDefault();
+}, { passive: false });
+
+window.addEventListener('touchend', () => {
+    if (dragPointerType === 'touch') {
+        isHovering = false;
+        endDrag();
+    }
+});
+
+window.addEventListener('touchcancel', () => {
+    if (dragPointerType === 'touch') {
+        isHovering = false;
+        endDrag(true);
+    }
+});
+
+canvas.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    manualSpinAdjustment = clamp(manualSpinAdjustment + (event.deltaY < 0 ? 0.2 : -0.2), -4.8, 7.0);
+    updateSpinMultiplier();
+}, { passive: false });
 
 function selectTier(tier, price) {
     activeTier = tier;
@@ -509,14 +708,23 @@ function executeMockPayment() {
 }
 
 // Animation loop
-function animate() {
-    rotationX += 0.005 * spinMultiplier;
-    rotationY += 0.008 * spinMultiplier;
-    drawGeodesicSphere();
+function animate(now) {
+    if (!lastFrameTime) {
+        lastFrameTime = now;
+    }
+    const deltaTime = now - lastFrameTime;
+    lastFrameTime = now;
+    interactionFlash = Math.max(0, interactionFlash - (deltaTime / 380));
+    if (!isDragging) {
+        rotationX += 0.005 * spinMultiplier;
+        rotationY += 0.008 * spinMultiplier;
+    }
+    drawGeodesicSphere(now);
     requestAnimationFrame(animate);
 }
 
-animate();
+updateSpinMultiplier();
+requestAnimationFrame(animate);
 
 // Engine Core Acceleration Control Loop
 setInterval(() => {
@@ -529,8 +737,8 @@ setInterval(() => {
     let currentLatency = (maxLatency - (progress * (maxLatency - minLatency))).toFixed(5);
     let currentThroughput = Math.floor(baseThroughput + (progress * (maxThroughput - baseThroughput)));
 
-    spinMultiplier = (1.0 + (progress * 4.0));
-    document.getElementById('spin-readout').innerText = spinMultiplier.toFixed(2);
+    autoSpinMultiplier = (1.0 + (progress * 4.0));
+    updateSpinMultiplier();
 
     document.getElementById('latency').innerText = currentLatency;
     document.getElementById('throughput').innerText = currentThroughput.toLocaleString();
