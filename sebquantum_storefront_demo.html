@@ -380,8 +380,8 @@ const pulseGlowExpansion = 1.2;
 const dragThreshold = 6;
 const rotationSensitivity = 0.012;
 
-function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
+function clamp(value, minValue, maxValue) {
+    return Math.min(Math.max(value, minValue), maxValue);
 }
 
 function mixChannel(start, end, amount) {
@@ -393,7 +393,7 @@ function mixColor(start, end, amount) {
 }
 
 function toRgba(color, alpha) {
-    return `rgba(${color.map(value => Math.round(value)).join(', ')}, ${alpha})`;
+    return `rgba(${color.map(channel => Math.round(channel)).join(', ')}, ${alpha})`;
 }
 
 function smoothStep(value) {
@@ -673,7 +673,6 @@ canvas.addEventListener('touchstart', (event) => {
         return;
     }
     const touch = event.touches[0];
-    isHovering = true;
     beginDrag(touch.clientX, touch.clientY, 'touch');
     event.preventDefault();
 }, { passive: false });
