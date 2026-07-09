@@ -329,8 +329,8 @@ let elapsedSeconds = 0;
 let rotationX = 0;
 let rotationY = 0;
 let spinMultiplier = 1.0;
-let autoSpinMultiplier = 1.0;
-let manualSpinAdjustment = 0;
+let autoSpinBase = 1.0;
+let manualSpinOffset = 0;
 let isDragging = false;
 let isHovering = false;
 let interactionMoved = false;
@@ -365,9 +365,18 @@ const highlightColors = { edge: [120, 255, 255], vertex: [255, 255, 255] };
 const themeCycleDurationMs = 5000;
 const pulseDurationMs = 550;
 const flashFadeDurationMs = 380;
+const minSpinMultiplier = 0.2;
+const maxSpinMultiplier = 8.0;
 const wheelSpinStep = 0.2;
 const minManualSpinAdjustment = -4.8;
 const maxManualSpinAdjustment = 7.0;
+const pulseFlashScale = 0.9;
+const hoverGlowMultiplier = 1.25;
+const vertexBaseSize = 2;
+const vertexDepthScale = 2;
+const pulseSizeScale = 0.45;
+const glowRadiusMultiplier = 3;
+const pulseGlowExpansion = 1.2;
 const dragThreshold = 6;
 const rotationSensitivity = 0.012;
 
@@ -396,7 +405,7 @@ function getSquaredDistance(deltaX, deltaY) {
 }
 
 function updateSpinMultiplier() {
-    spinMultiplier = clamp(autoSpinMultiplier + manualSpinAdjustment, 0.2, 8.0);
+    spinMultiplier = clamp(autoSpinBase + manualSpinOffset, minSpinMultiplier, maxSpinMultiplier);
     spinReadout.innerText = spinMultiplier.toFixed(2);
 }
 
@@ -407,7 +416,7 @@ function getThemeColors(now) {
     const transition = smoothStep(cyclePosition % 1);
     const baseEdge = mixColor(sphereThemes[currentIndex].edge, sphereThemes[nextIndex].edge, transition);
     const baseVertex = mixColor(sphereThemes[currentIndex].vertex, sphereThemes[nextIndex].vertex, transition);
-    const flashStrength = Math.max(interactionFlash, getPulseStrength(now) * 0.9);
+    const flashStrength = Math.max(interactionFlash, getPulseStrength(now) * pulseFlashScale);
     return {
         edge: mixColor(baseEdge, highlightColors.edge, flashStrength),
         vertex: mixColor(baseVertex, highlightColors.vertex, flashStrength)
@@ -580,7 +589,7 @@ function drawGeodesicSphere(now) {
     const centerY = canvas.height / 2;
     const themeColors = getThemeColors(now);
     const pulseStrength = getPulseStrength(now);
-    const hoverGlowBoost = isHovering && !isDragging ? 1.25 : 1;
+    const hoverGlowBoost = isHovering && !isDragging ? hoverGlowMultiplier : 1;
      
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#030406';
@@ -616,13 +625,13 @@ function drawGeodesicSphere(now) {
     
     for (const { p, depth } of vertexData) {
         if (depth > 0) {
-            const size = (2 + (depth * 2)) * (1 + (pulseStrength * 0.45));
+            const size = (vertexBaseSize + (depth * vertexDepthScale)) * (1 + (pulseStrength * pulseSizeScale));
             const opacity = 0.3 + depth * 0.7;
              
             // Glow effect
             ctx.fillStyle = toRgba(themeColors.edge, opacity * 0.26 * hoverGlowBoost);
             ctx.beginPath();
-            ctx.arc(centerX + p.x, centerY + p.y, size * (3 + (pulseStrength * 1.2)) * hoverGlowBoost, 0, Math.PI * 2);
+            ctx.arc(centerX + p.x, centerY + p.y, size * (glowRadiusMultiplier + (pulseStrength * pulseGlowExpansion)) * hoverGlowBoost, 0, Math.PI * 2);
             ctx.fill();
              
             // Vertex
@@ -694,8 +703,8 @@ window.addEventListener('touchcancel', () => {
 
 canvas.addEventListener('wheel', (event) => {
     event.preventDefault();
-    manualSpinAdjustment = clamp(
-        manualSpinAdjustment + (event.deltaY < 0 ? wheelSpinStep : -wheelSpinStep),
+    manualSpinOffset = clamp(
+        manualSpinOffset + (event.deltaY < 0 ? wheelSpinStep : -wheelSpinStep),
         minManualSpinAdjustment,
         maxManualSpinAdjustment
     );
@@ -754,7 +763,7 @@ setInterval(() => {
     let currentLatency = (maxLatency - (progress * (maxLatency - minLatency))).toFixed(5);
     let currentThroughput = Math.floor(baseThroughput + (progress * (maxThroughput - baseThroughput)));
 
-    autoSpinMultiplier = (1.0 + (progress * 4.0));
+    autoSpinBase = (1.0 + (progress * 4.0));
     updateSpinMultiplier();
 
     document.getElementById('latency').innerText = currentLatency;
