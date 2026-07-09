@@ -352,13 +352,19 @@ const canvas = document.getElementById('geodesic-canvas');
 const ctx = canvas.getContext('2d');
 const spinReadout = document.getElementById('spin-readout');
 const sphereThemes = [
+    // Cyan / Green
     { edge: [0, 240, 255], vertex: [0, 255, 102] },
+    // Purple / Magenta
     { edge: [191, 0, 255], vertex: [255, 0, 191] },
+    // Orange / Red
     { edge: [255, 102, 0], vertex: [255, 51, 0] },
+    // Gold / Yellow
     { edge: [255, 215, 0], vertex: [255, 170, 0] }
 ];
-const highlightColours = { edge: [120, 255, 255], vertex: [255, 255, 255] };
-const themeCycleDuration = 5000;
+const highlightColors = { edge: [120, 255, 255], vertex: [255, 255, 255] };
+const themeCycleDurationMs = 5000;
+const pulseDurationMs = 550;
+const flashFadeDurationMs = 380;
 const dragThreshold = 6;
 const rotationSensitivity = 0.012;
 
@@ -370,7 +376,7 @@ function mixChannel(start, end, amount) {
     return start + (end - start) * amount;
 }
 
-function mixColour(start, end, amount) {
+function mixColor(start, end, amount) {
     return start.map((channel, index) => mixChannel(channel, end[index], amount));
 }
 
@@ -387,17 +393,17 @@ function updateSpinMultiplier() {
     spinReadout.innerText = spinMultiplier.toFixed(2);
 }
 
-function getThemeColours(now) {
-    const cyclePosition = now / themeCycleDuration;
+function getThemeColors(now) {
+    const cyclePosition = now / themeCycleDurationMs;
     const currentIndex = Math.floor(cyclePosition) % sphereThemes.length;
     const nextIndex = (currentIndex + 1) % sphereThemes.length;
     const transition = smoothStep(cyclePosition % 1);
-    const baseEdge = mixColour(sphereThemes[currentIndex].edge, sphereThemes[nextIndex].edge, transition);
-    const baseVertex = mixColour(sphereThemes[currentIndex].vertex, sphereThemes[nextIndex].vertex, transition);
+    const baseEdge = mixColor(sphereThemes[currentIndex].edge, sphereThemes[nextIndex].edge, transition);
+    const baseVertex = mixColor(sphereThemes[currentIndex].vertex, sphereThemes[nextIndex].vertex, transition);
     const flashStrength = Math.max(interactionFlash, getPulseStrength(now) * 0.9);
     return {
-        edge: mixColour(baseEdge, highlightColours.edge, flashStrength),
-        vertex: mixColour(baseVertex, highlightColours.vertex, flashStrength)
+        edge: mixColor(baseEdge, highlightColors.edge, flashStrength),
+        vertex: mixColor(baseVertex, highlightColors.vertex, flashStrength)
     };
 }
 
@@ -406,11 +412,11 @@ function getPulseStrength(now) {
         return 0;
     }
     const elapsed = now - pulseStartTime;
-    if (elapsed >= 550) {
+    if (elapsed >= pulseDurationMs) {
         pulseStartTime = 0;
         return 0;
     }
-    return Math.sin((elapsed / 550) * Math.PI);
+    return Math.sin((elapsed / pulseDurationMs) * Math.PI);
 }
 
 function triggerInteractionFlash(strength = 1) {
@@ -565,7 +571,7 @@ function projectTo2D(vertex, rotX, rotY) {
 function drawGeodesicSphere(now) {
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const themeColours = getThemeColours(now);
+    const themeColors = getThemeColors(now);
     const pulseStrength = getPulseStrength(now);
     const hoverGlowBoost = isHovering && !isDragging ? 1.25 : 1;
      
@@ -585,7 +591,7 @@ function drawGeodesicSphere(now) {
         const depth2 = (p2.z + 1) / 2;
         
         if (depth1 > 0.1 && depth2 > 0.1) {
-            ctx.strokeStyle = toRgba(themeColours.edge, 0.12 + (((depth1 + depth2) / 2) * 0.28));
+            ctx.strokeStyle = toRgba(themeColors.edge, 0.12 + (((depth1 + depth2) / 2) * 0.28));
             ctx.beginPath();
             ctx.moveTo(centerX + p1.x, centerY + p1.y);
             ctx.lineTo(centerX + p2.x, centerY + p2.y);
@@ -607,13 +613,13 @@ function drawGeodesicSphere(now) {
             const opacity = 0.3 + depth * 0.7;
              
             // Glow effect
-            ctx.fillStyle = toRgba(themeColours.edge, opacity * 0.26 * hoverGlowBoost);
+            ctx.fillStyle = toRgba(themeColors.edge, opacity * 0.26 * hoverGlowBoost);
             ctx.beginPath();
             ctx.arc(centerX + p.x, centerY + p.y, size * (3 + (pulseStrength * 1.2)) * hoverGlowBoost, 0, Math.PI * 2);
             ctx.fill();
              
             // Vertex
-            ctx.fillStyle = toRgba(themeColours.vertex, opacity);
+            ctx.fillStyle = toRgba(themeColors.vertex, opacity);
             ctx.beginPath();
             ctx.arc(centerX + p.x, centerY + p.y, size, 0, Math.PI * 2);
             ctx.fill();
@@ -714,7 +720,7 @@ function animate(now) {
     }
     const deltaTime = now - lastFrameTime;
     lastFrameTime = now;
-    interactionFlash = Math.max(0, interactionFlash - (deltaTime / 380));
+    interactionFlash = Math.max(0, interactionFlash - (deltaTime / flashFadeDurationMs));
     if (!isDragging) {
         rotationX += 0.005 * spinMultiplier;
         rotationY += 0.008 * spinMultiplier;
