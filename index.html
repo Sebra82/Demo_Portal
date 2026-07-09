@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enterprise Data Infrastructure Management Console - DEMO</title>
     <style>
         body { background-color: #02040a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 30px; color: #f0f6fc; }
@@ -18,16 +19,21 @@
         .metric-label { color: #8b949e; }
         .metric-value { font-family: monospace; font-weight: 600; color: #c9d1d9; }
         .execute-panel { grid-column: span 2; background: #161b22; border: 1px solid #30363d; padding: 24px; border-radius: 8px; text-align: center; }
-        .action-btn { background-color: #238636; color: #ffffff; border: 1px solid rgba(240,246,252,0.1); border-radius: 6px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; margin-right: 10px; text-decoration: none; display: inline-block; }
+        .action-btn { background-color: #238636; color: #ffffff; border: 1px solid rgba(240,246,252,0.1); border-radius: 6px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; margin: 0 6px; text-decoration: none; display: inline-block; }
         .action-btn:hover { background-color: #2ea043; }
         .store-btn { background-color: #1f6feb; border-color: rgba(240,246,252,0.1); }
         .store-btn:hover { background-color: #388bfd; }
         .terminal-stream { margin-top: 24px; background: #010409; border: 1px solid #30363d; border-radius: 6px; padding: 20px; text-align: left; display: block; }
         .terminal-header { color: #8b949e; font-size: 11px; margin-bottom: 12px; font-family: monospace; border-bottom: 1px solid #21262d; padding-bottom: 8px; }
         pre { margin: 0; color: #39b57c; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
+
+        .benchmark-controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+        .benchmark-input { background: #0d1117; color: #c9d1d9; border: 1px solid #30363d; border-radius: 6px; padding: 10px; width: 230px; }
+        .benchmark-disclaimer { margin-top: 12px; color: #f59e0b; font-size: 12px; }
     </style>
     <script>
         let dynamicSeatCounter = 1800031;
+        let benchmarkData = [];
 
         function runQuantumTelemetrySync() {
             const badge = document.getElementById('node-status-badge');
@@ -38,16 +44,16 @@
                 const simulatedSurcharge = (dynamicSeatCounter * 0.036).toFixed(2);
 
                 const simulatedPayload = {
-                    "status": "PASS",
-                    "runtime_latency_seconds": parseFloat((calculatedLatency / 1e9).toFixed(11)),
-                    "compute_throughput_velocity_ops_sec": Math.floor(1e9 / calculatedLatency),
-                    "memory_leakage_buildup_mb": 0.00,
-                    "mobius_phase_distortion_floor": calculatedCpuLoad + "%",
-                    "float_register_decay_delta": 3.1415926535e-14,
-                    "records_processed_count": dynamicSeatCounter,
-                    "metered_billing_surcharge_gbp": parseFloat(simulatedSurcharge),
-                    "automated_income_assignment": "SUCCESS_STRIPE_METERED_RECORD_FIRED",
-                    "hardware_bound_latency_ns": calculatedLatency + " ns"
+                    status: "PASS",
+                    runtime_latency_seconds: parseFloat((calculatedLatency / 1e9).toFixed(11)),
+                    compute_throughput_velocity_ops_sec: Math.floor(1e9 / calculatedLatency),
+                    memory_leakage_buildup_mb: 0.00,
+                    mobius_phase_distortion_floor: calculatedCpuLoad + "%",
+                    float_register_decay_delta: 3.1415926535e-14,
+                    records_processed_count: dynamicSeatCounter,
+                    metered_billing_surcharge_gbp: parseFloat(simulatedSurcharge),
+                    automated_income_assignment: "SUCCESS_STRIPE_METERED_RECORD_FIRED",
+                    hardware_bound_latency_ns: calculatedLatency + " ns"
                 };
 
                 document.getElementById('raw-json-output').textContent = JSON.stringify(simulatedPayload, null, 4);
@@ -67,13 +73,152 @@
             }
         }
 
-        setInterval(runQuantumTelemetrySync, 2000);
-        window.onload = runQuantumTelemetrySync;
-
         function triggerProcurementStressRun() {
             const streamBlock = document.getElementById('secure-telemetry-payload');
             streamBlock.style.display = (streamBlock.style.display === 'none') ? 'block' : 'none';
         }
+
+        function fmt(n) { return Number(n).toLocaleString(); }
+
+        function downloadSampleCsv() {
+            const csv = [
+                "id,value,category,ts",
+                "1,123.45,A,1710000000000",
+                "2,987.65,C,1710000001000",
+                "3,456.78,B,1710000002000",
+                "4,777.01,C,1710000003000",
+                "5,222.22,E,1710000004000"
+            ].join("\n");
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "sample_benchmark_data.csv";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function generateRandomBenchmarkData() {
+            const rowsInput = document.getElementById('benchmark-row-count');
+            const out = document.getElementById('benchmark-results');
+            const requestedRows = Math.max(1, parseInt(rowsInput.value || '1000000', 10));
+            const rows = Math.min(requestedRows, 1000000);
+            const cats = ['A', 'B', 'C', 'D', 'E'];
+
+            const t0 = performance.now();
+            benchmarkData = new Array(rows);
+            for (let i = 0; i < rows; i++) {
+                benchmarkData[i] = {
+                    id: i + 1,
+                    value: +(Math.random() * 1000).toFixed(4),
+                    category: cats[(Math.random() * cats.length) | 0],
+                    ts: Date.now() - ((Math.random() * 86400000) | 0)
+                };
+            }
+            const elapsedMs = performance.now() - t0;
+            const nsPerRow = (elapsedMs * 1e6) / rows;
+
+            out.textContent =
+`DATASET READY
+Requested rows: ${fmt(requestedRows)}
+Loaded rows: ${fmt(rows)}
+Generation time: ${elapsedMs.toFixed(2)} ms
+Derived generation cost: ${nsPerRow.toFixed(2)} ns/row (derived)
+Source: In-page random generator`;
+        }
+
+        function parseCsvText(csvText) {
+            const lines = csvText.split(/\r?\n/).filter(Boolean);
+            if (lines.length < 2) throw new Error("CSV has no data rows.");
+
+            const header = lines[0].split(',').map(h => h.trim().toLowerCase());
+            const idx = {
+                id: header.indexOf('id'),
+                value: header.indexOf('value'),
+                category: header.indexOf('category'),
+                ts: header.indexOf('ts')
+            };
+
+            if (idx.value === -1 || idx.category === -1) {
+                throw new Error("CSV must include at least: value,category columns.");
+            }
+
+            const data = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(',').map(c => c.trim());
+                data.push({
+                    id: idx.id >= 0 ? Number(cols[idx.id]) || i : i,
+                    value: Number(cols[idx.value]) || 0,
+                    category: (cols[idx.category] || 'A').toUpperCase(),
+                    ts: idx.ts >= 0 ? Number(cols[idx.ts]) || Date.now() : Date.now()
+                });
+            }
+            return data;
+        }
+
+        function uploadCsvData(event) {
+            const file = event.target.files?.[0];
+            const out = document.getElementById('benchmark-results');
+            if (!file) return;
+
+            const reader = new FileReader();
+            const t0 = performance.now();
+            reader.onload = () => {
+                try {
+                    benchmarkData = parseCsvText(String(reader.result || ""));
+                    const elapsedMs = performance.now() - t0;
+                    out.textContent =
+`UPLOAD COMPLETE
+File: ${file.name}
+Rows loaded: ${fmt(benchmarkData.length)}
+Parse + load time: ${elapsedMs.toFixed(2)} ms
+Source: User CSV upload`;
+                } catch (err) {
+                    out.textContent = `UPLOAD FAILED\n${err.message}`;
+                }
+            };
+            reader.onerror = () => { out.textContent = "UPLOAD FAILED\nCould not read CSV file."; };
+            reader.readAsText(file);
+        }
+
+        function runBenchmarkNow() {
+            const out = document.getElementById('benchmark-results');
+            if (!benchmarkData.length) {
+                out.textContent = "No dataset loaded. Upload CSV or generate random data first.";
+                return;
+            }
+
+            const t0 = performance.now();
+            let count = 0, sum = 0, max = -Infinity;
+            for (let i = 0; i < benchmarkData.length; i++) {
+                const r = benchmarkData[i];
+                if (r.category === 'C' && r.value > 500) {
+                    count++; sum += r.value; if (r.value > max) max = r.value;
+                }
+            }
+
+            const elapsedMs = performance.now() - t0;
+            const avg = count ? (sum / count) : 0;
+            const throughput = benchmarkData.length / (elapsedMs / 1000);
+            const nsPerRow = (elapsedMs * 1e6) / benchmarkData.length;
+
+            out.textContent =
+`TEST COMPLETE
+Rows scanned: ${fmt(benchmarkData.length)}
+Query: category='C' AND value > 500
+Matches: ${fmt(count)}
+Average(value): ${avg.toFixed(3)}
+Max(value): ${Number.isFinite(max) ? max.toFixed(3) : 'N/A'}
+Measured latency: ${elapsedMs.toFixed(3)} ms
+Throughput: ${fmt(Math.round(throughput))} rows/sec
+Derived cost: ${nsPerRow.toFixed(2)} ns/row (derived)
+3.5 ns reference: ${nsPerRow <= 3.5 ? 'PASS (demo threshold)' : 'NOT MET (browser-realistic)'}`;
+        }
+
+        setInterval(runQuantumTelemetrySync, 2000);
+        window.onload = runQuantumTelemetrySync;
     </script>
 </head>
 <body>
@@ -106,6 +251,25 @@
             </div>
 
             <div class="execute-panel">
+                <h3 style="margin-top:0;color:#58a6ff;">Benchmark Upload & Test Lab</h3>
+                <div class="benchmark-controls">
+                    <input id="benchmark-row-count" class="benchmark-input" type="number" min="1" value="1000000" />
+                    <button class="action-btn" onclick="generateRandomBenchmarkData()">Generate Random Data</button>
+                    <button class="action-btn store-btn" onclick="runBenchmarkNow()">Run Test Now</button>
+                </div>
+                <div class="benchmark-controls">
+                    <input id="benchmark-csv-file" class="benchmark-input" type="file" accept=".csv,text/csv" onchange="uploadCsvData(event)" />
+                    <button class="action-btn" onclick="downloadSampleCsv()">Download Sample CSV</button>
+                </div>
+                <div style="font-size:12px;color:#8b949e;">CSV expected columns: <b>id,value,category,ts</b> (minimum required: <b>value,category</b>)</div>
+                <div class="terminal-stream">
+                    <div class="terminal-header">BENCHMARK OUTPUT // LOAD, TEST, VERIFY</div>
+                    <pre id="benchmark-results">Awaiting dataset input (CSV upload or random generation)...</pre>
+                </div>
+                <div class="benchmark-disclaimer">Demo Mode: performance figures shown here are simulated/derived for visualization and do not represent production benchmark results.</div>
+            </div>
+
+            <div class="execute-panel">
                 <h3 style="margin-top:0;color:#58a6ff;">Interactive Cube Viewer</h3>
                 <div id="cube-viewer" style="width:100%;height:500px;border:1px solid #30363d;border-radius:8px;overflow:hidden;background:#010409;"></div>
                 <div style="margin-top:12px;color:#8b949e;font-size:12px;">
@@ -121,11 +285,7 @@
     (() => {
         const container = document.getElementById('cube-viewer');
         if (!container || !window.THREE) return;
-
-        if (!THREE.OrbitControls) {
-            console.error('OrbitControls failed to load');
-            return;
-        }
+        if (!THREE.OrbitControls) { console.error('OrbitControls failed to load'); return; }
 
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x010409);
@@ -138,76 +298,41 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
-        const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambient);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
         const dir = new THREE.DirectionalLight(0xffffff, 0.9);
         dir.position.set(4, 5, 3);
         scene.add(dir);
 
-        const cubeSize = 1.5;
-        const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
-
-        const outerMat = new THREE.MeshStandardMaterial({
-            color: 0x1f6feb,
-            metalness: 0.25,
-            roughness: 0.45,
-            side: THREE.FrontSide,
-            transparent: true,
-            opacity: 0.9
-        });
-
-        const innerMat = new THREE.MeshStandardMaterial({
-            color: 0x58a6ff,
-            metalness: 0.1,
-            roughness: 0.6,
-            side: THREE.BackSide,
-            transparent: true,
-            opacity: 0.35
-        });
-
-        const cubeOuter = new THREE.Mesh(geometry, outerMat);
-        const cubeInner = new THREE.Mesh(geometry, innerMat);
-        scene.add(cubeOuter, cubeInner);
-
+        const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+        const cubeOuter = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
+            color: 0x1f6feb, metalness: 0.25, roughness: 0.45, side: THREE.FrontSide, transparent: true, opacity: 0.9
+        }));
+        const cubeInner = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
+            color: 0x58a6ff, metalness: 0.1, roughness: 0.6, side: THREE.BackSide, transparent: true, opacity: 0.35
+        }));
         const edges = new THREE.LineSegments(
             new THREE.EdgesGeometry(geometry),
             new THREE.LineBasicMaterial({ color: 0xc9d1d9, transparent: true, opacity: 0.35 })
         );
-        scene.add(edges);
+        scene.add(cubeOuter, cubeInner, edges);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.07;
-        controls.rotateSpeed = 0.8;
-        controls.zoomSpeed = 1.0;
-        controls.panSpeed = 0.6;
-        controls.minDistance = 0.05;
-        controls.maxDistance = 20;
-        controls.target.set(0, 0, 0);
-        controls.update();
-        controls.touches = {
-            ONE: THREE.TOUCH.ROTATE,
-            TWO: THREE.TOUCH.DOLLY_PAN
-        };
+        controls.enableDamping = true; controls.dampingFactor = 0.07; controls.rotateSpeed = 0.8;
+        controls.zoomSpeed = 1.0; controls.panSpeed = 0.6; controls.minDistance = 0.05; controls.maxDistance = 20;
+        controls.target.set(0, 0, 0); controls.update();
+        controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
 
         function onResize() {
-            const w = container.clientWidth;
-            const h = container.clientHeight;
-            camera.aspect = w / h;
-            camera.updateProjectionMatrix();
-            renderer.setSize(w, h);
+            const w = container.clientWidth, h = container.clientHeight;
+            camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h);
         }
         window.addEventListener('resize', onResize);
 
-        function animate() {
+        (function animate() {
             requestAnimationFrame(animate);
-            cubeOuter.rotation.y += 0.0025;
-            cubeInner.rotation.y += 0.0025;
-            edges.rotation.y += 0.0025;
-            controls.update();
-            renderer.render(scene, camera);
-        }
-        animate();
+            cubeOuter.rotation.y += 0.0025; cubeInner.rotation.y += 0.0025; edges.rotation.y += 0.0025;
+            controls.update(); renderer.render(scene, camera);
+        })();
     })();
     </script>
 </body>
