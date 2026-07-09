@@ -19,7 +19,7 @@
         .metric-label { color: #8b949e; }
         .metric-value { font-family: monospace; font-weight: 600; color: #c9d1d9; }
         .execute-panel { grid-column: span 2; background: #161b22; border: 1px solid #30363d; padding: 24px; border-radius: 8px; text-align: center; }
-        .action-btn { background-color: #238636; color: #ffffff; border: 1px solid rgba(240,246,252,0.1); border-radius: 6px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; margin: 0 6px 8px 6px; text-decoration: none; display: inline-block; }
+        .action-btn { background-color: #238636; color: #ffffff; border: 1px solid rgba(240,246,252,0.1); border-radius: 6px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; margin: 4px; display: inline-block; text-decoration: none; }
         .action-btn:hover { background-color: #2ea043; }
         .store-btn { background-color: #1f6feb; border-color: rgba(240,246,252,0.1); }
         .store-btn:hover { background-color: #388bfd; }
@@ -83,17 +83,17 @@
         function downloadSampleCsv() {
             const csv = [
                 "id,value,category,ts",
-                "1,123.45,A,1710000000000",
-                "2,987.65,C,1710000001000",
-                "3,456.78,B,1710000002000",
-                "4,777.01,C,1710000003000",
-                "5,222.22,E,1710000004000"
+                "1,123.45,ASTEROID,1710000000000",
+                "2,987.65,ORBIT,1710000001000",
+                "3,456.78,MISSION,1710000002000",
+                "4,777.01,LAUNCH,1710000003000",
+                "5,222.22,DEBRIS,1710000004000"
             ].join("\n");
             const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = "sample_benchmark_data.csv";
+            a.download = "space_signal_sample_benchmark_data.csv";
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -105,7 +105,7 @@
             const out = document.getElementById('benchmark-results');
             const requestedRows = Math.max(1, parseInt(rowsInput.value || '1000000', 10));
             const rows = Math.min(requestedRows, 1000000);
-            const cats = ['A', 'B', 'C', 'D', 'E'];
+            const cats = ['ASTEROID', 'ORBIT', 'MISSION', 'LAUNCH', 'DEBRIS'];
 
             const t0 = performance.now();
             benchmarkData = new Array(rows);
@@ -121,12 +121,13 @@
             const nsPerRow = (elapsedMs * 1e6) / rows;
 
             out.textContent =
-`DATASET READY
+`SPACE DATASET READY
 Requested rows: ${fmt(requestedRows)}
 Loaded rows: ${fmt(rows)}
 Generation time: ${elapsedMs.toFixed(2)} ms
 Derived generation cost: ${nsPerRow.toFixed(2)} ns/row (derived)
-Source: In-page random generator`;
+Source: In-page random generator
+Signal theme: orbit / mission / debris / launch`;
         }
 
         function parseCsvText(csvText) {
@@ -151,7 +152,7 @@ Source: In-page random generator`;
                 data.push({
                     id: idx.id >= 0 ? Number(cols[idx.id]) || i : i,
                     value: Number(cols[idx.value]) || 0,
-                    category: (cols[idx.category] || 'A').toUpperCase(),
+                    category: (cols[idx.category] || 'ASTEROID').toUpperCase(),
                     ts: idx.ts >= 0 ? Number(cols[idx.ts]) || Date.now() : Date.now()
                 });
             }
@@ -194,7 +195,7 @@ Source: User CSV upload`;
             let count = 0, sum = 0, max = -Infinity;
             for (let i = 0; i < benchmarkData.length; i++) {
                 const r = benchmarkData[i];
-                if (r.category === 'C' && r.value > 500) {
+                if (r.category === 'MISSION' && r.value > 500) {
                     count++; sum += r.value; if (r.value > max) max = r.value;
                 }
             }
@@ -207,7 +208,7 @@ Source: User CSV upload`;
             out.textContent =
 `TEST COMPLETE
 Rows scanned: ${fmt(benchmarkData.length)}
-Query: category='C' AND value > 500
+Query: category='MISSION' AND value > 500
 Matches: ${fmt(count)}
 Average(value): ${avg.toFixed(3)}
 Max(value): ${Number.isFinite(max) ? max.toFixed(3) : 'N/A'}
