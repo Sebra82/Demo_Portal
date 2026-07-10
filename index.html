@@ -684,6 +684,11 @@ Awaiting query authorization token pass...</div>
           badge.style.borderColor = 'var(--cyber-cyan)';
         }
       }
+
+      const modeLabel = document.getElementById('engine-mode-text');
+      if (modeLabel) {
+        modeLabel.textContent = mode === 'simd' ? 'SIMD_VECTOR' : 'RAM_MESH';
+      }
     }
 
     function getRowInput() {
@@ -1325,3 +1330,6 @@ Z-DEPTH: ${webglCameraNode.position.z.toFixed(4)} ${webglCameraNode.position.z <
         if (standardTerminal) standardTerminal.textContent += `\n${logLine}`;
       }
     });
+  </script>
+</body>
+</html>
