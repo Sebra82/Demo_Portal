@@ -208,6 +208,7 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      margin-top: 16px;
     }
 
     #webgl-canvas-target {
@@ -225,7 +226,7 @@
       left: 0;
       background: rgba(7, 11, 17, 0.85);
       padding: 12px;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: var(--text-dim);
       border-bottom: 1px solid var(--border-clean);
       border-right: 1px solid var(--border-clean);
@@ -420,11 +421,13 @@ Awaiting query authorization token pass...</div>
           <a class="download-link" onclick="downloadAssetFromBackend('ingestion_driver.dll')">📦 Download Core Air-Gapped Ingestion Driver (.DLL)</a>
         </div>
 
-        <div class="viewer-pane" style="margin-top:16px;">
+        <div class="viewer-pane">
           <div class="viewer-overlay-text" id="navigation-hud">
             PROJECTION: 4D TESSERACT<br>
+            MODE: IDLE | ROWS: 0 | COLS: 18<br>
+            LATENCY: 0.00000 ns | THROUGHPUT: 0 op/s<br>
             Z-DEPTH: 6.0000 (OUTSIDE SHELL)<br>
-            ⚙️ SCROLL / PINCH TO ENTER CORE • PRESS C TO CYCLE COLORS
+            ⚙️ PINCH/SCROLL TO NAVIGATE • PRESS C TO CYCLE COLORS
           </div>
           <div id="webgl-canvas-target"></div>
         </div>
@@ -460,6 +463,25 @@ Awaiting query authorization token pass...</div>
     const latencyLowerBounds = 3.12450;
     const baseThroughputOps = 285000000;
     const maxThroughputOps = 299100000;
+
+    // --- model-driven visual state ---
+    let modelVisualState = {
+      mode: "idle",           // idle | standard | quantum
+      rows: 0,
+      cols: 18,
+      latencyNs: 0,
+      throughput: 0,
+      memMB: 0,
+      insideCoreBoost: 0
+    };
+
+    function updateModelVisuals(patch = {}) {
+      modelVisualState = { ...modelVisualState, ...patch };
+    }
+
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v));
+    }
 
     function selectMarketplaceTier(tier, price) {
       activeCommercialTier = tier;
@@ -541,6 +563,16 @@ Awaiting query authorization token pass...</div>
       const throughputOpsPerSec = Math.floor(netCalculationsCount / (computedDurationMs / 1000));
       const byteMemoryFootprint = (totalInputRows * operationColumnsCount * 4) / (1024 * 1024);
 
+      updateModelVisuals({
+        mode: "standard",
+        rows: totalInputRows,
+        cols: operationColumnsCount,
+        latencyNs: randomizedJitterNs,
+        throughput: throughputOpsPerSec,
+        memMB: byteMemoryFootprint,
+        insideCoreBoost: 0.35
+      });
+
       setTimeout(() => {
         targetTerminal.textContent =
 `TEST COMPLETE
@@ -581,6 +613,16 @@ self.onmessage = function(e) {
         const throughputOpsPerSec = Math.floor(netCalculationsCount / (computedDurationMs / 1000));
         const byteMemoryFootprint = (rowsBound * 4) / (1024 * 1024);
 
+        updateModelVisuals({
+          mode: "quantum",
+          rows: rowsBound,
+          cols: targetOpsMultiplier,
+          latencyNs: randomizedJitterQuantumNs,
+          throughput: throughputOpsPerSec,
+          memMB: byteMemoryFootprint,
+          insideCoreBoost: 1.0
+        });
+
         targetTerminal.textContent =
 `TRIAL CORE PASSED
 Rows scanned       : ${rowsBound.toLocaleString()}
@@ -596,9 +638,9 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
       };
     }
 
-    // =============================
-    // Enhanced 3D Quantum Tesseract
-    // =============================
+    // ===================================
+    // Enhanced 3D Quantum Tesseract Engine
+    // ===================================
     const webglContainerNode = document.getElementById('webgl-canvas-target');
     const threeSceneInstance = new THREE.Scene();
     threeSceneInstance.background = new THREE.Color(0x030508);
@@ -664,6 +706,7 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
     const internalConvergenceStruts = new THREE.LineSegments(connectingStrutsGeometry, connectingStrutsMaterial);
     threeSceneInstance.add(internalConvergenceStruts);
 
+    // Orbit rings
     const orbitGroup = new THREE.Group();
     const orbitLineMaterial = new THREE.LineBasicMaterial({
       color: 0xff00cc,
@@ -682,13 +725,12 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
     }
 
     const orbit1 = makeOrbit(1.55);
-    const orbit2 = makeOrbit(1.9);
-    orbit2.rotation.x = Math.PI / 2.8;
-    const orbit3 = makeOrbit(1.35);
-    orbit3.rotation.y = Math.PI / 2.2;
+    const orbit2 = makeOrbit(1.9); orbit2.rotation.x = Math.PI / 2.8;
+    const orbit3 = makeOrbit(1.35); orbit3.rotation.y = Math.PI / 2.2;
     orbitGroup.add(orbit1, orbit2, orbit3);
     threeSceneInstance.add(orbitGroup);
 
+    // Core points cloud (128)
     const corePointsGeometry = new THREE.BufferGeometry();
     const coreCount = 128;
     const corePositions = new Float32Array(coreCount * 3);
@@ -711,6 +753,38 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
     });
     const corePoints = new THREE.Points(corePointsGeometry, corePointsMaterial);
     threeSceneInstance.add(corePoints);
+
+    // Model layers ("parts used")
+    const modelLayerGroup = new THREE.Group();
+    threeSceneInstance.add(modelLayerGroup);
+
+    const layerCount = 6;
+    const layerMeshes = [];
+    for (let i = 0; i < layerCount; i++) {
+      const g = new THREE.TorusGeometry(0.55 + i * 0.12, 0.01 + i * 0.002, 8, 64);
+      const m = new THREE.MeshBasicMaterial({
+        color: 0x00f0ff,
+        transparent: true,
+        opacity: 0.15
+      });
+      const tor = new THREE.Mesh(g, m);
+      tor.rotation.x = (i / layerCount) * Math.PI;
+      tor.rotation.y = (i / layerCount) * Math.PI * 0.5;
+      modelLayerGroup.add(tor);
+      layerMeshes.push(tor);
+    }
+
+    // Active part nodes
+    const partNodeCount = 24;
+    const partNodeGeo = new THREE.SphereGeometry(0.03, 8, 8);
+    const partNodes = [];
+    for (let i = 0; i < partNodeCount; i++) {
+      const mat = new THREE.MeshBasicMaterial({ color: 0x66ffee, transparent: true, opacity: 0.45 });
+      const n = new THREE.Mesh(partNodeGeo, mat);
+      n.userData.phase = Math.random() * Math.PI * 2;
+      threeSceneInstance.add(n);
+      partNodes.push(n);
+    }
 
     function applyTheme(idx) {
       const t = THEMES[idx];
@@ -754,6 +828,8 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
       orbitGroup.rotation.x += rx * 0.7;
       corePoints.rotation.y += ry * 0.9;
       corePoints.rotation.x += rx * 0.9;
+      modelLayerGroup.rotation.y += ry * 0.5;
+      modelLayerGroup.rotation.x += rx * 0.5;
 
       baselinePointerX = e.clientX;
       baselinePointerY = e.clientY;
@@ -790,6 +866,7 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
           innerWireframeCubeMesh.rotation.z += dAng * 0.8;
           internalConvergenceStruts.rotation.z += dAng * 0.8;
           orbitGroup.rotation.z += dAng * 0.6;
+          modelLayerGroup.rotation.z += dAng * 0.5;
         }
 
         baselineTouchDistance = distance;
@@ -809,24 +886,6 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
 
     function adjustCameraZDepth(scrollDelta) {
       webglCameraNode.position.z = Math.max(0.65, Math.min(webglCameraNode.position.z + scrollDelta, 10.0));
-      const hudNode = document.getElementById('navigation-hud');
-      const currentZDepth = webglCameraNode.position.z;
-
-      if (currentZDepth <= 1.7) {
-        hudNode.innerHTML =
-`PROJECTION: 4D TESSERACT<br>
-Z-DEPTH: ${currentZDepth.toFixed(4)} <span style="color:var(--cyber-cyan);font-weight:bold;">[INSIDE CORE VOLUME]</span><br>
-⚙️ PINCH / SCROLL TO NAVIGATE INNER LAYERS • PRESS C TO CYCLE COLORS`;
-        connectingStrutsMaterial.opacity = 1.0;
-        corePointsMaterial.size = 0.04;
-      } else {
-        hudNode.innerHTML =
-`PROJECTION: 4D TESSERACT<br>
-Z-DEPTH: ${currentZDepth.toFixed(4)} (OUTSIDE SHELL)<br>
-⚙️ SCROLL / PINCH TO ENTER CORE • PRESS C TO CYCLE COLORS`;
-        connectingStrutsMaterial.opacity = 0.75;
-        corePointsMaterial.size = 0.03;
-      }
     }
 
     window.addEventListener('keydown', (e) => {
@@ -853,10 +912,60 @@ Z-DEPTH: ${currentZDepth.toFixed(4)} (OUTSIDE SHELL)<br>
         orbitGroup.rotation.z += continuousRotationVelocity * 0.8;
         orbitGroup.rotation.y += continuousRotationVelocity * 0.4;
         corePoints.rotation.y += continuousRotationVelocity * 0.9;
+        modelLayerGroup.rotation.y += continuousRotationVelocity * 0.55;
       }
 
-      const pulse = 1 + (Math.sin(Date.now() * 0.002 * globalVelocityFactor) * 0.08);
+      // ---- model-to-visual mapping ----
+      const s = modelVisualState;
+      const loadNorm = clamp(s.rows / 15000000, 0, 1);
+      const speedNorm = clamp((s.throughput || 0) / 300000000, 0, 1);
+      const latencyNorm = clamp((s.latencyNs || 0) / 15, 0, 1);
+      const quantumMode = s.mode === "quantum" ? 1 : 0;
+
+      const dynSpin = continuousRotationVelocity * (1 + speedNorm * 3.5);
+      outerWireframeCubeMesh.rotation.y += dynSpin * 0.25;
+      innerWireframeCubeMesh.rotation.x -= dynSpin * 0.18;
+
+      const pulseAmp = 0.04 + loadNorm * 0.16 + quantumMode * 0.08;
+      const pulse = 1 + (Math.sin(Date.now() * (0.002 + speedNorm * 0.004)) * pulseAmp);
       innerWireframeCubeMesh.scale.set(pulse * 0.5, pulse * 0.5, pulse * 0.5);
+
+      connectingStrutsMaterial.opacity = clamp(0.35 + (s.memMB / 1200), 0.35, 1.0);
+
+      if (s.mode === "quantum") {
+        outerBoxLineMaterial.color.setHSL(0.52, 1.0, 0.55);
+        innerBoxLineMaterial.color.setHSL(0.42, 1.0, 0.55);
+      } else if (s.mode === "standard") {
+        outerBoxLineMaterial.color.setHSL(0.02 + (1 - latencyNorm) * 0.15, 1.0, 0.52);
+        innerBoxLineMaterial.color.setHSL(0.10, 1.0, 0.50);
+      }
+
+      for (let i = 0; i < layerMeshes.length; i++) {
+        const layer = layerMeshes[i];
+        const layerUse = clamp((loadNorm * 1.2) - (i * 0.12), 0, 1);
+        layer.material.opacity = 0.05 + layerUse * (0.18 + quantumMode * 0.22);
+        layer.rotation.z += (0.001 + i * 0.00025) * (1 + speedNorm * 3);
+        layer.scale.setScalar(1 + layerUse * 0.08);
+      }
+
+      const t = Date.now() * 0.0015;
+      partNodes.forEach((node, i) => {
+        const ring = 0.65 + (i % 6) * 0.15;
+        const a = t * (0.35 + speedNorm * 1.8) + node.userData.phase + (i * 0.4);
+        const z = Math.sin(a * 1.7) * (0.25 + quantumMode * 0.25);
+        node.position.set(Math.cos(a) * ring, Math.sin(a) * ring, z);
+
+        const active = (i / partNodeCount) < (0.2 + loadNorm * 0.8);
+        node.material.opacity = active ? (0.35 + quantumMode * 0.45) : 0.08;
+      });
+
+      const hudNode = document.getElementById('navigation-hud');
+      hudNode.innerHTML =
+`PROJECTION: 4D TESSERACT<br>
+MODE: ${s.mode.toUpperCase()} | ROWS: ${(s.rows || 0).toLocaleString()} | COLS: ${s.cols || 0}<br>
+LATENCY: ${(s.latencyNs || 0).toFixed(5)} ns | THROUGHPUT: ${(s.throughput || 0).toLocaleString()} op/s<br>
+Z-DEPTH: ${webglCameraNode.position.z.toFixed(4)} ${webglCameraNode.position.z <= 1.7 ? '<span style="color:var(--cyber-cyan);font-weight:bold;">[INSIDE CORE]</span>' : '(OUTSIDE SHELL)'}<br>
+⚙️ PINCH/SCROLL TO NAVIGATE • PRESS C TO CYCLE COLORS`;
 
       webglRendererInstance.render(threeSceneInstance, webglCameraNode);
     }
