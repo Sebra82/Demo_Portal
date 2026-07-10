@@ -14,6 +14,7 @@
       --tech-red: #ff3366;
       --text-white: #ffffff;
       --text-dim: #4a5d78;
+      --power-gold: #ffcc33;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -204,7 +205,7 @@
       background: var(--panel-bg);
       border: 1px solid var(--border-clean);
       border-radius: 4px;
-      height: 320px;
+      height: 340px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -224,15 +225,16 @@
       position: absolute;
       top: 0;
       left: 0;
-      background: rgba(7, 11, 17, 0.85);
+      background: rgba(7, 11, 17, 0.88);
       padding: 12px;
-      font-size: 0.68rem;
+      font-size: 0.67rem;
       color: var(--text-dim);
       border-bottom: 1px solid var(--border-clean);
       border-right: 1px solid var(--border-clean);
       z-index: 10;
-      line-height: 1.45;
+      line-height: 1.4;
       pointer-events: none;
+      max-width: 100%;
     }
 
     .store-pane {
@@ -345,6 +347,7 @@
       header { grid-column: span 1; }
       .telemetry-grid { grid-template-columns: repeat(2, 1fr); }
       .output-grid { grid-template-columns: 1fr; }
+      .viewer-pane { height: 320px; }
     }
   </style>
 </head>
@@ -424,8 +427,9 @@ Awaiting query authorization token pass...</div>
         <div class="viewer-pane">
           <div class="viewer-overlay-text" id="navigation-hud">
             PROJECTION: 4D TESSERACT<br>
-            MODE: IDLE | ROWS: 0 | COLS: 18<br>
+            MODE: IDLE | STAGE: STANDBY | ROWS: 0<br>
             LATENCY: 0.00000 ns | THROUGHPUT: 0 op/s<br>
+            POWER: 0.00 TW-EQ | STREAMS: 0 ACTIVE<br>
             Z-DEPTH: 6.0000 (OUTSIDE SHELL)<br>
             ⚙️ PINCH/SCROLL TO NAVIGATE • PRESS C TO CYCLE COLORS
           </div>
@@ -450,6 +454,9 @@ Awaiting query authorization token pass...</div>
 
   <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
   <script>
+    // =====================
+    // App + Business Logic
+    // =====================
     let activeCommercialTier = 'saas';
     let billingPriceValue = 50000;
     let trackingSessionUptime = 0;
@@ -464,23 +471,44 @@ Awaiting query authorization token pass...</div>
     const baseThroughputOps = 285000000;
     const maxThroughputOps = 299100000;
 
-    // --- model-driven visual state ---
+    // -----------------------------
+    // Model-driven visual state
+    // -----------------------------
     let modelVisualState = {
-      mode: "idle",           // idle | standard | quantum
+      mode: "idle",                  // idle | standard | quantum
+      stage: "standby",              // ingest | hash | join | emit
       rows: 0,
       cols: 18,
       latencyNs: 0,
       throughput: 0,
       memMB: 0,
-      insideCoreBoost: 0
+      insideCoreBoost: 0,
+      powerTW: 0,                    // synthetic "power equivalent"
+      streamsActive: 0,
+      burstUntil: 0                  // timestamp for burst visual mode
     };
+
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v));
+    }
 
     function updateModelVisuals(patch = {}) {
       modelVisualState = { ...modelVisualState, ...patch };
     }
 
-    function clamp(v, min, max) {
-      return Math.max(min, Math.min(max, v));
+    function startStageSequence(mode = "standard") {
+      const now = performance.now();
+      const base = mode === "quantum" ? 320 : 460;
+      // schedule transient stage changes
+      setTimeout(() => updateModelVisuals({ stage: "ingest" }), 0);
+      setTimeout(() => updateModelVisuals({ stage: "hash" }), base);
+      setTimeout(() => updateModelVisuals({ stage: "join" }), base * 2);
+      setTimeout(() => updateModelVisuals({ stage: "emit" }), base * 3);
+      setTimeout(() => updateModelVisuals({ stage: "standby" }), base * 4);
+
+      // power burst window (quantum stronger)
+      const burstMs = mode === "quantum" ? 3200 : 1400;
+      updateModelVisuals({ burstUntil: now + burstMs });
     }
 
     function selectMarketplaceTier(tier, price) {
@@ -563,6 +591,8 @@ Awaiting query authorization token pass...</div>
       const throughputOpsPerSec = Math.floor(netCalculationsCount / (computedDurationMs / 1000));
       const byteMemoryFootprint = (totalInputRows * operationColumnsCount * 4) / (1024 * 1024);
 
+      const powerTW = (throughputOpsPerSec / 1e8) * (randomizedJitterNs / 8.5); // synthetic display metric
+
       updateModelVisuals({
         mode: "standard",
         rows: totalInputRows,
@@ -570,8 +600,12 @@ Awaiting query authorization token pass...</div>
         latencyNs: randomizedJitterNs,
         throughput: throughputOpsPerSec,
         memMB: byteMemoryFootprint,
-        insideCoreBoost: 0.35
+        insideCoreBoost: 0.35,
+        powerTW,
+        streamsActive: Math.floor(10 + (throughputOpsPerSec / 2.2e7))
       });
+
+      startStageSequence("standard");
 
       setTimeout(() => {
         targetTerminal.textContent =
@@ -584,7 +618,7 @@ Engine Throughput  : ${throughputOpsPerSec.toLocaleString()} rows/sec
 Derived Row Cost   : ${randomizedJitterNs.toFixed(5)} ns/row
 3.5 ns Reference   : NOT MET (UI-bound tax)
 Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (LOCKED IN HEAP)`;
-      }, 400);
+      }, 420);
     }
 
     const structuralWorkerScriptCode = `
@@ -604,6 +638,8 @@ self.onmessage = function(e) {
       const backgroundExecutionWorker = new Worker(URL.createObjectURL(blobFileObject));
       backgroundExecutionWorker.postMessage({ rowCount: totalInputRows });
 
+      startStageSequence("quantum");
+
       backgroundExecutionWorker.onmessage = function(e) {
         const rowsBound = e.data.rowsBound;
         const targetOpsMultiplier = 18;
@@ -613,6 +649,8 @@ self.onmessage = function(e) {
         const throughputOpsPerSec = Math.floor(netCalculationsCount / (computedDurationMs / 1000));
         const byteMemoryFootprint = (rowsBound * 4) / (1024 * 1024);
 
+        const powerTW = (throughputOpsPerSec / 1e8) * (5.0 / randomizedJitterQuantumNs) * 3.2;
+
         updateModelVisuals({
           mode: "quantum",
           rows: rowsBound,
@@ -620,7 +658,10 @@ self.onmessage = function(e) {
           latencyNs: randomizedJitterQuantumNs,
           throughput: throughputOpsPerSec,
           memMB: byteMemoryFootprint,
-          insideCoreBoost: 1.0
+          insideCoreBoost: 1.0,
+          powerTW,
+          streamsActive: Math.floor(30 + (throughputOpsPerSec / 9e6)),
+          burstUntil: performance.now() + 3600
         });
 
         targetTerminal.textContent =
@@ -665,13 +706,14 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
     ];
     let activeThemeIndex = 0;
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-    const keyLight = new THREE.PointLight(0x88ccff, 1.1, 30);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.62);
+    const keyLight = new THREE.PointLight(0x88ccff, 1.25, 35);
     keyLight.position.set(4, 4, 6);
-    const rimLight = new THREE.PointLight(0x00ffaa, 0.8, 25);
+    const rimLight = new THREE.PointLight(0x00ffaa, 0.95, 30);
     rimLight.position.set(-5, -3, -4);
     threeSceneInstance.add(ambient, keyLight, rimLight);
 
+    // Core wireframes
     const outerBoxGeometry = new THREE.BoxGeometry(2.2, 2.2, 2.2);
     const outerBoxEdges = new THREE.EdgesGeometry(outerBoxGeometry);
     const outerBoxLineMaterial = new THREE.LineBasicMaterial({ color: 0x00f0ff });
@@ -758,14 +800,14 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
     const modelLayerGroup = new THREE.Group();
     threeSceneInstance.add(modelLayerGroup);
 
-    const layerCount = 6;
+    const layerCount = 7;
     const layerMeshes = [];
     for (let i = 0; i < layerCount; i++) {
-      const g = new THREE.TorusGeometry(0.55 + i * 0.12, 0.01 + i * 0.002, 8, 64);
+      const g = new THREE.TorusGeometry(0.55 + i * 0.11, 0.008 + i * 0.002, 8, 64);
       const m = new THREE.MeshBasicMaterial({
         color: 0x00f0ff,
         transparent: true,
-        opacity: 0.15
+        opacity: 0.14
       });
       const tor = new THREE.Mesh(g, m);
       tor.rotation.x = (i / layerCount) * Math.PI;
@@ -775,8 +817,8 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
     }
 
     // Active part nodes
-    const partNodeCount = 24;
-    const partNodeGeo = new THREE.SphereGeometry(0.03, 8, 8);
+    const partNodeCount = 32;
+    const partNodeGeo = new THREE.SphereGeometry(0.028, 8, 8);
     const partNodes = [];
     for (let i = 0; i < partNodeCount; i++) {
       const mat = new THREE.MeshBasicMaterial({ color: 0x66ffee, transparent: true, opacity: 0.45 });
@@ -785,6 +827,32 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
       threeSceneInstance.add(n);
       partNodes.push(n);
     }
+
+    // Data stream particles (animated traffic lines)
+    const streamCount = 180;
+    const streamPositions = new Float32Array(streamCount * 3);
+    const streamMeta = [];
+    for (let i = 0; i < streamCount; i++) {
+      streamPositions[i * 3] = (Math.random() - 0.5) * 3.8;
+      streamPositions[i * 3 + 1] = (Math.random() - 0.5) * 3.8;
+      streamPositions[i * 3 + 2] = (Math.random() - 0.5) * 3.8;
+      streamMeta.push({
+        vel: 0.004 + Math.random() * 0.02,
+        axis: Math.floor(Math.random() * 3),
+        dir: Math.random() > 0.5 ? 1 : -1
+      });
+    }
+
+    const streamGeometry = new THREE.BufferGeometry();
+    streamGeometry.setAttribute('position', new THREE.BufferAttribute(streamPositions, 3));
+    const streamMaterial = new THREE.PointsMaterial({
+      color: 0xffcc33,
+      size: 0.018,
+      transparent: true,
+      opacity: 0.0
+    });
+    const dataStreams = new THREE.Points(streamGeometry, streamMaterial);
+    threeSceneInstance.add(dataStreams);
 
     function applyTheme(idx) {
       const t = THEMES[idx];
@@ -798,6 +866,7 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
 
     webglCameraNode.position.set(0, 0, 6.0);
 
+    // Interaction
     let localPointerIsDragging = false;
     let baselinePointerX = 0;
     let baselinePointerY = 0;
@@ -885,7 +954,7 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
     }, { passive: false });
 
     function adjustCameraZDepth(scrollDelta) {
-      webglCameraNode.position.z = Math.max(0.65, Math.min(webglCameraNode.position.z + scrollDelta, 10.0));
+      webglCameraNode.position.z = Math.max(0.62, Math.min(webglCameraNode.position.z + scrollDelta, 10.0));
     }
 
     window.addEventListener('keydown', (e) => {
@@ -900,6 +969,7 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
     function renderViewportCycle() {
       requestAnimationFrame(renderViewportCycle);
 
+      const now = performance.now();
       const continuousRotationVelocity = 0.0025 * globalVelocityFactor;
 
       if (!localPointerIsDragging) {
@@ -921,49 +991,96 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
       const speedNorm = clamp((s.throughput || 0) / 300000000, 0, 1);
       const latencyNorm = clamp((s.latencyNs || 0) / 15, 0, 1);
       const quantumMode = s.mode === "quantum" ? 1 : 0;
+      const burstActive = now < s.burstUntil;
 
-      const dynSpin = continuousRotationVelocity * (1 + speedNorm * 3.5);
+      // camera punch-in during burst, recovers smoothly
+      const targetZ = burstActive
+        ? (quantumMode ? 1.15 : 1.7)
+        : (quantumMode ? 2.2 : 3.1);
+      webglCameraNode.position.z += (targetZ - webglCameraNode.position.z) * 0.03;
+
+      // spin + pulse intensity
+      const dynSpin = continuousRotationVelocity * (1 + speedNorm * 4.2 + (burstActive ? 1.2 : 0));
       outerWireframeCubeMesh.rotation.y += dynSpin * 0.25;
       innerWireframeCubeMesh.rotation.x -= dynSpin * 0.18;
+      orbitGroup.rotation.x += dynSpin * 0.06;
 
-      const pulseAmp = 0.04 + loadNorm * 0.16 + quantumMode * 0.08;
-      const pulse = 1 + (Math.sin(Date.now() * (0.002 + speedNorm * 0.004)) * pulseAmp);
+      const pulseAmp = 0.05 + loadNorm * 0.18 + quantumMode * 0.10 + (burstActive ? 0.1 : 0);
+      const pulseFreq = 0.002 + speedNorm * 0.004 + (burstActive ? 0.003 : 0);
+      const pulse = 1 + (Math.sin(Date.now() * pulseFreq) * pulseAmp);
       innerWireframeCubeMesh.scale.set(pulse * 0.5, pulse * 0.5, pulse * 0.5);
 
-      connectingStrutsMaterial.opacity = clamp(0.35 + (s.memMB / 1200), 0.35, 1.0);
+      // structure density from memory
+      connectingStrutsMaterial.opacity = clamp(0.35 + (s.memMB / 1100) + (burstActive ? 0.12 : 0), 0.35, 1.0);
 
+      // performance color logic
       if (s.mode === "quantum") {
-        outerBoxLineMaterial.color.setHSL(0.52, 1.0, 0.55);
-        innerBoxLineMaterial.color.setHSL(0.42, 1.0, 0.55);
+        outerBoxLineMaterial.color.setHSL(0.52, 1.0, burstActive ? 0.66 : 0.55);
+        innerBoxLineMaterial.color.setHSL(0.42, 1.0, burstActive ? 0.64 : 0.55);
       } else if (s.mode === "standard") {
-        outerBoxLineMaterial.color.setHSL(0.02 + (1 - latencyNorm) * 0.15, 1.0, 0.52);
-        innerBoxLineMaterial.color.setHSL(0.10, 1.0, 0.50);
+        outerBoxLineMaterial.color.setHSL(0.02 + (1 - latencyNorm) * 0.15, 1.0, burstActive ? 0.62 : 0.52);
+        innerBoxLineMaterial.color.setHSL(0.10, 1.0, burstActive ? 0.58 : 0.50);
       }
 
+      // layer activation = "parts being used"
       for (let i = 0; i < layerMeshes.length; i++) {
         const layer = layerMeshes[i];
-        const layerUse = clamp((loadNorm * 1.2) - (i * 0.12), 0, 1);
-        layer.material.opacity = 0.05 + layerUse * (0.18 + quantumMode * 0.22);
-        layer.rotation.z += (0.001 + i * 0.00025) * (1 + speedNorm * 3);
-        layer.scale.setScalar(1 + layerUse * 0.08);
+        const stageBias =
+          s.stage === "ingest" ? (i < 2 ? 0.35 : 0) :
+          s.stage === "hash"   ? (i >= 2 && i < 4 ? 0.35 : 0) :
+          s.stage === "join"   ? (i >= 3 && i < 6 ? 0.35 : 0) :
+          s.stage === "emit"   ? (i >= 5 ? 0.35 : 0) : 0;
+
+        const layerUse = clamp((loadNorm * 1.2) - (i * 0.11) + stageBias, 0, 1);
+        layer.material.opacity = 0.04 + layerUse * (0.16 + quantumMode * 0.26 + (burstActive ? 0.12 : 0));
+        layer.rotation.z += (0.001 + i * 0.0003) * (1 + speedNorm * 3.8);
+        layer.scale.setScalar(1 + layerUse * 0.11);
       }
 
-      const t = Date.now() * 0.0015;
+      // active part nodes
+      const t = Date.now() * 0.0016;
       partNodes.forEach((node, i) => {
-        const ring = 0.65 + (i % 6) * 0.15;
-        const a = t * (0.35 + speedNorm * 1.8) + node.userData.phase + (i * 0.4);
-        const z = Math.sin(a * 1.7) * (0.25 + quantumMode * 0.25);
+        const ring = 0.62 + (i % 8) * 0.12;
+        const a = t * (0.36 + speedNorm * 2.0 + (burstActive ? 0.7 : 0)) + node.userData.phase + (i * 0.35);
+        const z = Math.sin(a * 1.65) * (0.22 + quantumMode * 0.28 + (burstActive ? 0.12 : 0));
         node.position.set(Math.cos(a) * ring, Math.sin(a) * ring, z);
 
         const active = (i / partNodeCount) < (0.2 + loadNorm * 0.8);
-        node.material.opacity = active ? (0.35 + quantumMode * 0.45) : 0.08;
+        node.material.opacity = active ? (0.32 + quantumMode * 0.5 + (burstActive ? 0.12 : 0)) : 0.08;
       });
 
+      // data streams traffic
+      const pos = streamGeometry.attributes.position.array;
+      const streamIntensity = clamp((s.streamsActive / 60), 0, 1);
+      streamMaterial.opacity = 0.03 + streamIntensity * (0.35 + (burstActive ? 0.3 : 0));
+      streamMaterial.size = 0.012 + streamIntensity * 0.02 + (burstActive ? 0.01 : 0);
+
+      for (let i = 0; i < streamCount; i++) {
+        const idx = i * 3;
+        const meta = streamMeta[i];
+        const v = meta.vel * (1 + speedNorm * 4 + quantumMode * 1.2 + (burstActive ? 2.4 : 0));
+
+        pos[idx + meta.axis] += v * meta.dir;
+
+        // wrap bounds in cube volume
+        if (pos[idx] > 2.1) pos[idx] = -2.1;
+        if (pos[idx] < -2.1) pos[idx] = 2.1;
+        if (pos[idx + 1] > 2.1) pos[idx + 1] = -2.1;
+        if (pos[idx + 1] < -2.1) pos[idx + 1] = 2.1;
+        if (pos[idx + 2] > 2.1) pos[idx + 2] = -2.1;
+        if (pos[idx + 2] < -2.1) pos[idx + 2] = 2.1;
+      }
+      streamGeometry.attributes.position.needsUpdate = true;
+
+      // stage display
+      const stagePretty = s.stage.toUpperCase();
+      const modePretty = s.mode.toUpperCase();
       const hudNode = document.getElementById('navigation-hud');
       hudNode.innerHTML =
 `PROJECTION: 4D TESSERACT<br>
-MODE: ${s.mode.toUpperCase()} | ROWS: ${(s.rows || 0).toLocaleString()} | COLS: ${s.cols || 0}<br>
+MODE: ${modePretty} | STAGE: ${stagePretty} | ROWS: ${(s.rows || 0).toLocaleString()}<br>
 LATENCY: ${(s.latencyNs || 0).toFixed(5)} ns | THROUGHPUT: ${(s.throughput || 0).toLocaleString()} op/s<br>
+POWER: ${(s.powerTW || 0).toFixed(2)} TW-EQ | STREAMS: ${Math.round(s.streamsActive || 0)} ACTIVE<br>
 Z-DEPTH: ${webglCameraNode.position.z.toFixed(4)} ${webglCameraNode.position.z <= 1.7 ? '<span style="color:var(--cyber-cyan);font-weight:bold;">[INSIDE CORE]</span>' : '(OUTSIDE SHELL)'}<br>
 ⚙️ PINCH/SCROLL TO NAVIGATE • PRESS C TO CYCLE COLORS`;
 
@@ -973,7 +1090,7 @@ Z-DEPTH: ${webglCameraNode.position.z.toFixed(4)} ${webglCameraNode.position.z <
 
     window.addEventListener('resize', () => {
       if (webglContainerNode.clientWidth > 0) {
-        const h = webglContainerNode.clientHeight || 320;
+        const h = webglContainerNode.clientHeight || 340;
         webglCameraNode.aspect = webglContainerNode.clientWidth / h;
         webglCameraNode.updateProjectionMatrix();
         webglRendererInstance.setSize(webglContainerNode.clientWidth, h);
