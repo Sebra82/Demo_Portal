@@ -15,7 +15,9 @@
       --text-white: #ffffff;
       --text-dim: #4a5d78;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       background-color: var(--bg-deep);
       color: var(--terminal-green);
@@ -23,6 +25,7 @@
       padding: 24px;
       overflow-x: hidden;
     }
+
     .app-container {
       max-width: 1600px;
       margin: 0 auto;
@@ -30,6 +33,7 @@
       grid-template-columns: 1fr 460px;
       gap: 24px;
     }
+
     header {
       grid-column: span 2;
       border-bottom: 1px solid var(--border-clean);
@@ -40,12 +44,14 @@
       gap: 12px;
       flex-wrap: wrap;
     }
+
     .brand-title {
       font-size: 0.85rem;
       letter-spacing: 2px;
       font-weight: 700;
       color: var(--text-white);
     }
+
     .system-status {
       font-size: 0.75rem;
       background: rgba(0, 240, 255, 0.05);
@@ -54,17 +60,20 @@
       color: var(--cyber-cyan);
       text-transform: uppercase;
     }
+
     .main-workspace {
       display: flex;
       flex-direction: column;
       gap: 24px;
     }
+
     .card-panel {
       background: var(--panel-bg);
       border: 1px solid var(--border-clean);
       border-radius: 4px;
       padding: 20px;
     }
+
     .panel-heading {
       font-size: 0.75rem;
       color: var(--text-white);
@@ -74,19 +83,33 @@
       border-left: 2px solid var(--terminal-green);
       padding-left: 10px;
     }
+
     .telemetry-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
     }
+
     .telemetry-node {
       background: rgba(3, 5, 8, 0.5);
       border: 1px solid var(--border-clean);
       padding: 12px;
       border-radius: 2px;
     }
-    .telemetry-label { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; }
-    .telemetry-value { font-size: 1.1rem; font-weight: bold; color: var(--text-white); margin-top: 4px; }
+
+    .telemetry-label {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .telemetry-value {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--text-white);
+      margin-top: 4px;
+    }
+
     .telemetry-value span { color: var(--cyber-cyan); }
 
     .progress-wrap {
@@ -95,6 +118,7 @@
       background: #020305;
       height: 10px;
     }
+
     .progress-bar {
       height: 100%;
       width: 0%;
@@ -109,6 +133,7 @@
       margin-bottom: 20px;
       flex-wrap: wrap;
     }
+
     .input-box {
       background: var(--bg-deep);
       border: 1px solid var(--border-clean);
@@ -120,7 +145,11 @@
       width: 220px;
       text-align: center;
     }
-    .input-box:focus { border-color: var(--cyber-cyan); outline: none; }
+
+    .input-box:focus {
+      border-color: var(--cyber-cyan);
+      outline: none;
+    }
 
     .action-btn {
       background: transparent;
@@ -135,15 +164,28 @@
       letter-spacing: 0.5px;
       transition: all 0.2s ease;
     }
-    .action-btn:hover { background: rgba(0, 255, 102, 0.08); box-shadow: 0 0 12px rgba(0, 255, 102, 0.2); }
-    .action-btn.quantum-btn { border-color: var(--cyber-cyan); color: var(--cyber-cyan); }
-    .action-btn.quantum-btn:hover { background: rgba(0, 240, 255, 0.08); box-shadow: 0 0 12px rgba(0, 240, 255, 0.2); }
+
+    .action-btn:hover {
+      background: rgba(0, 255, 102, 0.08);
+      box-shadow: 0 0 12px rgba(0, 255, 102, 0.2);
+    }
+
+    .action-btn.quantum-btn {
+      border-color: var(--cyber-cyan);
+      color: var(--cyber-cyan);
+    }
+
+    .action-btn.quantum-btn:hover {
+      background: rgba(0, 240, 255, 0.08);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+    }
 
     .output-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
     }
+
     .terminal-block {
       background: #020305;
       border: 1px solid var(--border-clean);
@@ -162,13 +204,21 @@
       background: var(--panel-bg);
       border: 1px solid var(--border-clean);
       border-radius: 4px;
-      height: 520px;
+      height: 320px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
     }
-    #webgl-canvas-target { width: 100%; height: 100%; cursor: grab; }
+
+    #webgl-canvas-target {
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+
     #webgl-canvas-target:active { cursor: grabbing; }
+
     .viewer-overlay-text {
       position: absolute;
       top: 0;
@@ -181,13 +231,20 @@
       border-right: 1px solid var(--border-clean);
       z-index: 10;
       line-height: 1.45;
+      pointer-events: none;
     }
 
-    .store-pane { display: flex; flex-direction: column; gap: 16px; }
+    .store-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
     .store-pane .card-panel {
       display: flex;
       flex-direction: column;
     }
+
     .license-card {
       border: 1px solid var(--border-clean);
       background: var(--bg-deep);
@@ -196,11 +253,18 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
+
     .license-card.selected {
       border-color: var(--cyber-cyan);
       background: rgba(0, 240, 255, 0.02);
     }
-    .price-text { font-size: 1.4rem; color: var(--text-white); font-weight: bold; margin-top: 8px; }
+
+    .price-text {
+      font-size: 1.4rem;
+      color: var(--text-white);
+      font-weight: bold;
+      margin-top: 8px;
+    }
 
     .checkout-btn {
       background: var(--cyber-cyan);
@@ -215,7 +279,10 @@
       border-radius: 4px;
       text-align: center;
     }
-    .checkout-btn:hover { box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
+
+    .checkout-btn:hover {
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+    }
 
     .delivery-box {
       border: 1px dashed var(--terminal-green);
@@ -225,6 +292,7 @@
       display: none;
       margin-top: 16px;
     }
+
     .download-link {
       display: block;
       color: var(--cyber-cyan);
@@ -243,6 +311,7 @@
       align-items: center;
       justify-content: center;
     }
+
     .modal-window {
       background: var(--panel-bg);
       border: 1px solid var(--cyber-cyan);
@@ -250,7 +319,9 @@
       width: min(92vw, 460px);
       border-radius: 4px;
     }
+
     .form-row { margin-bottom: 16px; }
+
     .form-row label {
       display: block;
       font-size: 0.65rem;
@@ -258,6 +329,7 @@
       margin-bottom: 6px;
       text-transform: uppercase;
     }
+
     .form-row input {
       width: 100%;
       background: var(--bg-deep);
@@ -286,10 +358,22 @@
       <div class="card-panel">
         <div class="panel-heading">System Operations Telemetry</div>
         <div class="telemetry-grid">
-          <div class="telemetry-node"><div class="telemetry-label">Ingestion Latency</div><div class="telemetry-value"><span id="telemetry-lat">3.50035</span> ns</div></div>
-          <div class="telemetry-node"><div class="telemetry-label">Processing Rate</div><div class="telemetry-value"><span id="telemetry-tp">285,000,000</span> op/s</div></div>
-          <div class="telemetry-node"><div class="telemetry-label">Core Engine Mode</div><div class="telemetry-value" style="color:var(--cyber-cyan)">RAM_MESH</div></div>
-          <div class="telemetry-node"><div class="telemetry-label">Session Uptime</div><div class="telemetry-value"><span id="telemetry-time">0</span>s</div></div>
+          <div class="telemetry-node">
+            <div class="telemetry-label">Ingestion Latency</div>
+            <div class="telemetry-value"><span id="telemetry-lat">3.50035</span> ns</div>
+          </div>
+          <div class="telemetry-node">
+            <div class="telemetry-label">Processing Rate</div>
+            <div class="telemetry-value"><span id="telemetry-tp">285,000,000</span> op/s</div>
+          </div>
+          <div class="telemetry-node">
+            <div class="telemetry-label">Core Engine Mode</div>
+            <div class="telemetry-value" style="color:var(--cyber-cyan)">RAM_MESH</div>
+          </div>
+          <div class="telemetry-node">
+            <div class="telemetry-label">Session Uptime</div>
+            <div class="telemetry-value"><span id="telemetry-time">0</span>s</div>
+          </div>
         </div>
         <div class="progress-wrap"><div class="progress-bar" id="accel-bar"></div></div>
       </div>
@@ -336,11 +420,11 @@ Awaiting query authorization token pass...</div>
           <a class="download-link" onclick="downloadAssetFromBackend('ingestion_driver.dll')">📦 Download Core Air-Gapped Ingestion Driver (.DLL)</a>
         </div>
 
-        <div class="viewer-pane" style="height: 320px; margin-top: 16px;">
+        <div class="viewer-pane" style="margin-top:16px;">
           <div class="viewer-overlay-text" id="navigation-hud">
             PROJECTION: 4D TESSERACT<br>
             Z-DEPTH: 6.0000 (OUTSIDE SHELL)<br>
-            ⚙️ SCROLL / PINCH TO ENTER CORE
+            ⚙️ SCROLL / PINCH TO ENTER CORE • PRESS C TO CYCLE COLORS
           </div>
           <div id="webgl-canvas-target"></div>
         </div>
@@ -405,9 +489,7 @@ Awaiting query authorization token pass...</div>
       });
 
       const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data.token) {
-        throw new Error(data.error || "Checkout failed");
-      }
+      if (!response.ok || !data.token) throw new Error(data.error || "Checkout failed");
 
       activeLicenseToken = data.token;
       return data.token;
@@ -514,15 +596,39 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
       };
     }
 
+    // =============================
+    // Enhanced 3D Quantum Tesseract
+    // =============================
     const webglContainerNode = document.getElementById('webgl-canvas-target');
     const threeSceneInstance = new THREE.Scene();
     threeSceneInstance.background = new THREE.Color(0x030508);
 
-    const webglCameraNode = new THREE.PerspectiveCamera(45, webglContainerNode.clientWidth / webglContainerNode.clientHeight, 0.1, 1000);
+    const webglCameraNode = new THREE.PerspectiveCamera(
+      50,
+      webglContainerNode.clientWidth / webglContainerNode.clientHeight,
+      0.05,
+      2000
+    );
+
     const webglRendererInstance = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     webglRendererInstance.setSize(webglContainerNode.clientWidth, webglContainerNode.clientHeight);
     webglRendererInstance.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     webglContainerNode.appendChild(webglRendererInstance.domElement);
+
+    const THEMES = [
+      { outer: 0x00f0ff, inner: 0x00ff66, strut: 0x335577, orbit: 0xff00cc, core: 0x66ffee, bg: 0x030508 },
+      { outer: 0xff7a00, inner: 0xffe600, strut: 0x553300, orbit: 0xff3366, core: 0xffcc88, bg: 0x0b0602 },
+      { outer: 0x8b5cf6, inner: 0x22d3ee, strut: 0x2b2d66, orbit: 0xf43f5e, core: 0xc4b5fd, bg: 0x05040a },
+      { outer: 0xa3e635, inner: 0x4ade80, strut: 0x2f4f2f, orbit: 0x22c55e, core: 0xd9f99d, bg: 0x030805 }
+    ];
+    let activeThemeIndex = 0;
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+    const keyLight = new THREE.PointLight(0x88ccff, 1.1, 30);
+    keyLight.position.set(4, 4, 6);
+    const rimLight = new THREE.PointLight(0x00ffaa, 0.8, 25);
+    rimLight.position.set(-5, -3, -4);
+    threeSceneInstance.add(ambient, keyLight, rimLight);
 
     const outerBoxGeometry = new THREE.BoxGeometry(2.2, 2.2, 2.2);
     const outerBoxEdges = new THREE.EdgesGeometry(outerBoxGeometry);
@@ -536,19 +642,87 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
     const innerWireframeCubeMesh = new THREE.LineSegments(innerBoxEdges, innerBoxLineMaterial);
     threeSceneInstance.add(innerWireframeCubeMesh);
 
-    const connectingStrutsMaterial = new THREE.LineBasicMaterial({ color: 0x121e2d, transparent: true, opacity: 0.7 });
+    const connectingStrutsMaterial = new THREE.LineBasicMaterial({
+      color: 0x335577,
+      transparent: true,
+      opacity: 0.75
+    });
+
     const connectingStrutsGeometry = new THREE.BufferGeometry();
     const rawVertexCoordinatePositions = [];
-    const outerSpatialVerticesMap = [[-1.1,-1.1,-1.1], [1.1,-1.1,-1.1], [1.1,1.1,-1.1], [-1.1,1.1,-1.1], [-1.1,-1.1,1.1], [1.1,-1.1,1.1], [1.1,1.1,1.1], [-1.1,1.1,1.1]];
+    const outerSpatialVerticesMap = [
+      [-1.1,-1.1,-1.1], [1.1,-1.1,-1.1], [1.1,1.1,-1.1], [-1.1,1.1,-1.1],
+      [-1.1,-1.1,1.1], [1.1,-1.1,1.1], [1.1,1.1,1.1], [-1.1,1.1,1.1]
+    ];
     const innerSpatialVerticesMap = outerSpatialVerticesMap.map(vert => vert.map(coord => coord * 0.5));
+
     for (let i = 0; i < 8; i++) {
       rawVertexCoordinatePositions.push(...outerSpatialVerticesMap[i], ...innerSpatialVerticesMap[i]);
     }
+
     connectingStrutsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(rawVertexCoordinatePositions, 3));
     const internalConvergenceStruts = new THREE.LineSegments(connectingStrutsGeometry, connectingStrutsMaterial);
     threeSceneInstance.add(internalConvergenceStruts);
 
-    webglCameraNode.position.z = 6.0;
+    const orbitGroup = new THREE.Group();
+    const orbitLineMaterial = new THREE.LineBasicMaterial({
+      color: 0xff00cc,
+      transparent: true,
+      opacity: 0.55
+    });
+
+    function makeOrbit(radius, segments = 96) {
+      const points = [];
+      for (let i = 0; i <= segments; i++) {
+        const a = (i / segments) * Math.PI * 2;
+        points.push(new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius, 0));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(points);
+      return new THREE.Line(geo, orbitLineMaterial);
+    }
+
+    const orbit1 = makeOrbit(1.55);
+    const orbit2 = makeOrbit(1.9);
+    orbit2.rotation.x = Math.PI / 2.8;
+    const orbit3 = makeOrbit(1.35);
+    orbit3.rotation.y = Math.PI / 2.2;
+    orbitGroup.add(orbit1, orbit2, orbit3);
+    threeSceneInstance.add(orbitGroup);
+
+    const corePointsGeometry = new THREE.BufferGeometry();
+    const coreCount = 128;
+    const corePositions = new Float32Array(coreCount * 3);
+
+    for (let i = 0; i < coreCount; i++) {
+      const r = 0.15 + Math.random() * 0.55;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos((Math.random() * 2) - 1);
+      corePositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      corePositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      corePositions[i * 3 + 2] = r * Math.cos(phi);
+    }
+
+    corePointsGeometry.setAttribute('position', new THREE.BufferAttribute(corePositions, 3));
+    const corePointsMaterial = new THREE.PointsMaterial({
+      color: 0x66ffee,
+      size: 0.03,
+      transparent: true,
+      opacity: 0.9
+    });
+    const corePoints = new THREE.Points(corePointsGeometry, corePointsMaterial);
+    threeSceneInstance.add(corePoints);
+
+    function applyTheme(idx) {
+      const t = THEMES[idx];
+      threeSceneInstance.background.setHex(t.bg);
+      outerBoxLineMaterial.color.setHex(t.outer);
+      innerBoxLineMaterial.color.setHex(t.inner);
+      connectingStrutsMaterial.color.setHex(t.strut);
+      orbitLineMaterial.color.setHex(t.orbit);
+      corePointsMaterial.color.setHex(t.core);
+    }
+
+    webglCameraNode.position.set(0, 0, 6.0);
 
     let localPointerIsDragging = false;
     let baselinePointerX = 0;
@@ -559,82 +733,130 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
       baselinePointerX = e.clientX;
       baselinePointerY = e.clientY;
     });
+
     window.addEventListener('mouseup', () => { localPointerIsDragging = false; });
 
     webglContainerNode.addEventListener('mousemove', (e) => {
       if (!localPointerIsDragging) return;
+
       const deltaX = e.clientX - baselinePointerX;
       const deltaY = e.clientY - baselinePointerY;
-      outerWireframeCubeMesh.rotation.y += deltaX * 0.01;
-      outerWireframeCubeMesh.rotation.x += deltaY * 0.01;
-      innerWireframeCubeMesh.rotation.y += deltaX * 0.01;
-      innerWireframeCubeMesh.rotation.x += deltaY * 0.01;
-      internalConvergenceStruts.rotation.y = outerWireframeCubeMesh.rotation.y;
-      internalConvergenceStruts.rotation.x = outerWireframeCubeMesh.rotation.x;
+      const ry = deltaX * 0.008;
+      const rx = deltaY * 0.008;
+
+      outerWireframeCubeMesh.rotation.y += ry;
+      outerWireframeCubeMesh.rotation.x += rx;
+      innerWireframeCubeMesh.rotation.y += ry;
+      innerWireframeCubeMesh.rotation.x += rx;
+      internalConvergenceStruts.rotation.y += ry;
+      internalConvergenceStruts.rotation.x += rx;
+      orbitGroup.rotation.y += ry * 0.7;
+      orbitGroup.rotation.x += rx * 0.7;
+      corePoints.rotation.y += ry * 0.9;
+      corePoints.rotation.x += rx * 0.9;
+
       baselinePointerX = e.clientX;
       baselinePointerY = e.clientY;
     });
 
     let baselineTouchDistance = null;
+    let lastTouchAngle = null;
+
+    function getTouchDistance(t1, t2) {
+      return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+    }
+
+    function getTouchAngle(t1, t2) {
+      return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX);
+    }
+
     webglContainerNode.addEventListener('touchmove', (e) => {
       if (e.touches.length === 2) {
-        const distance = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
+        e.preventDefault();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+
+        const distance = getTouchDistance(t1, t2);
+        const angle = getTouchAngle(t1, t2);
+
         if (baselineTouchDistance !== null) {
-          const deltaScroll = (baselineTouchDistance - distance) * 0.02;
-          adjustCameraZDepth(deltaScroll);
+          const deltaZoom = (baselineTouchDistance - distance) * 0.02;
+          adjustCameraZDepth(deltaZoom);
         }
+
+        if (lastTouchAngle !== null) {
+          const dAng = angle - lastTouchAngle;
+          outerWireframeCubeMesh.rotation.z += dAng * 0.8;
+          innerWireframeCubeMesh.rotation.z += dAng * 0.8;
+          internalConvergenceStruts.rotation.z += dAng * 0.8;
+          orbitGroup.rotation.z += dAng * 0.6;
+        }
+
         baselineTouchDistance = distance;
+        lastTouchAngle = angle;
       }
-    }, { passive: true });
-    webglContainerNode.addEventListener('touchend', () => { baselineTouchDistance = null; });
+    }, { passive: false });
+
+    webglContainerNode.addEventListener('touchend', () => {
+      baselineTouchDistance = null;
+      lastTouchAngle = null;
+    });
 
     webglContainerNode.addEventListener('wheel', (e) => {
       e.preventDefault();
-      adjustCameraZDepth(e.deltaY * 0.005);
+      adjustCameraZDepth(e.deltaY * 0.0045);
     }, { passive: false });
 
     function adjustCameraZDepth(scrollDelta) {
-      webglCameraNode.position.z = Math.max(1.2, Math.min(webglCameraNode.position.z + scrollDelta, 8.0));
+      webglCameraNode.position.z = Math.max(0.65, Math.min(webglCameraNode.position.z + scrollDelta, 10.0));
       const hudNode = document.getElementById('navigation-hud');
       const currentZDepth = webglCameraNode.position.z;
 
-      if (currentZDepth <= 2.2) {
+      if (currentZDepth <= 1.7) {
         hudNode.innerHTML =
 `PROJECTION: 4D TESSERACT<br>
-Z-DEPTH: ${currentZDepth.toFixed(4)} <span style="color:var(--cyber-cyan);font-weight:bold;">[INSIDE MESH CORE]</span><br>
-⚙️ SCROLL REVERSE TO EXIT INNER BOUNDS`;
-        outerBoxLineMaterial.color.setHex(0x121e2d);
-        innerBoxLineMaterial.color.setHex(0x00f0ff);
-        connectingStrutsMaterial.color.setHex(0x00ff66);
+Z-DEPTH: ${currentZDepth.toFixed(4)} <span style="color:var(--cyber-cyan);font-weight:bold;">[INSIDE CORE VOLUME]</span><br>
+⚙️ PINCH / SCROLL TO NAVIGATE INNER LAYERS • PRESS C TO CYCLE COLORS`;
+        connectingStrutsMaterial.opacity = 1.0;
+        corePointsMaterial.size = 0.04;
       } else {
         hudNode.innerHTML =
 `PROJECTION: 4D TESSERACT<br>
 Z-DEPTH: ${currentZDepth.toFixed(4)} (OUTSIDE SHELL)<br>
-⚙️ SCROLL / PINCH TO ENTER CORE`;
-        outerBoxLineMaterial.color.setHex(0x00f0ff);
-        innerBoxLineMaterial.color.setHex(0x00ff66);
-        connectingStrutsMaterial.color.setHex(0x121e2d);
+⚙️ SCROLL / PINCH TO ENTER CORE • PRESS C TO CYCLE COLORS`;
+        connectingStrutsMaterial.opacity = 0.75;
+        corePointsMaterial.size = 0.03;
       }
     }
 
+    window.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 'c') {
+        activeThemeIndex = (activeThemeIndex + 1) % THEMES.length;
+        applyTheme(activeThemeIndex);
+      }
+    });
+
+    applyTheme(activeThemeIndex);
+
     function renderViewportCycle() {
       requestAnimationFrame(renderViewportCycle);
-      const continuousRotationVelocity = 0.003 * globalVelocityFactor;
+
+      const continuousRotationVelocity = 0.0025 * globalVelocityFactor;
 
       if (!localPointerIsDragging) {
         outerWireframeCubeMesh.rotation.x += continuousRotationVelocity;
         outerWireframeCubeMesh.rotation.y += continuousRotationVelocity * 0.7;
-        innerWireframeCubeMesh.rotation.x -= continuousRotationVelocity * 0.5;
-        innerWireframeCubeMesh.rotation.y -= continuousRotationVelocity * 1.2;
-        internalConvergenceStruts.rotation.x = outerWireframeCubeMesh.rotation.x;
-        internalConvergenceStruts.rotation.y = outerWireframeCubeMesh.rotation.y;
+        innerWireframeCubeMesh.rotation.x -= continuousRotationVelocity * 0.45;
+        innerWireframeCubeMesh.rotation.y -= continuousRotationVelocity * 1.1;
+        internalConvergenceStruts.rotation.x += continuousRotationVelocity * 0.2;
+        internalConvergenceStruts.rotation.y += continuousRotationVelocity * 0.2;
+        orbitGroup.rotation.z += continuousRotationVelocity * 0.8;
+        orbitGroup.rotation.y += continuousRotationVelocity * 0.4;
+        corePoints.rotation.y += continuousRotationVelocity * 0.9;
       }
 
-      const geographicPulseWaveScale = 1 + (Math.sin(Date.now() * 0.002 * globalVelocityFactor) * 0.1);
-      innerWireframeCubeMesh.scale.set(geographicPulseWaveScale * 0.5, geographicPulseWaveScale * 0.5, geographicPulseWaveScale * 0.5);
+      const pulse = 1 + (Math.sin(Date.now() * 0.002 * globalVelocityFactor) * 0.08);
+      innerWireframeCubeMesh.scale.set(pulse * 0.5, pulse * 0.5, pulse * 0.5);
 
       webglRendererInstance.render(threeSceneInstance, webglCameraNode);
     }
@@ -642,7 +864,7 @@ Z-DEPTH: ${currentZDepth.toFixed(4)} (OUTSIDE SHELL)<br>
 
     window.addEventListener('resize', () => {
       if (webglContainerNode.clientWidth > 0) {
-        const h = webglContainerNode.clientHeight || 520;
+        const h = webglContainerNode.clientHeight || 320;
         webglCameraNode.aspect = webglContainerNode.clientWidth / h;
         webglCameraNode.updateProjectionMatrix();
         webglRendererInstance.setSize(webglContainerNode.clientWidth, h);
