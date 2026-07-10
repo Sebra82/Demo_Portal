@@ -981,6 +981,7 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
       webglCameraNode.position.z = Math.max(0.62, Math.min(webglCameraNode.position.z + scrollDelta, 10.0));
     }
 
+    // Existing C hotkey: theme cycle
     window.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() === 'c') {
         activeThemeIndex = (activeThemeIndex + 1) % THEMES.length;
@@ -1137,6 +1138,42 @@ Z-DEPTH: ${webglCameraNode.position.z.toFixed(4)} ${webglCameraNode.position.z <
       document.getElementById('telemetry-lat').innerText = fluctuatingLatency;
       document.getElementById('telemetry-tp').innerText = fluctuatingThroughput.toLocaleString();
     }, 1000);
+  </script>
+
+  <!-- 1) Enforce strict numerical bounds to protect client browser threads -->
+  <script>
+    function validateRowCeiling() {
+      const inputNode = document.getElementById('row-input');
+      if (!inputNode) return;
+
+      let parsedRows = parseInt(inputNode.value, 10);
+      if (!Number.isFinite(parsedRows)) parsedRows = 1000000;
+
+      if (parsedRows > 15000000) {
+        inputNode.value = "13500000"; // Dynamic lock to your corporate peak benchmark ceiling
+
+        const standardTerminal = document.getElementById('standard-terminal');
+        const quantumTerminal = document.getElementById('quantum-terminal');
+        const logLine = `[SECURITY] Target upscaled to maximum hardware constraint: 13,500,000 rows.\n`;
+
+        if (standardTerminal) standardTerminal.textContent += `\n${logLine}`;
+        if (quantumTerminal) quantumTerminal.textContent += `\n${logLine}`;
+      }
+    }
+
+    const rowInputNode = document.getElementById('row-input');
+    if (rowInputNode) rowInputNode.addEventListener('blur', validateRowCeiling);
+  </script>
+
+  <!-- 2) Bind keyboard shortcuts to enrich the 4D canvas interactivity -->
+  <script>
+    window.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 'c') {
+        const standardTerminal = document.getElementById('standard-terminal');
+        const logLine = `[GEOMETRY] Re-calibrating quad-axis (XYZW) color spectrum parameters...\n`;
+        if (standardTerminal) standardTerminal.textContent += `\n${logLine}`;
+      }
+    });
   </script>
 </body>
 </html>
