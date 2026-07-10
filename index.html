@@ -184,6 +184,10 @@
     }
 
     .store-pane { display: flex; flex-direction: column; gap: 16px; }
+    .store-pane .card-panel {
+      display: flex;
+      flex-direction: column;
+    }
     .license-card {
       border: 1px solid var(--border-clean);
       background: var(--bg-deep);
@@ -305,15 +309,6 @@ Awaiting query authorization token pass...</div>
 Awaiting query authorization token pass...</div>
         </div>
       </div>
-
-      <div class="viewer-pane">
-        <div class="viewer-overlay-text" id="navigation-hud">
-          PROJECTION: 4D TESSERACT<br>
-          Z-DEPTH: 6.0000 (OUTSIDE SHELL)<br>
-          ⚙️ SCROLL / PINCH TO ENTER CORE
-        </div>
-        <div id="webgl-canvas-target"></div>
-      </div>
     </div>
 
     <div class="store-pane">
@@ -339,6 +334,15 @@ Awaiting query authorization token pass...</div>
           <a class="download-link" onclick="downloadAssetFromBackend('license_key.txt')">⚡ Download Signed Corporate License Key (.TXT)</a>
           <a class="download-link" onclick="downloadAssetFromBackend('optimization_guide.pdf')">📘 Download Power BI & Excel Optimization Guide (.PDF)</a>
           <a class="download-link" onclick="downloadAssetFromBackend('ingestion_driver.dll')">📦 Download Core Air-Gapped Ingestion Driver (.DLL)</a>
+        </div>
+
+        <div class="viewer-pane" style="height: 320px; margin-top: 16px;">
+          <div class="viewer-overlay-text" id="navigation-hud">
+            PROJECTION: 4D TESSERACT<br>
+            Z-DEPTH: 6.0000 (OUTSIDE SHELL)<br>
+            ⚙️ SCROLL / PINCH TO ENTER CORE
+          </div>
+          <div id="webgl-canvas-target"></div>
         </div>
       </div>
     </div>
