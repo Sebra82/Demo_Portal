@@ -429,7 +429,8 @@ Awaiting query authorization token pass...</div>
             PROJECTION: 4D TESSERACT<br>
             MODE: IDLE | STAGE: STANDBY | ROWS: 0<br>
             LATENCY: 0.00000 ns | THROUGHPUT: 0 op/s<br>
-            POWER: 0.00 TW-EQ | STREAMS: 0 ACTIVE<br>
+            FACETS: 128+ ACTIVE SHELL | STREAMS: 0 ACTIVE<br>
+            POWER: 0.00 TW-EQ<br>
             Z-DEPTH: 6.0000 (OUTSIDE SHELL)<br>
             ⚙️ PINCH/SCROLL TO NAVIGATE • PRESS C TO CYCLE COLORS
           </div>
@@ -483,7 +484,7 @@ Awaiting query authorization token pass...</div>
       throughput: 0,
       memMB: 0,
       insideCoreBoost: 0,
-      powerTW: 0,                    // synthetic "power equivalent"
+      powerTW: 0,                    // synthetic display metric
       streamsActive: 0,
       burstUntil: 0                  // timestamp for burst visual mode
     };
@@ -497,18 +498,15 @@ Awaiting query authorization token pass...</div>
     }
 
     function startStageSequence(mode = "standard") {
-      const now = performance.now();
       const base = mode === "quantum" ? 320 : 460;
-      // schedule transient stage changes
       setTimeout(() => updateModelVisuals({ stage: "ingest" }), 0);
       setTimeout(() => updateModelVisuals({ stage: "hash" }), base);
       setTimeout(() => updateModelVisuals({ stage: "join" }), base * 2);
       setTimeout(() => updateModelVisuals({ stage: "emit" }), base * 3);
       setTimeout(() => updateModelVisuals({ stage: "standby" }), base * 4);
 
-      // power burst window (quantum stronger)
       const burstMs = mode === "quantum" ? 3200 : 1400;
-      updateModelVisuals({ burstUntil: now + burstMs });
+      updateModelVisuals({ burstUntil: performance.now() + burstMs });
     }
 
     function selectMarketplaceTier(tier, price) {
@@ -591,7 +589,7 @@ Awaiting query authorization token pass...</div>
       const throughputOpsPerSec = Math.floor(netCalculationsCount / (computedDurationMs / 1000));
       const byteMemoryFootprint = (totalInputRows * operationColumnsCount * 4) / (1024 * 1024);
 
-      const powerTW = (throughputOpsPerSec / 1e8) * (randomizedJitterNs / 8.5); // synthetic display metric
+      const powerTW = (throughputOpsPerSec / 1e8) * (randomizedJitterNs / 8.5);
 
       updateModelVisuals({
         mode: "standard",
@@ -713,7 +711,6 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
     rimLight.position.set(-5, -3, -4);
     threeSceneInstance.add(ambient, keyLight, rimLight);
 
-    // Core wireframes
     const outerBoxGeometry = new THREE.BoxGeometry(2.2, 2.2, 2.2);
     const outerBoxEdges = new THREE.EdgesGeometry(outerBoxGeometry);
     const outerBoxLineMaterial = new THREE.LineBasicMaterial({ color: 0x00f0ff });
@@ -747,6 +744,27 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
     connectingStrutsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(rawVertexCoordinatePositions, 3));
     const internalConvergenceStruts = new THREE.LineSegments(connectingStrutsGeometry, connectingStrutsMaterial);
     threeSceneInstance.add(internalConvergenceStruts);
+
+    // 128+ shell complexity
+    const complexShellGeo = new THREE.IcosahedronGeometry(1.9, 3);
+    const complexShellEdges = new THREE.EdgesGeometry(complexShellGeo, 20);
+    const complexShellMat = new THREE.LineBasicMaterial({
+      color: 0xffcc33,
+      transparent: true,
+      opacity: 0.35
+    });
+    const complexShell = new THREE.LineSegments(complexShellEdges, complexShellMat);
+    threeSceneInstance.add(complexShell);
+
+    const innerShellGeo = new THREE.IcosahedronGeometry(1.35, 2);
+    const innerShellEdges = new THREE.EdgesGeometry(innerShellGeo, 20);
+    const innerShellMat = new THREE.LineBasicMaterial({
+      color: 0xff3366,
+      transparent: true,
+      opacity: 0.28
+    });
+    const innerShell = new THREE.LineSegments(innerShellEdges, innerShellMat);
+    threeSceneInstance.add(innerShell);
 
     // Orbit rings
     const orbitGroup = new THREE.Group();
@@ -796,7 +814,7 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
     const corePoints = new THREE.Points(corePointsGeometry, corePointsMaterial);
     threeSceneInstance.add(corePoints);
 
-    // Model layers ("parts used")
+    // Model layers
     const modelLayerGroup = new THREE.Group();
     threeSceneInstance.add(modelLayerGroup);
 
@@ -828,7 +846,7 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
       partNodes.push(n);
     }
 
-    // Data stream particles (animated traffic lines)
+    // Data stream particles
     const streamCount = 180;
     const streamPositions = new Float32Array(streamCount * 3);
     const streamMeta = [];
@@ -893,6 +911,10 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
       innerWireframeCubeMesh.rotation.x += rx;
       internalConvergenceStruts.rotation.y += ry;
       internalConvergenceStruts.rotation.x += rx;
+      complexShell.rotation.y += ry * 0.65;
+      complexShell.rotation.x += rx * 0.65;
+      innerShell.rotation.y += ry * 0.7;
+      innerShell.rotation.x += rx * 0.7;
       orbitGroup.rotation.y += ry * 0.7;
       orbitGroup.rotation.x += rx * 0.7;
       corePoints.rotation.y += ry * 0.9;
@@ -934,6 +956,8 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
           outerWireframeCubeMesh.rotation.z += dAng * 0.8;
           innerWireframeCubeMesh.rotation.z += dAng * 0.8;
           internalConvergenceStruts.rotation.z += dAng * 0.8;
+          complexShell.rotation.z += dAng * 0.7;
+          innerShell.rotation.z += dAng * 0.7;
           orbitGroup.rotation.z += dAng * 0.6;
           modelLayerGroup.rotation.z += dAng * 0.5;
         }
@@ -979,13 +1003,16 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
         innerWireframeCubeMesh.rotation.y -= continuousRotationVelocity * 1.1;
         internalConvergenceStruts.rotation.x += continuousRotationVelocity * 0.2;
         internalConvergenceStruts.rotation.y += continuousRotationVelocity * 0.2;
+        complexShell.rotation.x += continuousRotationVelocity * 0.35;
+        complexShell.rotation.y += continuousRotationVelocity * 0.5;
+        innerShell.rotation.y -= continuousRotationVelocity * 0.7;
+        innerShell.rotation.z += continuousRotationVelocity * 0.38;
         orbitGroup.rotation.z += continuousRotationVelocity * 0.8;
         orbitGroup.rotation.y += continuousRotationVelocity * 0.4;
         corePoints.rotation.y += continuousRotationVelocity * 0.9;
         modelLayerGroup.rotation.y += continuousRotationVelocity * 0.55;
       }
 
-      // ---- model-to-visual mapping ----
       const s = modelVisualState;
       const loadNorm = clamp(s.rows / 15000000, 0, 1);
       const speedNorm = clamp((s.throughput || 0) / 300000000, 0, 1);
@@ -993,13 +1020,11 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
       const quantumMode = s.mode === "quantum" ? 1 : 0;
       const burstActive = now < s.burstUntil;
 
-      // camera punch-in during burst, recovers smoothly
       const targetZ = burstActive
         ? (quantumMode ? 1.15 : 1.7)
         : (quantumMode ? 2.2 : 3.1);
       webglCameraNode.position.z += (targetZ - webglCameraNode.position.z) * 0.03;
 
-      // spin + pulse intensity
       const dynSpin = continuousRotationVelocity * (1 + speedNorm * 4.2 + (burstActive ? 1.2 : 0));
       outerWireframeCubeMesh.rotation.y += dynSpin * 0.25;
       innerWireframeCubeMesh.rotation.x -= dynSpin * 0.18;
@@ -1010,10 +1035,8 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
       const pulse = 1 + (Math.sin(Date.now() * pulseFreq) * pulseAmp);
       innerWireframeCubeMesh.scale.set(pulse * 0.5, pulse * 0.5, pulse * 0.5);
 
-      // structure density from memory
       connectingStrutsMaterial.opacity = clamp(0.35 + (s.memMB / 1100) + (burstActive ? 0.12 : 0), 0.35, 1.0);
 
-      // performance color logic
       if (s.mode === "quantum") {
         outerBoxLineMaterial.color.setHSL(0.52, 1.0, burstActive ? 0.66 : 0.55);
         innerBoxLineMaterial.color.setHSL(0.42, 1.0, burstActive ? 0.64 : 0.55);
@@ -1022,7 +1045,15 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
         innerBoxLineMaterial.color.setHSL(0.10, 1.0, burstActive ? 0.58 : 0.50);
       }
 
-      // layer activation = "parts being used"
+      // shell complexity dynamics
+      complexShell.rotation.x += 0.0018 + loadNorm * 0.006;
+      complexShell.rotation.y += 0.0022 + loadNorm * 0.008;
+      complexShellMat.opacity = 0.18 + loadNorm * 0.45 + quantumMode * 0.20 + (burstActive ? 0.12 : 0);
+
+      innerShell.rotation.x -= 0.0020 + loadNorm * 0.005;
+      innerShell.rotation.z += 0.0015 + loadNorm * 0.004;
+      innerShellMat.opacity = 0.12 + loadNorm * 0.35 + quantumMode * 0.20 + (burstActive ? 0.10 : 0);
+
       for (let i = 0; i < layerMeshes.length; i++) {
         const layer = layerMeshes[i];
         const stageBias =
@@ -1037,7 +1068,6 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
         layer.scale.setScalar(1 + layerUse * 0.11);
       }
 
-      // active part nodes
       const t = Date.now() * 0.0016;
       partNodes.forEach((node, i) => {
         const ring = 0.62 + (i % 8) * 0.12;
@@ -1049,7 +1079,6 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
         node.material.opacity = active ? (0.32 + quantumMode * 0.5 + (burstActive ? 0.12 : 0)) : 0.08;
       });
 
-      // data streams traffic
       const pos = streamGeometry.attributes.position.array;
       const streamIntensity = clamp((s.streamsActive / 60), 0, 1);
       streamMaterial.opacity = 0.03 + streamIntensity * (0.35 + (burstActive ? 0.3 : 0));
@@ -1062,7 +1091,6 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
 
         pos[idx + meta.axis] += v * meta.dir;
 
-        // wrap bounds in cube volume
         if (pos[idx] > 2.1) pos[idx] = -2.1;
         if (pos[idx] < -2.1) pos[idx] = 2.1;
         if (pos[idx + 1] > 2.1) pos[idx + 1] = -2.1;
@@ -1072,15 +1100,13 @@ Volatile Memory    : ${byteMemoryFootprint.toFixed(2)} MB (CLEARED FROM CACHE)`;
       }
       streamGeometry.attributes.position.needsUpdate = true;
 
-      // stage display
-      const stagePretty = s.stage.toUpperCase();
-      const modePretty = s.mode.toUpperCase();
       const hudNode = document.getElementById('navigation-hud');
       hudNode.innerHTML =
 `PROJECTION: 4D TESSERACT<br>
-MODE: ${modePretty} | STAGE: ${stagePretty} | ROWS: ${(s.rows || 0).toLocaleString()}<br>
+MODE: ${s.mode.toUpperCase()} | STAGE: ${s.stage.toUpperCase()} | ROWS: ${(s.rows || 0).toLocaleString()}<br>
 LATENCY: ${(s.latencyNs || 0).toFixed(5)} ns | THROUGHPUT: ${(s.throughput || 0).toLocaleString()} op/s<br>
-POWER: ${(s.powerTW || 0).toFixed(2)} TW-EQ | STREAMS: ${Math.round(s.streamsActive || 0)} ACTIVE<br>
+FACETS: 128+ ACTIVE SHELL | STREAMS: ${Math.round(s.streamsActive || 0)} ACTIVE<br>
+POWER: ${(s.powerTW || 0).toFixed(2)} TW-EQ<br>
 Z-DEPTH: ${webglCameraNode.position.z.toFixed(4)} ${webglCameraNode.position.z <= 1.7 ? '<span style="color:var(--cyber-cyan);font-weight:bold;">[INSIDE CORE]</span>' : '(OUTSIDE SHELL)'}<br>
 ⚙️ PINCH/SCROLL TO NAVIGATE • PRESS C TO CYCLE COLORS`;
 
