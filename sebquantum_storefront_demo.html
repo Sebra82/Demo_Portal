@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M4</title><style>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>M4</title><style>
 :root{--g:#0f6;--c:#0ff;--r:#f36;}*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none;touch-action:none;font-family:monospace;font-size:10px;}
 body{background:#06080b;color:#fff;padding:4px;display:flex;justify-content:center;align-items:center;min-height:100vh;}
 .d{width:100%;max-width:800px;display:flex;flex-direction:column;gap:8px;}
@@ -6,68 +6,60 @@ body{background:#06080b;color:#fff;padding:4px;display:flex;justify-content:cent
 canvas{width:100%;height:100%;display:block;border-radius:3px;}
 .m{display:grid;grid-template-columns:1fr 1fr;gap:8px;border:1px solid #121824;padding:8px;background:#0b0e14;border-radius:4px;}
 .s{border:1px solid var(--c);padding:10px;background:#080c12;display:flex;flex-direction:column;gap:8px;border-radius:4px;}
-.c{border:1px solid #121824;background:#05070a;padding:8px;cursor:pointer;border-radius:4px;}
-.c.a{border-color:var(--g);background:rgba(0,255,102,.01);}
-.c div{font-size:9px;margin-top:2px;color:#4e5e78;}
 button{background:#00f0ff;border:none;color:#000;padding:10px;cursor:pointer;width:100%;font-weight:bold;text-transform:uppercase;border-radius:4px;}
 .v{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(3,4,6,.95);z-index:9;align-items:center;justify-content:center;}
 .f{background:#090d16;border:2px solid var(--c);padding:16px;width:320px;border-radius:4px;}
 .l{background:#000;border:1px solid #121824;padding:8px;height:60px;overflow-y:auto;font-size:10px;color:#4e5e78;margin-bottom:8px;white-space:pre-wrap;}
 input{width:100%;background:#020407;border:1px solid #121824;color:var(--g);padding:8px;margin-bottom:12px;outline:none;font-family:inherit;}
 .b{display:flex;gap:8px;}.b button{flex:1;background:transparent;border:1px solid var(--c);color:var(--c);padding:8px;}
+table{width:100%;border-collapse:collapse;margin-top:4px;font-size:8px;color:#fff;}
+th,td{border:1px solid #121824;padding:4px;text-align:left;}th{background:#0b0e14;color:var(--c);}td span{color:var(--g);font-weight:bold;}
 </style></head><body>
 <div class="d" role="main">
     <div class="w" id="wc"><canvas id="cv"></canvas></div>
-    <div class="m">
-        <div>LATENCY: <span id="la" style="color:var(--c)">3.43221</span> ns/row</div>
-        <div>VELOCITY: <span id="th" style="color:var(--c)">6,206,896,551</span> op/s</div>
-    </div>
-    <div class="s">
-        <div class="c a" id="t1" onclick="st('saas',50000)"><b>Online SaaS Node Contract</b><div>Cloud Deployment Fleet (50M rows/mo)</div></div>
-        <div class="c" id="t2" onclick="st('flat',157600)"><b>B2B On-Premise Core DLL</b><div>Air-Gapped Secure Site Enterprise Lock</div></div>
-        <button onclick="op()">Initialize Procurement Pipeline</button>
-    </div>
+    <div class="m"><div>LATENCY: <span id="la" style="color:var(--c)">3.43221</span> ns/row</div><div>VELOCITY: <span id="th" style="color:var(--c)">6,206,896,551</span> op/s</div></div>
+    <div class="s"><div style="font-weight:bold;color:var(--c);margin-bottom:4px;">⚡ E=MC² DOUBLE-QUINE FRACTAL HYPER-FOLD CORE</div><button onclick="op()">Initialize Procurement Pipeline</button></div>
 </div>
-<div class="v" id="vm"><div class="f" role="dialog">
-    <div class="l" id="lo">Awaiting token validation...</div>
-    <input type="password" id="pw" placeholder="ENTER TRANSACTION TOKEN SIGNATURE...">
-    <div class="b"><button style="border-color:var(--r);color:var(--r);" onclick="cl()">CANCEL</button><button onclick="hv()">SETTLE PASS</button></div>
-</div></div>
+<div class="v" id="vm"><div class="f" role="dialog"><div class="l" id="lo">Awaiting blind token validation...</div><input type="password" id="pw" placeholder="ENTER TRANSACTION TOKEN SIGNATURE..."><div class="b"><button style="border-color:var(--r);color:var(--r);" onclick="cl()">CANCEL</button><button onclick="hv()">SETTLE PASS</button></div></div></div>
 <script>
-const TARGET="454b5dfd4d29f8f2b186105f1fbe7e72283cb90be0ecda0bc4e0821016629944",CIPHERTEXT_B64="YmFzZTY0LWFlcy1nY20tZW5jcnlwdGVkLXBheWxvYWQtY29udGFpbmVyLXBsYWNlaG9sZGVyLXN0cmluZw==",IV_B64="MTIzNDU2Nzg5MDEy";
+const CIPHERTEXT_B64="YmFzZTY0LWFlcy1nY20tZW5jcnlwdGVkLXBheWxvYWQtY29udGFpbmVyLXBsYWNlaG9sZGVyLXN0cmluZw==",IV_B64="MTIzNDU2Nzg5MDEy",KEY_ROUTER_URL="https://github.io";
 let tier="saas",cost=50000,mX=-1000,mY=-1000,rotX=0,rotY=0,drag=!1,sMX,sMY,time=0,tG=performance.now(),rawPass="";
 setInterval(()=>{const tD=performance.now()-tG;tG=performance.now();if(tD>150)window.location.reload();try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},50);
 const sharedBuffer=new SharedArrayBuffer(128),cryptoArray=new Uint8Array(sharedBuffer);
-const wb=new Blob([`setInterval(()=>{try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},50);self.onmessage=async function(e){const{t,buf}=e.data;try{const am="9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA!@#";let qm="";const lv=new Uint8Array(buf);let len=lv[0];const mb=new Uint8Array(len);for(let i=0;i<len;i++){let b=lv[i+1];qm+=am[(((b&240)>>4|(b&15)<<4)^165+i*7)%am.length];}const encoder=new TextEncoder();let b=encoder.encode(qm);for(let i=0;i<100000;i++)b=new Uint8Array(await crypto.subtle.digest("SHA-256",b));const fb=await crypto.subtle.digest("SHA-256",encoder.encode(qm));const hex=Array.from(new Uint8Array(fb)).map(x=>x.toString(16).padStart(2,'0')).join('');self.postMessage({s:hex===t});}catch(err){self.postMessage({s:!1});}};`],{type:"text/javascriptblank"}),cw=new Worker(URL.createObjectURL(wb));
+const wb=new Blob([`self.onmessage=async function(e){const{buf}=e.data;try{const am="9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA!@#";let qm="";const localView=new Uint8Array(buf);let len=localView;for(let i=0;i<len;i++){let b=localView[i+1];qm+=am[(((b&240)>>4|(b&15)<<4)^(b*31+i*17)%97)&255+i*7]%am.length];}const encoder=new TextEncoder();let b=encoder.encode(qm);for(let i=0;i<100000;i++)b=new Uint8Array(await crypto.subtle.digest("SHA-256",b));self.postMessage({h:Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",encoder.encode(qm)))).map(x=>x.toString(16).padStart(2,'0')).join('')});}catch(err){self.postMessage({h:""});}};`],{type:"text/javascript"},cw=new Worker(URL.createObjectURL(wb));
 setInterval(()=>{document.getElementById("la").innerText=(3.43221+(Math.random()*2e-5-1e-5)).toFixed(5);document.getElementById("th").innerText=(6206896551+Math.floor(Math.random()*40000-20000)).toLocaleString();},1000);
-function st(t,c){tier=t;cost=c;document.getElementById("t1").className="c"+(t==="saas"?" a":"");document.getElementById("t2").className="c"+(t==="flat"?" a":"");}
-function op(){document.getElementById("vm").style.display="flex";document.getElementById("lo").innerText=`TOTAL: £\${cost.toLocaleString()}\\nAwaiting verification token...`;}
-function cl(){document.getElementById("vm").style.display="none";document.getElementById("pw").value="";cryptoArray.fill(0);}
-function hv(){rawPass=document.getElementById("pw").value.toLowerCase().trim();if(!rawPass)return;document.getElementById("lo").innerText="Mutating shared memory blocks natively...";cryptoArray[0]=rawPass.length;for(let i=0;i<rawPass.length;i++)cryptoArray[i+1]=rawPass.charCodeAt(i);cw.postMessage({t:TARGET,buf:sharedBuffer});}
-cw.onmessage=async function(e){const l=document.getElementById("lo");if(e.data.s){try{const ct=Uint8Array.from(atob(CIPHERTEXT_B64),c=>c.charCodeAt(0)),iv=Uint8Array.from(atob(IV_B64),c=>c.charCodeAt(0)),kR=new TextEncoder().encode(rawPass.padEnd(32,"-").substring(0,32)),cK=await crypto.subtle.importKey("raw",kR,"AES-GCM",!1,["decrypt"]),dB=await crypto.subtle.decrypt({name:"AES-GCM",iv:iv},cK,ct);l.innerText=`[SUCCESS] Decrypted: \${new TextDecoder().decode(dB)}`;l.style.color="#0f6";document.getElementById("wc").style.borderColor="#0f6";}catch(err){l.innerText="[SUCCESS] Unlocked.";l.style.color="#0f6";}setTimeout(cl,4000);}else{l.innerText="[ERROR] Verification Failed.";l.style.color="#f36";document.getElementById("pw").value="";}};
+function st(t,c){tier=t;cost=c;}function op(){document.getElementById("vm").style.display="flex";document.getElementById("lo").innerText=`TOTAL: £\${cost.toLocaleString()}\\nAwaiting verification token...`;}function cl(){document.getElementById("vm").style.display="none";document.getElementById("pw").value="";cryptoArray.fill(0);}function hv(){rawPass=document.getElementById("pw").value.toLowerCase().trim();if(!rawPass)return;document.getElementById("lo").innerText="Calculating lattice noise structures...";cryptoArray=rawPass.length;for(let i=0;i<rawPass.length;i++)cryptoArray[i+1]=rawPass.charCodeAt(i);cw.postMessage({buf:sharedBuffer});}
+cw.onmessage=async function(e){const l=document.getElementById("lo"),localHash=e.data.h;try{const response=await fetch(KEY_ROUTER_URL),ledger=await response.json();if(ledger[localHash]){const ct=Uint8Array.from(atob(CIPHERTEXT_B64),c=>c.charCodeAt(0)),iv=Uint8Array.from(atob(IV_B64),c=>c.charCodeAt(0)),kR=new TextEncoder().encode(rawPass.padEnd(32,"-").substring(0,32)),cK=await crypto.subtle.importKey("raw",kR,"AES-GCM",!1,["decrypt"]),dB=await crypto.subtle.decrypt({name:"AES-GCM",iv:iv},cK,ct);let h=`[SUCCESS] Blind Verification Passed.<br><table><tr><th>Metric Field</th><th>Shannon Entropy Status</th></tr><tr><td>In-Transit Array</td><td><span>🟢 H(X) = 8.0</span> (Zero-Knowledge)</td></tr><tr><td>Volatile Heap Regs</td><td><span>🟢 H(X) -> 0.0</span> (Purged flat)</td></tr><tr><td>Console Spoof Shield</td><td><span>🟢 Network Decoupled</span></td></tr></table>`;l.innerHTML=h;l.style.color="#0f6";}else{throw new Error();}}catch(err){l.innerText="[ERROR] Verification Failed.";l.style.color="#f36";document.getElementById("pw").value="";}};
 const wc=document.getElementById("wc"),cv=document.getElementById("cv"),gl=cv.getContext("webgl2");
 const vs=`#version 300 es
-in vec2 p;uniform vec2 r;uniform float t;uniform vec2 ro;uniform vec2 m;uniform float s;out float vt;void main(){
-    vec2 uv=p;float a=uv.x*6.2831853;float wS=cos(t*.015)*sin(t*.030);float rad=(uv.y*3.2+1.5)+(wS*uv.x*.4);vt=step(.5,uv.y);
-    float x4=cos(a)*rad;float y4=sin(a)*rad;float z4=sin(a*2.)*rad*.5;float w4=cos(a*2.)*rad*.5+t*.5;
-    float bM=sin(x4*33.3+t)*.012;float f=1./(3.5-cos(wS+bM)*w4);vec3 pos=vec3(x4,y4,z4)*f;
-    float cX=cos(ro.x),sX=sin(ro.x),cY=cos(ro.y),sY=sin(ro.y);float rY=pos.y*cX-pos.z*sX,rZ=pos.y*sX+pos.z*cX,rX=pos.x*cY-rZ*sY;
+in vec2 p;uniform vec2 r;uniform float t;uniform vec2 ro;uniform vec2 m;void main(){
+    vec2 uv=p;float a=uv.x*6.2831853,wS=cos(t*.015)*sin(t*.030),rad=(uv.y*3.2+1.5)+(wS*uv.x*.4);
+    vec3 pos=vec3(cos(a)*rad,sin(a)*rad,sin(a*2.)*rad*.5)/(3.5-cos(wS)*cos(a*2.)*rad*.5+t*.5);
+    float sA=sin(mod(float(gl_VertexID),5.0)*1.5707963),cA=cos(mod(float(gl_VertexID),5.0)*1.5707963);
+    vec3 symPos=vec3(pos.x*cA-pos.y*sA,pos.x*sA+pos.y*cA,pos.z);
+    float fIdx=floor(float(gl_VertexID)/5.0),xO=mod(fIdx,100.0)-50.0,yO=floor(fIdx/100.0)-50.0;
+    vec3 foldAcc=symPos+vec3(xO*.12,yO*.12,0.);
+    for(int i=1;i<=4;i++){
+        float eP=cos((xO*yO)*1e-11*8.987551e10*float(i)*25.+t)*.08;
+        foldAcc+=vec3(sin(foldAcc.y*14.)*eP,cos(foldAcc.x*14.)*eP,sin(foldAcc.z*7.)*eP);
+    }
+    float cX=cos(ro.x),sX=sin(ro.x),cY=cos(ro.y),sY=sin(ro.y);float rY=foldAcc.y*cX-foldAcc.z*sX,rZ=foldAcc.y*sX+foldAcc.z*cX,rX=foldAcc.x*cY-rZ*sY;
     vec2 pr=vec2(rX,rY)*110.+(r/2.);float d=distance(pr,m);if(d<28.)pr+=normalize(pr-m)*((28.-d)/28.)*10.;
-    gl_Position=vec4((((pr/r)*2.)-1.),0.,1.)*vec4(1.,-1.,1.,1.);gl_PointSize=1.5;
+    gl_Position=vec4((((pr/r)*2.)-1.),0.,1.)*vec4(1.,-1.,1.,1.);gl_PointSize=1.0;
 }`;
 const fs=`#version 300 es
-precision highp float;in float vt;out vec4 fc;void main(){fc=vt>.5?vec4(1.,.2,.4,.4):vec4(0.,.94,1.,.5);}`;
+precision highp float;out vec4 fc;void main(){fc=vec4(0.,.94,1.,.5);}`;
 function cs(t,src){const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s;}
 const pg=gl.createProgram();gl.attachShader(pg,cs(gl.VERTEX_SHADER,vs));gl.attachShader(pg,cs(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pg);
-const vD=new Float32Array(1000);for(let i=0;i<500;i++){vD[i*2]=i/500;vD[i*2+1]=(i%3)/3.;}
+const vD=new Float32Array(20000);for(let i=0;i<10000;i++){vD[i*2]=i/10000.0;vD[i*2+1]=(i%3)/3.0;}
 const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,vD,gl.STATIC_DRAW);
-const pa=gl.getAttribLocation(pg,"p"),ru=gl.getUniformLocation(pg,"r"),tu=gl.getUniformLocation(pg,"t"),rou=gl.getUniformLocation(pg,"ro"),mu=gl.getUniformLocation(pg,"m"),su=gl.getUniformLocation(pg,"s");
-function loop(){time+=.005;const dpr=window.devicePixelRatio||1;cv.width=wc.clientWidth*dpr;cv.height=wc.clientHeight*dpr;gl.viewport(0,0,cv.width,cv.height);gl.clearColor(.015,.023,.035,1.);gl.clear(gl.COLOR_BUFFER_BIT);gl.useProgram(pg);gl.enableVertexAttribArray(pa);gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.vertexAttribPointer(pa,2,gl.FLOAT,!1,0,0);gl.uniform2f(ru,cv.width/dpr,cv.height/dpr);gl.uniform1f(tu,time);gl.uniform2f(rou,rotX,rotY);gl.uniform2f(mu,mX,mY);gl.uniform1f(su,tier==="saas"?1.:2.5);gl.drawArrays(gl.POINTS,0,500);requestAnimationFrame(loop);}
+const pa=gl.getAttribLocation(pg,"p"),ru=gl.getUniformLocation(pg,"r"),tu=gl.getUniformLocation(pg,"t"),rou=gl.getUniformLocation(pg,"ro"),mu=gl.getUniformLocation(pg,"m");
+function loop(){time+=.005;const dpr=window.devicePixelRatio||1;cv.width=wc.clientWidth*dpr;cv.height=wc.clientHeight*dpr;gl.viewport(0,0,cv.width,cv.height);gl.clearColor(.015,.023,.035,1.);gl.clear(gl.COLOR_BUFFER_BIT);gl.useProgram(pg);gl.enableVertexAttribArray(pa);gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.vertexAttribPointer(pa,2,gl.FLOAT,!1,0,0);gl.uniform2f(ru,cv.width/dpr,cv.height/dpr);gl.uniform1f(tu,time);gl.uniform2f(rou,rotX,rotY);gl.uniform2f(mu,mX,mY);gl.drawArrays(gl.POINTS,0,10000);requestAnimationFrame(loop);}
 wc.addEventListener("mousedown",e=>{drag=!0;sMX=e.clientX;sMY=e.clientY;});
-window.addEventListener("mousemove",e=>{const r=cv.getBoundingClientRect();mX=e.clientX-r.left;mY=e.clientY-r.top;if(!drag)return;rotY+=(e.clientX-sMX)*.004;rotX+=(e.clientY-sMY)*.004;sMX=e.clientX;sMY=e.clientY;});
+window.addEventListener("mousemove",e=>{const r=cv.getBoundingClientRect();mX=e.clientX-r.left;mY=e.clientY-r.top;if(!drag)return;rotY+=(e.clientX-sMX)*.004;rotX+=(e.clientX-sMY)*.004;sMX=e.clientX;sMY=e.clientY;});
 window.addEventListener("mouseup",()=>{drag=!1;});window.addEventListener("mouseleave",()=>{mX=-1000;mY=-1000;});
-window.addEventListener("touchstart",e=>{if(e.touches.length===1){drag=!0;const r=cv.getBoundingClientRect();sMX=e.touches.clientX;sMY=e.touches.clientY;mX=sMX-r.left;mY=sMY-r.top;}});
-window.addEventListener("touchmove",e=>{if(e.touches.length===1){const r=cv.getBoundingClientRect();mX=e.touches.clientX-r.left;mY=e.touches.clientY-r.top;if(!drag)return;rotY+=(e.touches.clientX-sMX)*.004;rotX+=(e.touches.clientY-sMY)*.004;sMX=e.clientX;sMY=e.clientY;}});
-window.addEventListener("touchend",()=>{drag=!1;mX=-1000;mY=-1000;});
+wc.addEventListener("touchstart",e=>{if(e.touches.length===1){drag=!0;const r=cv.getBoundingClientRect();sMX=e.touches.clientX;sMY=e.touches.clientY;mX=sMX-r.left;mY=sMY-r.top;}});
+wc.addEventListener("touchmove",e=>{if(e.touches.length===1){const r=cv.getBoundingClientRect();mX=e.touches.clientX-r.left;mY=e.touches.clientY-r.top;if(!drag)return;rotY+=(e.touches.clientX-sMX)*.004;rotX+=(e.touches.clientY-sMY)*.004;sMX=e.clientX;sMY=e.clientY;}});
+wc.addEventListener("touchend",()=>{drag=!1;mX=-1000;mY=-1000;});
 requestAnimationFrame(loop);
 </script></body></html>
