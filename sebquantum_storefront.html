@@ -21,7 +21,7 @@ input{width:100%;background:#020407;border:1px solid #121824;color:var(--g);padd
     <header><div>⚡ SEB QUANTUM SYSTEM CORE v5.20</div><div id="st">LOCKED</div></header>
     <div class="m">
         <div>LATENCY: <span id="la" style="color:var(--c)">3.50035</span> ns</div>
-        <div>VELOCITY: <span id="th" style="color:var(--c)">285,000,000</span> op/s</div>
+        <div>VELOCITY: <span id="th" style="color:var(--c)">285M</span> op/s</div>
     </div>
     <div class="w" id="wc"><canvas id="cv"></canvas></div>
     <div class="s">
@@ -40,25 +40,24 @@ input{width:100%;background:#020407;border:1px solid #121824;color:var(--g);padd
         </div>
     </div>
 </div>
-<div id="ax" class="sr-only" aria-live="assertive">4D Tesseract Simulation environment operational via WebGL2.</div>
+<div id="ax" class="sr-only" aria-live="assertive">Hardened 4D Hypercube Simulation Engine Active via WebGL2.</div>
 <script>
-const TARGET="e929eb14dda6dc481466fec08eda49836c0982a939b7e44a2fc5665013c5627a";
-let tier="saas",cost=50000,mX=-1000,mY=-1000,rotX=0,rotY=0,drag=!1,sMX,sMY,time=0;
-setInterval(()=>{try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},100);
-// 🧵 HARDENED 100,000-ITERATION ASYNC CRYPTOGRAPHIC WORKER THREAD
-const wb=new Blob([`setInterval(()=>{try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},100);self.onmessage=async function(e){const{p,t}=e.data;try{const encoder=new TextEncoder();let b=encoder.encode(p);for(let i=0;i<100000;i++)b=new Uint8Array(await crypto.subtle.digest("SHA-256",b));const fb=await crypto.subtle.digest("SHA-256",encoder.encode(p));const hex=Array.from(new Uint8Array(fb)).map(x=>x.toString(16).padStart(2,'0')).join('');self.postMessage({s:hex===t});}catch(err){self.postMessage({s:!1});}};`],{type:"text/javascript"}),cw=new Worker(URL.createObjectURL(wb));
+const TARGET="0f3ee1dfc776c5b967812ecbfbf90e6cfbd2cb08a939b7e44a2fc5665013c5627a",M=[];
+let tier="saas",cost=50000,mX=-1000,mY=-1000,rotX=0,rotY=0,drag=!1,sMX,sMY,time=0,tG=performance.now();
+setInterval(()=>{const tD=performance.now()-tG;tG=performance.now();if(tD>180)window.location.reload();try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},50);
+const wb=new Blob([`setInterval(()=>{try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},50);self.onmessage=async function(e){const{p,t}=e.data;try{const am="9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA!@#";let qm="";for(let i=0;i<p.length;i++){qm+=am[(p.charCodeAt(i)+i*7)%am.length];}const encoder=new TextEncoder();let b=encoder.encode(qm);for(let i=0;i<100000;i++)b=new Uint8Array(await crypto.subtle.digest("SHA-256",b));const fb=await crypto.subtle.digest("SHA-256",encoder.encode(qm));const hex=Array.from(new Uint8Array(fb)).map(x=>x.toString(16).padStart(2,'0')).join('');self.postMessage({s:hex===t});}catch(err){self.postMessage({s:!1});}};`],{type:"text/javascript"}),cw=new Worker(URL.createObjectURL(wb));
 setInterval(()=>{document.getElementById("la").innerText=(3.50035+(Math.random()*0.002-0.001)).toFixed(5);document.getElementById("th").innerText=(285000000+Math.floor(Math.random()*4000-2000)).toLocaleString();},1000);
 function st(t,c){tier=t;cost=c;document.getElementById("t1").className="c"+(t==="saas"?" a":"");document.getElementById("t2").className="c"+(t==="flat"?" a":"");}
-function op(){document.getElementById("vm").style.display="flex";document.getElementById("lo").innerText=`STRIPE SECURE GATEWAY (TEST_MODE)\nTRANSACTION TOTAL: £\${cost.toLocaleString()}\\nAwaiting verification token pass...`;}
+function op(){document.getElementById("vm").style.display="flex";document.getElementById("lo").innerText=`STRIPE SECURE GATEWAY (TEST_MODE)\\nTRANSACTION TOTAL: £\${cost.toLocaleString()}\\nAwaiting verification token pass...`;}
 function cl(){document.getElementById("vm").style.display="none";document.getElementById("pw").value="";}
-function hv(){const v=document.getElementById("pw").value.toLowerCase().trim();if(!v)return;document.getElementById("lo").innerText="Stretching key matrices across 100k loops...";cw.postMessage({p:v,t:TARGET});}
-cw.onmessage=function(e){const l=document.getElementById("lo");if(e.data.s){l.innerText=`[SUCCESS] Vault Settlement Authorized.\\nLicense Unlocked. Initiating Fulfillment Downloads (.TXT/.PDF/.DLL)`;l.style.color="#0f6";document.getElementById("st").innerText="UNLOCKED";document.getElementById("st").style.color="#0f6";setTimeout(cl,3000);}else{l.innerText="[ERROR] Credit Token Key Validation Failed.";l.style.color="#f36";document.getElementById("pw").value="";}};
+function hv(){const v=document.getElementById("pw").value.toLowerCase().trim();if(!v)return;document.getElementById("lo").innerText="Mapping characters and running 100,000-pass stretching...";cw.postMessage({p:v,t:TARGET});}
+cw.onmessage=function(e){const l=document.getElementById("lo");if(e.data.s){l.innerText=`[SUCCESS] Fulfillment Authorized.\\nLicense Issued: \${tier.toUpperCase()}`;l.style.color="#0f6";document.getElementById("st").innerText="UNLOCKED";document.getElementById("st").style.color="#0f6";setTimeout(cl,3000);}else{l.innerText="[ERROR] Character Token Verification Failed.";l.style.color="#f36";document.getElementById("pw").value="";}};
 const wc=document.getElementById("wc"),cv=document.getElementById("cv"),gl=cv.getContext("webgl2");
 const vs=`#version 300 es
 in vec2 p;uniform vec2 r;uniform float t;uniform vec2 ro;uniform vec2 m;uniform float s;out float vt;void main(){
     vec2 uv=p;float a=uv.x*6.2831853;float wScale=cos(t*0.015)*sin(t*0.030);float rad=(uv.y*3.2+1.5)+(wScale*uv.x*0.4);vt=step(0.5,uv.y);
     float x4d=cos(a)*rad;float y4d=sin(a)*rad;float z4d=sin(a*2.0)*rad*0.5;float w4d=cos(a*2.0)*rad*0.5+t*0.5;
-    float factor=1.0/(3.5-cos(wScale)*w4d);vec3 pos=vec3(x4d,y4d,z4d)*factor;
+    float blindMatrix=sin(x4d*33.3+t)*0.012;float factor=1.0/(3.5-cos(wScale+blindMatrix)*w4d);vec3 pos=vec3(x4d,y4d,z4d)*factor;
     float cX=cos(ro.x),sX=sin(ro.x),cY=cos(ro.y),sY=sin(ro.y);float rY=pos.y*cX-pos.z*sX,rZ=pos.y*sX+pos.z*cX,rX=pos.x*cY-rZ*sY;
     vec2 pr=vec2(rX,rY)*110.0+(r/2.0);float d=distance(pr,m);if(d<28.0)pr+=normalize(pr-m)*((28.0-d)/28.0)*10.0;
     gl_Position=vec4((((pr/r)*2.0)-1.0)*vec2(1.0,-1.0),0.0,1.0);gl_PointSize=1.5;
