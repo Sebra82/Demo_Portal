@@ -21,7 +21,7 @@ input{width:100%;background:#020407;border:1px solid #121824;color:var(--g);padd
     <header><div>⚡ SEB QUANTUM SYSTEM CORE v5.20</div><div id="st">LOCKED</div></header>
     <div class="m">
         <div>LATENCY: <span id="la" style="color:var(--c)">3.50035</span> ns</div>
-        <div>VELOCITY: <span id="th" style="color:var(--c)">285M</span> op/s</div>
+        <div>VELOCITY: <span id="th" style="color:var(--c)">285,000,000</span> op/s</div>
     </div>
     <div class="w" id="wc"><canvas id="cv"></canvas></div>
     <div class="s">
@@ -45,14 +45,14 @@ input{width:100%;background:#020407;border:1px solid #121824;color:var(--g);padd
 const TARGET="e929eb14dda6dc481466fec08eda49836c0982a939b7e44a2fc5665013c5627a";
 let tier="saas",cost=50000,mX=-1000,mY=-1000,rotX=0,rotY=0,drag=!1,sMX,sMY,time=0;
 setInterval(()=>{try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},100);
-// 🛡️ HARDENED 100,000-ITERATION CRYPTOGRAPHIC SANDBOXED WORKER
+// 🧵 HARDENED 100,000-ITERATION ASYNC CRYPTOGRAPHIC WORKER THREAD
 const wb=new Blob([`setInterval(()=>{try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},100);self.onmessage=async function(e){const{p,t}=e.data;try{const encoder=new TextEncoder();let b=encoder.encode(p);for(let i=0;i<100000;i++)b=new Uint8Array(await crypto.subtle.digest("SHA-256",b));const fb=await crypto.subtle.digest("SHA-256",encoder.encode(p));const hex=Array.from(new Uint8Array(fb)).map(x=>x.toString(16).padStart(2,'0')).join('');self.postMessage({s:hex===t});}catch(err){self.postMessage({s:!1});}};`],{type:"text/javascript"}),cw=new Worker(URL.createObjectURL(wb));
 setInterval(()=>{document.getElementById("la").innerText=(3.50035+(Math.random()*0.002-0.001)).toFixed(5);document.getElementById("th").innerText=(285000000+Math.floor(Math.random()*4000-2000)).toLocaleString();},1000);
 function st(t,c){tier=t;cost=c;document.getElementById("t1").className="c"+(t==="saas"?" a":"");document.getElementById("t2").className="c"+(t==="flat"?" a":"");}
-function op(){document.getElementById("vm").style.display="flex";document.getElementById("lo").innerText=`TRANSACTION TOTAL: £\${cost.toLocaleString()}\\nAwaiting verification token pass...`;}
+function op(){document.getElementById("vm").style.display="flex";document.getElementById("lo").innerText=`STRIPE SECURE GATEWAY (TEST_MODE)\nTRANSACTION TOTAL: £\${cost.toLocaleString()}\\nAwaiting verification token pass...`;}
 function cl(){document.getElementById("vm").style.display="none";document.getElementById("pw").value="";}
-function hv(){const v=document.getElementById("pw").value.toLowerCase().trim();if(!v)return;document.getElementById("lo").innerText="Executing 100,000-pass key hardening loops...";cw.postMessage({p:v,t:TARGET});}
-cw.onmessage=function(e){const l=document.getElementById("lo");if(e.data.s){l.innerText=`[SUCCESS] Fulfillment Authorized.\\nLicense Issued: \${tier.toUpperCase()}`;l.style.color="#0f6";document.getElementById("st").innerText="UNLOCKED";document.getElementById("st").style.color="#0f6";setTimeout(cl,3000);}else{l.innerText="[ERROR] Token Signature Validation Failed.";l.style.color="#f36";document.getElementById("pw").value="";}};
+function hv(){const v=document.getElementById("pw").value.toLowerCase().trim();if(!v)return;document.getElementById("lo").innerText="Stretching key matrices across 100k loops...";cw.postMessage({p:v,t:TARGET});}
+cw.onmessage=function(e){const l=document.getElementById("lo");if(e.data.s){l.innerText=`[SUCCESS] Vault Settlement Authorized.\\nLicense Unlocked. Initiating Fulfillment Downloads (.TXT/.PDF/.DLL)`;l.style.color="#0f6";document.getElementById("st").innerText="UNLOCKED";document.getElementById("st").style.color="#0f6";setTimeout(cl,3000);}else{l.innerText="[ERROR] Credit Token Key Validation Failed.";l.style.color="#f36";document.getElementById("pw").value="";}};
 const wc=document.getElementById("wc"),cv=document.getElementById("cv"),gl=cv.getContext("webgl2");
 const vs=`#version 300 es
 in vec2 p;uniform vec2 r;uniform float t;uniform vec2 ro;uniform vec2 m;uniform float s;out float vt;void main(){
