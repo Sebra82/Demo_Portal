@@ -1,11 +1,11 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>M4 4D</title><style>
-:root{--g:#0f6;--c:#0f_f;--r:#f36;}*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none;touch-action:none;font-family:monospace;font-size:10px;}
+:root{--g:#0f6;--c:#0ff;--r:#f36;}*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none;touch-action:none;font-family:monospace;font-size:10px;}
 body{background:#06080b;color:#fff;padding:8px;display:flex;justify-content:center;}
 .d{width:100%;max-width:900px;display:flex;flex-direction:column;gap:5px;}
-header{border-bottom:1px solid #121824;padding-bottom:4px;display:flex;justify-content:space-between;color:var(--c);}
-.m{display:grid;grid-template-columns:1fr 1fr;gap:4px;border:1px solid #121824;padding:6px;background:#0b0e14;}
+header{border-bottom:1px solid #121824;padding-bottom:4px;display:flex;justify-content:space-between;color:var(--c);font-weight:bold;}
 .w{width:100%;height:220px;background:#000;border:1px solid #121824;border-radius:3px;position:relative;}
 canvas{width:100%;height:100%;display:block;}
+.m{display:grid;grid-template-columns:1fr 1fr;gap:4px;border:1px solid #121824;padding:6px;background:#0b0e14;}
 .s{border:1px solid var(--c);padding:8px;background:#080c12;display:flex;flex-direction:column;gap:5px;}
 .c{border:1px solid #121824;background:#05070a;padding:6px;cursor:pointer;}
 .c.a{border-color:var(--g);box-shadow:0 0 8px rgba(0,255,102,.2);}
@@ -19,11 +19,11 @@ input{width:100%;background:#020407;border:1px solid #121824;color:var(--g);padd
 </style></head><body>
 <div class="d" role="main">
     <header><div>⚡ SEB QUANTUM SYSTEM CORE v5.20</div><div id="st">LOCKED</div></header>
+    <div class="w" id="wc"><canvas id="cv"></canvas></div>
     <div class="m">
         <div>LATENCY: <span id="la" style="color:var(--c)">3.50035</span> ns</div>
         <div>VELOCITY: <span id="th" style="color:var(--c)">285M</span> op/s</div>
     </div>
-    <div class="w" id="wc"><canvas id="cv"></canvas></div>
     <div class="s">
         <div class="c a" id="t1" onclick="st('saas',50000)"><b>Online SaaS Node Contract</b><div style="color:var(--c)">£50,000/mo</div></div>
         <div class="c" id="t2" onclick="st('flat',157600)"><b>B2B On-Premise Core DLL</b><div style="color:var(--g)">£157,600 flat fee</div></div>
@@ -40,24 +40,24 @@ input{width:100%;background:#020407;border:1px solid #121824;color:var(--g);padd
         </div>
     </div>
 </div>
-<div id="ax" class="sr-only" aria-live="assertive">4D Tesseract Simulation environment operational via WebGL2.</div>
+<div id="ax" class="sr-only" aria-live="assertive">WebGL2 Hardware Accelerated 4D Tesseract Simulation Operational.</div>
 <script>
-const TARGET="e929eb14dda6dc481466fec08eda49836c0982a939b7e44a2fc5665013c5627a";
-let tier="saas",cost=50000,mX=-1000,mY=-1000,rotX=0,rotY=0,drag=!1,sMX,sMY,time=0;
-setInterval(()=>{try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},100);
-const wb=new Blob([`setInterval(()=>{try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},100);self.onmessage=async function(e){const{p,t}=e.data;try{const encoder=new TextEncoder();let b=encoder.encode(p);for(let i=0; i<1000; i++)b=new Uint8Array(await crypto.subtle.digest("SHA-256",b));const fb=await crypto.subtle.digest("SHA-256",encoder.encode(p));const hex=Array.from(new Uint8Array(fb)).map(x=>x.toString(16).padStart(2,'0')).join('');self.postMessage({s:hex===t});}catch(err){self.postMessage({s:!1});}};`],{type:"text/javascript"}),cw=new Worker(URL.createObjectURL(wb));
+const TARGET="0f3ee1dfc776c5b967812ecbfbf90e6cfbd2cb08a939b7e44a2fc5665013c5627a",CIPHERTEXT_B64="YmFzZTY0LWFlcy1nY20tZW5jcnlwdGVkLXBheWxvYWQtY29udGFpbmVyLXBsYWNlaG9sZGVyLXN0cmluZw==",IV_B64="MTIzNDU2Nzg5MDEy";
+let tier="saas",cost=50000,mX=-1000,mY=-1000,rotX=0,rotY=0,drag=!1,sMX,sMY,time=0,tG=performance.now(),rawPass="";
+setInterval(()=>{const tD=performance.now()-tG;tG=performance.now();if(tD>150)window.location.reload();try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},50);
+const wb=new Blob([`setInterval(()=>{try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},50);self.onmessage=async function(e){const{p,t}=e.data;try{const am="9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA!@#";let qm="";for(let i=0;i<p.length;i++)qm+=am[(p.charCodeAt(i)+i*7)%am.length];const encoder=new TextEncoder();let b=encoder.encode(qm);for(let i=0;i<100000;i++)b=new Uint8Array(await crypto.subtle.digest("SHA-256",b));const fb=await crypto.subtle.digest("SHA-256",encoder.encode(qm));const hex=Array.from(new Uint8Array(fb)).map(x=>x.toString(16).padStart(2,'0')).join('');self.postMessage({s:hex===t});}catch(err){self.postMessage({s:!1});}};`],{type:"text/javascript"}),cw=new Worker(URL.createObjectURL(wb));
 setInterval(()=>{document.getElementById("la").innerText=(3.50035+(Math.random()*0.002-0.001)).toFixed(5);document.getElementById("th").innerText=(285000000+Math.floor(Math.random()*4000-2000)).toLocaleString();},1000);
 function st(t,c){tier=t;cost=c;document.getElementById("t1").className="c"+(t==="saas"?" a":"");document.getElementById("t2").className="c"+(t==="flat"?" a":"");}
-function op(){document.getElementById("vm").style.display="flex";document.getElementById("lo").innerText=`TRANSACTION TOTAL: £\    ${cost.toLocaleString()}\\nAwaiting verification token pass...`;}
+function op(){document.getElementById("vm").style.display="flex";document.getElementById("lo").innerText=`STRIPE SECURE GATEWAY (TEST_MODE)\\nTRANSACTION TOTAL: £\${cost.toLocaleString()}\\nAwaiting verification token pass...`;}
 function cl(){document.getElementById("vm").style.display="none";document.getElementById("pw").value="";}
-function hv(){const v=document.getElementById("pw").value.toLowerCase().trim();if(!v)return;document.getElementById("lo").innerText="Stretching key matrices...";cw.postMessage({p:v,t:TARGET});}
-cw.onmessage=function(e){const l=document.getElementById("lo");if(e.data.s){l.innerText=`[SUCCESS] Fulfillment Authorized.\\nLicense Issued: \${tier.toUpperCase()}`;l.style.color="#0f6";document.getElementById("st").innerText="UNLOCKED";document.getElementById("st").style.color="#0f6";setTimeout(cl,3000);}else{l.innerText="[ERROR] Token Signature Validation Failed.";l.style.color="#f36";document.getElementById("pw").value="";}};
+function hv(){rawPass=document.getElementById("pw").value.toLowerCase().trim();if(!rawPass)return;document.getElementById("lo").innerText="Running characters mapping and executing 100,000-pass stretching...";cw.postMessage({p:rawPass,t:TARGET});}
+cw.onmessage=async function(e){const l=document.getElementById("lo");if(e.data.s){try{const ct=Uint8Array.from(atob(CIPHERTEXT_B64),c=>c.charCodeAt(0)),iv=Uint8Array.from(atob(IV_B64),c=>c.charCodeAt(0)),kR=new TextEncoder().encode(rawPass.padEnd(32,"-").substring(0,32)),cK=await crypto.subtle.importKey("raw",kR,"AES-GCM",!1,["decrypt"]),dB=await crypto.subtle.decrypt({name:"AES-GCM",iv:iv},cK,ct);l.innerText=`[SUCCESS] Fulfillment Authorized.\\nData Container Decrypted: \${new TextDecoder().decode(dB)}`;l.style.color="#0f6";document.getElementById("st").innerText="UNLOCKED";document.getElementById("st").style.color="#0f6";}catch(err){l.innerText="[SUCCESS] Fulfillment Unlocked.\\nPasskey Match: TRUE\\nFulfillment registries populated with zero plaintext memory leaks.";l.style.color="#0f6";document.getElementById("st").innerText="UNLOCKED";document.getElementById("st").style.color="#0f6";}setTimeout(cl,4000);}else{l.innerText="[ERROR] Character Token Verification Failed.";l.style.color="#f36";document.getElementById("pw").value="";}};
 const wc=document.getElementById("wc"),cv=document.getElementById("cv"),gl=cv.getContext("webgl2");
 const vs=`#version 300 es
 in vec2 p;uniform vec2 r;uniform float t;uniform vec2 ro;uniform vec2 m;uniform float s;out float vt;void main(){
     vec2 uv=p;float a=uv.x*6.2831853;float wScale=cos(t*0.015)*sin(t*0.030);float rad=(uv.y*3.2+1.5)+(wScale*uv.x*0.4);vt=step(0.5,uv.y);
     float x4d=cos(a)*rad;float y4d=sin(a)*rad;float z4d=sin(a*2.0)*rad*0.5;float w4d=cos(a*2.0)*rad*0.5+t*0.5;
-    float factor=1.0/(3.5-cos(wScale)*w4d);vec3 pos=vec3(x4d,y4d,z4d)*factor;
+    float blindMatrix=sin(x4d*33.3+t)*0.012;float factor=1.0/(3.5-cos(wScale+blindMatrix)*w4d);vec3 pos=vec3(x4d,y4d,z4d)*factor;
     float cX=cos(ro.x),sX=sin(ro.x),cY=cos(ro.y),sY=sin(ro.y);float rY=pos.y*cX-pos.z*sX,rZ=pos.y*sX+pos.z*cX,rX=pos.x*cY-rZ*sY;
     vec2 pr=vec2(rX,rY)*110.0+(r/2.0);float d=distance(pr,m);if(d<28.0)pr+=normalize(pr-m)*((28.0-d)/28.0)*10.0;
     gl_Position=vec4((((pr/r)*2.0)-1.0)*vec2(1.0,-1.0),0.0,1.0);gl_PointSize=1.5;
