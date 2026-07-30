@@ -1,0 +1,30 @@
+from qiskit import QuantumCircuit
+from qiskit_aer import AerSimulator
+
+def generate_bell_state():
+    """Generates a 2-qubit entangled Bell State circuit."""
+    circuit = QuantumCircuit(2, 2)
+    circuit.h(0)  # Put qubit 0 into superposition
+    circuit.cx(0, 1)  # Entangle qubit 0 and qubit 1
+    circuit.measure([0, 1], [0, 1])  # Measure both qubits
+    return circuit
+
+def run_simulation():
+    """Simulates the circuit locally and prints a text histogram interface."""
+    circuit = generate_bell_state()
+    simulator = AerSimulator()
+    
+    job = simulator.run(circuit, shots=1024)
+    counts = job.result().get_counts()
+    
+    print("\n--- 🌌 Quantum Circuit Visualized ---")
+    print(circuit.draw(output='text'))
+    
+    print("\n--- 📊 Simulation Results (Histogram Interface) ---")
+    for state, count in counts.items():
+        percentage = (count / 1024) * 100
+        bar = "█" * int(percentage // 5)
+        print(f"State |{state}⟩: {count:4d} shots ({percentage:.2f}%) {bar}")
+
+if __name__ == "__main__":
+    run_simulation()
