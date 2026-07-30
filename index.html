@@ -2,250 +2,62 @@
 <html lang="en-GB">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-    <title>SEB QUANTUM CONSOLE</title>
-    <style>
-        :root {
-            --neon-blue: #00f0ff;
-            --neon-green: #39ff14;
-            --neon-pink: #ff007f;
-            --dark-bg: #03060c;
-            --panel-bg: rgba(6, 14, 26, 0.88);
-            --border-line: rgba(0, 240, 255, 0.25);
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Courier New', monospace;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: none;
-        }
-        body {
-            background-color: var(--dark-bg);
-            color: #fff;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 12px;
-            background-image: 
-                linear-gradient(rgba(16, 42, 69, 0.25) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(16, 42, 69, 0.25) 1px, transparent 1px),
-                radial-gradient(circle at center, #0c233c 0%, #03060c 100%);
-            background-size: 40px 40px, 40px 40px, 100% 100%;
-        }
-        body::after {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-            background-size: 100% 4px;
-            z-index: 999;
-            pointer-events: none;
-        }
-        .console-container {
-            width: 100%;
-            height: 100%;
-            background: var(--panel-bg);
-            border: 1px solid var(--border-line);
-            border-radius: 8px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            box-shadow: 0 0 35px rgba(0, 240, 255, 0.15), inset 0 0 30px rgba(0, 240, 255, 0.05);
-            backdrop-filter: blur(16px);
-        }
-        header {
-            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
-            padding-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .main-title {
-            color: var(--neon-blue);
-            font-size: 15px;
-            font-weight: bold;
-            letter-spacing: 3px;
-            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
-        }
-        .status-badge {
-            border: 1px solid var(--neon-pink);
-            color: var(--neon-pink);
-            padding: 4px 10px;
-            font-weight: bold;
-            border-radius: 3px;
-            background: rgba(255, 0, 127, 0.05);
-        }
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            flex-shrink: 0;
-        }
-        .telemetry-card {
-            background: rgba(2, 6, 14, 0.8);
-            border: 1px solid rgba(0, 240, 255, 0.1);
-            padding: 10px;
-            border-radius: 4px;
-            text-align: center;
-            color: #55799e;
-        }
-        span {
-            color: var(--neon-green);
-            font-weight: bold;
-        }
-        .viewport-frame {
-            width: 100%;
-            flex-grow: 1;
-            background: #010205;
-            border: 1px solid rgba(0, 240, 255, 0.15);
-            border-radius: 5px;
-            position: relative;
-            box-shadow: inset 0 0 30px #000;
-            overflow: hidden;
-        }
-        canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            cursor: grab;
-        }
-        canvas:active {
-            cursor: grabbing;
-        }
-        .control-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background: rgba(2, 6, 14, 0.4);
-            border: 1px solid rgba(0, 240, 255, 0.1);
-            padding: 12px;
-            border-radius: 5px;
-            flex-shrink: 0;
-        }
-        .license-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .license-card {
-            border: 1px solid rgba(0, 240, 255, 0.15);
-            background: rgba(2, 4, 8, 0.85);
-            padding: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .license-card.active {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 12px rgba(57, 255, 20, 0.2);
-        }
-        button {
-            background: transparent;
-            border: 1px solid var(--neon-blue);
-            color: var(--neon-blue);
-            padding: 12px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            cursor: pointer;
-            text-transform: uppercase;
-            border-radius: 4px;
-        }
-        button:hover {
-            background: rgba(0, 240, 255, 0.1);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
-        }
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(2, 4, 8, 0.95);
-            z-index: 999;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(6px);
-        }
-        .modal-box {
-            background: #050b1a;
-            border: 1px solid var(--neon-blue);
-            border-radius: 6px;
-            padding: 20px;
-            width: 360px;
-            box-shadow: 0 0 35px rgba(0, 240, 255, 0.25);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .modal-log {
-            background: #010205;
-            border: 1px solid rgba(0, 240, 255, 0.15);
-            padding: 10px;
-            height: 80px;
-            overflow-y: auto;
-            color: #4a658a;
-            white-space: pre-wrap;
-        }
-        input {
-            width: 100%;
-            background: #010205;
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            color: var(--neon-green);
-            padding: 10px;
-            outline: none;
-            border-radius: 3px;
-            letter-spacing: 1px;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .modal-buttons button {
-            flex: 1;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>SEB QUANTUM OPERATIONS MODULE</title>
+    <!-- 🛰️ External Modular Cyberpunk Theme Stylesheet -->
+    <link rel="stylesheet" href="global.css">
 </head>
 <body>
+
 <div class="console-container" role="main">
     <header>
-        <div>
-            <div class="main-title">⚡ SEB QUANTUM CONSOLE</div>
-            <div style="color:#4a74a5;font-size:8px;margin-top:2px;letter-spacing:1.5px;">POST-QUANTUM MODULAR PIPELINE // INTERFACE OPERATIONAL</div>
+        <div class="title-block">
+            <div class="main-title">⚡ SEB QUANTUM OPERATION SYSTEM</div>
+            <div class="sub-title">POST-QUANTUM CRYPTOGRAPHIC PIPELINE // THREE-PART MODULAR REGIME</div>
         </div>
         <div class="status-badge" id="st">ENCLAVE_LOCKED</div>
     </header>
+
     <div class="metrics-grid">
-        <div class="telemetry-card">LATENCY: <span id="la">0.92411 ns</span></div>
-        <div class="telemetry-card">BOUNDS: <span style="color:var(--neon-blue)">TERABYTE_RADIX</span></div>
-        <div class="telemetry-card">ENGINE: <span id="md">LATTICE_VRAM</span></div>
-        <div class="telemetry-card">STRIDES: <span id="rw">250,000 NODES</span></div>
+        <div class="telemetry-card"><div class="card-label">Latency Loop</div><div class="card-value" id="la">0.92411 ns</div></div>
+        <div class="telemetry-card"><div class="card-label">Scaling Horizon</div><div class="card-value" style="color:#00f0ff">TERABYTE_RADIX</div></div>
+        <div class="telemetry-card"><div class="card-label">Compute Core</div><div class="card-value" id="md">LATTICE_VRAM (STBY)</div></div>
+        <div class="telemetry-card"><div class="card-label">VRAM Shard Density</div><div class="card-value" id="rw">250,000 NODES</div></div>
     </div>
-    <div class="viewport-frame" id="wc"><canvas id="cv"></canvas></div>
+
+    <!-- 🌌 High-Fidelity 3D WebGL2 Canvas Mount -->
+    <div class="viewport-frame" id="wc">
+        <canvas id="cv"></canvas>
+    </div>
+
     <div class="control-panel">
         <div class="license-selector">
-            <div class="license-card active" id="t1" onclick="st('saas',50000)"><b>SaaS Fleet Module</b><div style="color:var(--neon-blue)">£50,000/mo</div></div>
-            <div class="license-card" id="t2" onclick="st('flat',157600)"><b>Core Node DLL</b><div style="color:var(--neon-green)">£157,600 flat</div></div>
+            <div class="license-card active" id="t1" onclick="st('saas',50000)">
+                <div class="license-name">Online SaaS Fleet Lease</div>
+                <div class="license-cost" style="color:#00f0ff">£50,000 / mo</div>
+            </div>
+            <div class="license-card" id="t2" onclick="st('flat',157600)">
+                <div class="license-name">Air-Gapped Node Core DLL</div>
+                <div class="license-cost" style="color:#39ff14">£157,600 flat</div>
+            </div>
         </div>
-        <button onclick="op()">Initialize Procurement Pipeline</button>
-        <button style="border-color:#ffa500;color:#ffa500;" onclick="dl()">Download Free 1,000-Row Sample Database (.JSON)</button>
+        <button class="action-btn" onclick="op()">Initialize Procurement Pipeline</button>
+        <button class="action-btn decoy-btn" onclick="dl()">Download Free 1,000-Row Sample Database (.JSON)</button>
     </div>
 </div>
+
 <div class="modal-overlay" id="vm">
     <div class="modal-box" role="dialog">
-        <div class="modal-log" id="lo">Awaiting token...</div>
-        <input type="password" id="pw" placeholder="Enter security validation key...">
+        <div class="modal-log" id="lo">Awaiting terminal secure key token validation pass...</div>
+        <input type="password" id="pw" placeholder="Enter authorization key...">
         <div class="modal-buttons">
-            <button style="border-color:var(--neon-pink);color:var(--neon-pink);" onclick="cl()">CANCEL</button>
-            <button onclick="hv()">RESOLVE</button>
+            <button class="action-btn" style="border-color:#ff007f;color:#ff007f;" onclick="cl()">CANCEL</button>
+            <button class="action-btn" onclick="hv()">RESOLVE</button>
         </div>
     </div>
 </div>
+
+<!-- 🛰️ Standalone Core Graphics & Authentication Script Processing Logic Module -->
 <script src="app.js"></script>
 </body>
 </html>
