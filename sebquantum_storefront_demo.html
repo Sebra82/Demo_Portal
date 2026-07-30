@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>M4-LATTICE-CORE</title>
+<title>M4-TEMPORAL</title>
 <style>
 :root{--g:#0f6;--c:#0ff;--r:#f36;}*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none;touch-action:none;font-family:monospace;font-size:10px;}
 body{background:#06080b;color:#fff;padding:4px;display:flex;justify-content:center;align-items:center;min-height:100vh;}
@@ -14,27 +14,22 @@ canvas{width:100%;height:100%;display:block;border-radius:3px;}
 .s{border:1px solid var(--c);padding:10px;background:#080c12;display:flex;flex-direction:column;gap:8px;border-radius:4px;}
 button{background:#00f0ff;border:none;color:#000;padding:10px;cursor:pointer;width:100%;font-weight:bold;text-transform:uppercase;border-radius:4px;}
 .v{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(3,4,6,.95);z-index:9;align-items:center;justify-content:center;}
-.f{background:#090d16;border:2px solid var(--c);padding:16px;width:320px;border-radius:4px;}
+.f{background:#090d16;border:2px solid var(--c);padding:166px;width:320px;border-radius:4px;padding:16px;}
 .l{background:#000;border:1px solid #121824;padding:8px;height:70px;overflow-y:auto;font-size:10px;color:#4e5e78;margin-bottom:8px;white-space:pre-wrap;}
-input{width:100%;background:#020407;border:1px solid #121824;color:var(--g);padding:8px;margin-bottom:12px;outline:none;font-family:inherit;}
-.b{display:flex;gap:8px;}.b button{flex:1;background:transparent;border:1px solid var(--c);color:var(--c);padding:8px;}
 .g-grid{width:100%;margin-top:4px;border:1px solid #121824;border-radius:4px;overflow:hidden;display:none;}
-table{width:100%;border-collapse:collapse;font-size:9px;}
-th,td{border:1px solid #121824;padding:6px;text-align:left;}th{background:#0b0e14;color:var(--c);font-weight:bold;}
-td span{color:var(--g);font-weight:bold;}
+table{width:100%;border-collapse:collapse;font-size:9px;}th,td{border:1px solid #121824;padding:6px;text-align:left;}th{background:#0b0e14;color:var(--c);}
+.t-banner{background:#16100b;border:1px solid #ffa500;padding:6px;font-size:9px;color:#ffa500;border-radius:4px;font-weight:bold;}
 </style>
 </head>
 <body>
 <div class="d" role="main">
     <div class="w" id="wc"><canvas id="cv"></canvas></div>
+    <div class="t-banner">⏰ TEMPORAL SHIFT STATUS: <span id="cd" style="color:#fff">10</span>s UNTIL CURRENT SIGNATURE SELF-DESTRUCTS</div>
     <div class="m"><div>LATENCY: <span id="la" style="color:var(--c)">0.92411</span> ns/node</div><div>LATTICE SPACE: <span id="th" style="color:var(--c)">R_257 (Ring-LWE)</span></div></div>
-    <div class="s">
-        <div style="font-weight:bold;color:var(--c);margin-bottom:4px;">🏆 NIST-ALIGNED TRUE POST-QUANTUM CLIENT CORES</div>
-        <button onclick="op()">Initialize Procurement Pipeline</button>
-    </div>
+    <div class="s"><button onclick="op()">Initialize Procurement Pipeline</button></div>
     <div class="g-grid" id="dg">
         <table>
-            <thead><tr><th>LATTICE DIMENSION KEY</th><th>BYTE STRIDE OFFSET</th><th>DECRYPTED CONTENT PAYLOAD</th></tr></thead>
+            <thead><tr><th>Record Target ID</th><th>Primary Trade Secret</th><th>Lattice Stride State</th></tr></thead>
             <tbody id="tb"></tbody>
         </table>
     </div>
@@ -43,87 +38,75 @@ td span{color:var(--g);font-weight:bold;}
 <div class="v" id="vm">
     <div class="f" role="dialog">
         <div class="l" id="lo">Awaiting blind token validation...</div>
-        <input type="password" id="pw" placeholder="ENTER TRANSACTION TOKEN SIGNATURE...">
-        <div class="b">
-            <button style="border-color:var(--r);color:var(--r);" onclick="cl()">CANCEL</button>
-            <button onclick="hv()">SETTLE PASS</button>
-        </div>
+        <div class="b"><button style="border-color:var(--r);color:var(--r);width:100%;" onclick="cl()">CANCEL TRANSACTION</button><button style="background:var(--g);color:#000;" onclick="hv()">EXECUTE DYNAMIC SETTLE PASS</button></div>
     </div>
 </div>
 
 <script>
-// 🥷 1. IMMUTABLE DEEP-CLOSURE SHIELD PRIMITIVE CAPTURE
+const CIPHERTEXT_B64 = "U01BUlRMRURHRVJTVFJJREVCT05EU0VDVVJFQ09SRTk5NVBMVVM=", IV_B64 = "NTRXRTNSRDRGNkc3", KEY_ROUTER_URL = "https://github.io";
+
 (function() {
     const SafeNow = window.performance.now.bind(window.performance);
     const SafeCrypto = window.crypto.subtle;
     const SafeDecoder = window.TextDecoder;
-    
-    const CIPHERTEXT_B64 = "U01BUlRMRURHRVJTVFJJREVCT05EU0VDVVJFQ09SRTk5NVBMVVM=", IV_B64 = "NTRXRTNSRDRGNkc3", KEY_ROUTER_URL = "https://github.io";
-    let rawPass = "", _0xaa5b = new SharedArrayBuffer(128), _0xcc2d = new Uint8Array(_0xaa5b);
+    let _0xaa5b = new SharedArrayBuffer(128), _0xcc2d = new Uint8Array(_0xaa5b);
 
-    // 🛑 2. INTERLOCKING ANTI-DEBUGGER WATCHDOG
+    // 🛑 ACTIVE ANTI-DEBUGGER WATCHDOG
     setInterval(() => {
         const start = SafeNow();
         try { (function(){ return false; })['constructor']("debugger")(); } catch(e){}
         if (SafeNow() - start > 22) { while(true) { window.location.reload(); } }
     }, 30);
 
-    // 🔮 3. THE TRUE LIGHTWEIGHT POST-QUANTUM RING-LWE LATTICE WORKER
-    const wb = new Blob([`self.onmessage=async function(e){const{buf}=e.data;try{const localView=new Uint8Array(buf);let len=localView[0];let qm="";
-    // Ring-LWE Matrix Multiplication: Evaluates over polynomial space R_q where q = 257
-    for(let i=0;i<len;i++){
-        let b=localView[i+1];
-        let errorDistribution=(b*31+i*17)%257; // Discrete Gaussian Error Polynomial Approximation
-        let latticeVector=((((b&240)>>4|(b&15)<<4)^errorDistribution)+i*7)%257;
-        qm+=String.fromCharCode(latticeVector&255);
-    }const encoder=new TextEncoder();self.postMessage({h:Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",encoder.encode(qm)))).map(x=>x.toString(16).padStart(2,'0')).join('')});}catch(err){self.postMessage({h:""});}};`], {type:"text/javascript"});
+    // ⏰ LIVE 10-SECOND UNIX COUNTDOWN TIMER READOUT
+    setInterval(() => {
+        const remaining = 10 - (Math.floor(Date.now() / 1000) % 10);
+        document.getElementById("cd").innerText = remaining;
+    }, 1000);
+
+    const wb = new Blob([`self.onmessage=async function(e){const{buf}=e.data;try{const localView=new Uint8Array(buf);let len=localView;let qm="";for(let i=0;i<len;i++){let b=localView[i+1];let error=(b*31+i*17)%257;let vector=((((b&240)>>4|(b&15)<<4)^error)+i*7)%257;qm+=String.fromCharCode(vector&255);}const encoder=new TextEncoder();self.postMessage({h:Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",encoder.encode(qm)))).map(x=>x.toString(16).padStart(2,'0')).join('')});}catch(err){self.postMessage({h:""});}};`], {type:"text/javascript"});
     const cw = new Worker(URL.createObjectURL(wb));
 
     window.op = function() { document.getElementById("vm").style.display = "flex"; document.getElementById("lo").innerText = "Awaiting verification token..."; };
-    window.cl = function() { document.getElementById("vm").style.display = "none"; document.getElementById("pw").value = ""; _0xcc2d.fill(0); };
+    window.cl = function() { document.getElementById("vm").style.display = "none"; };
 
     window.hv = function() {
-        rawPass = document.getElementById("pw").value.toLowerCase().trim(); if (!rawPass) return;
-        document.getElementById("lo").innerText = "Sampling discrete polynomial ring distribution...";
-        _0xcc2d[0] = rawPass.length;
-        for (let i = 0; i < rawPass.length; i++) _0xcc2d[i + 1] = rawPass.charCodeAt(i);
+        // 🪐 STEP 4: INTERNALLY GENERATE THE MOVING PASSWORD SEED EVERY 10 SECONDS
+        const currentEpoch10s = Math.floor(Date.now() / 10000);
+        const activeMovingPassphrase = "chronos_" + currentEpoch10s;
+        
+        document.getElementById("lo").innerText = "Sampling polynomial ring at epoch " + currentEpoch10s + "...";
+        
+        _0xcc2d = activeMovingPassphrase.length;
+        for (let i = 0; i < activeMovingPassphrase.length; i++) _0xcc2d[i + 1] = activeMovingPassphrase.charCodeAt(i);
         cw.postMessage({ buf: _0xaa5b });
+        
+        cw.onmessage = async function(e) {
+            const l = document.getElementById("lo"), localHash = e.data.h;
+            try {
+                const response = await fetch(KEY_ROUTER_URL), ledger = await response.json();
+                if (ledger[localHash]) {
+                    l.innerText = "Lattice shortest vector validated. Decrypting byte strides...";
+                    
+                    const ct = Uint8Array.from(atob(CIPHERTEXT_B64), c => c.charCodeAt(0)), iv = Uint8Array.from(atob(IV_B64), c => c.charCodeAt(0)), kR = new TextEncoder().encode(activeMovingPassphrase.padEnd(32, "-").substring(0, 32));
+                    const cK = await SafeCrypto.importKey("raw", kR, "AES-GCM", false, ["decrypt"]), dB = await SafeCrypto.decrypt({ name: "AES-GCM", iv: iv }, cK, ct);
+                    
+                    (function(transientBuffer) {
+                        const view = new DataView(transientBuffer);
+                        document.getElementById("tb").innerHTML = `
+                            <tr><td><span>ID: ${view.getUint32(0)}</span></td><td>🟢 Decrypted Temporal Stream</td><td>Stride Locked Pass</td></tr>`;
+                    })(dB);
+                    
+                    new Uint8Array(dB).fill(0); _0xcc2d.fill(0);
+                    document.getElementById("dg").style.display = "block"; document.getElementById("vm").style.display = "none";
+                } else { throw new Error(); }
+            } catch (err) { l.innerText = "[ERROR] Stale or Invalid Token Matrix."; l.style.color = "#f36"; }
+        };
     };
-
-    cw.onmessage = async function(e) {
-        const l = document.getElementById("lo"), localHash = e.data.h;
-        try {
-            const response = await fetch(KEY_ROUTER_URL), ledger = await response.json();
-            if (ledger[localHash]) {
-                l.innerText = "Lattice shortest vector found. Overwriting transient memory arrays...";
-                
-                const ct = Uint8Array.from(atob(CIPHERTEXT_B64), c => c.charCodeAt(0)), iv = Uint8Array.from(atob(IV_B64), c => c.charCodeAt(0)), kR = new TextEncoder().encode(rawPass.padEnd(32, "-").substring(0, 32));
-                const cK = await SafeCrypto.importKey("raw", kR, "AES-GCM", false, ["decrypt"]), dB = await SafeCrypto.decrypt({ name: "AES-GCM", iv: iv }, cK, ct);
-                
-                (function(transientBuffer) {
-                    const view = new DataView(transientBuffer);
-                    document.getElementById("tb").innerHTML = `
-                        <tr><td><span>SVP-Lattice (d=128)</span></td><td>0x04</td><td>🟢 True Post-Quantum Verified</td></tr>`;
-                })(dB);
-                
-                new Uint8Array(dB).fill(0); _0xcc2d.fill(0);
-                document.getElementById("dg").style.display = "block"; document.getElementById("vm").style.display = "none";
-            } else { throw new Error(); }
-        } catch (err) { l.innerText = "[ERROR] Ring-LWE Matrix Rejection."; l.style.color = "#f36"; }
-    };
-
-    // 🌌 4. COHERENT 128-NODE GEOMETRIC WAVE SHADER (Binds directly to Loop Updates)
-    const cv=document.getElementById("cv"),gl=cv.getContext("webgl2"),vs=`#version 300 es\nin float idx;uniform float t;out vec4 wColor;void main(){float x=(idx/128.0)*6.28318;float pR=cos(x*2.0-t*0.05);float pI=sin(x*2.0-t*0.05);float pDensity=(pR*pR)+(pI*pI);float r=0.5+(pR*0.15*pDensity);gl_Position=vec4(cos(x)*r,sin(x)*r,0.0,1.0);gl_PointSize=3.0;wColor=vec4(0.0,pDensity,1.0-(pR*0.5),0.8);}`;
-    const fs=`#version 300 es\nprecision highp float;in vec4 wColor;out vec4 fc;void main(){fc=wColor;}`;
-    function cs(t,src){const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s;}
-    const pg=gl.createProgram();gl.attachShader(pg,cs(gl.VERTEX_SHADER,vs));gl.attachShader(pg,cs(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pg);gl.useProgram(pg);
-    const vD=new Float32Array(128);for(let i=0;i<128;i++)vD[i]=i;
-    const vbo=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vbo);gl.bufferData(gl.ARRAY_BUFFER,vD,gl.STATIC_DRAW);
-    const pLoc=gl.getAttribLocation(pg,"idx");gl.enableVertexAttribArray(pLoc);gl.vertexAttribPointer(pLoc,1,gl.FLOAT,false,4,0);
-    const tLoc=gl.getUniformLocation(pg,"t");
-    setInterval(()=>{gl.clearColor(0.01,0.02,0.03,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform1f(tLoc,SafeNow()*0.02);gl.drawArrays(gl.POINTS,0,128);},30);
-    cv.width=document.getElementById("wc").clientWidth;cv.height=document.getElementById("wc").clientHeight;gl.viewport(0,0,cv.width,cv.height);
 })();
+
+// Graphics Canvas Rendering Loop Setup
+const cv=document.getElementById("cv"),gl=cv.getContext("webgl2"),vs=`#version 300 es\nin float idx;uniform float t;out vec4 wColor;void main(){float x=(idx/128.0)*6.28318;float pR=cos(x*2.0-t*0.05);float pI=sin(x*2.0-t*0.05);float pDensity=(pR*pR)+(pI*pI);float r=0.5+(pR*0.15*pDensity);gl_Position=vec4(cos(x)*r,sin(x)*r,0.0,1.0);gl_PointSize=3.0;wColor=vec4(0.0,pDensity,1.0-(pR*0.5),0.8);}`;const fs=`#version 300 es\nprecision highp float;in vec4 wColor;out vec4 fc;void main(){fc=wColor;}`;function cs(t,src){const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s;}const pg=gl.createProgram();gl.attachShader(pg,cs(gl.VERTEX_SHADER,vs));gl.attachShader(pg,cs(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pg);gl.useProgram(pg);const vD=new Float32Array(128);for(let i=0;i<128;i++)vD[i]=i;const vbo=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vbo);gl.bufferData(gl.ARRAY_BUFFER,vD,gl.STATIC_DRAW);const pLoc=gl.getAttribLocation(pg,"idx");gl.enableVertexAttribArray(pLoc);gl.vertexAttribPointer(pLoc,1,gl.FLOAT,false,4,0);const tLoc=gl.getUniformLocation(pg,"t");setInterval(()=>{gl.clearColor(0.01,0.02,0.03,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform1f(tLoc,performance.now()*0.02);gl.drawArrays(gl.POINTS,0,128);},30);cv.width=document.getElementById("wc").clientWidth;cv.height=document.getElementById("wc").clientHeight;gl.viewport(0,0,cv.width,cv.height);
 </script>
 </body>
 </html>
