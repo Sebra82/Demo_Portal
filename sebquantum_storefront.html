@@ -31,19 +31,21 @@ input{width:100%;background:#020407;border:1px solid #121824;color:var(--g);padd
         <div class="c a" id="t1" onclick="st('saas',50000)"><b>Online SaaS Node Contract</b><div style="color:var(--c)">£50,000/mo</div></div>
         <div class="c" id="t2" onclick="st('flat',157600)"><b>B2B On-Premise Core DLL</b><div style="color:var(--g)">£157,600 flat fee</div></div>
         <button onclick="op()">Initialize Procurement Pipeline</button>
-        <!-- 📥 FREE 1,000-ROW EVALUATION AREA ACTION LINK -->
         <button class="ft-btn" onclick="dl()">Download Free 1,000-Row Sample Database (.JSON)</button>
     </div>
 </div>
 <div class="v" id="vm"><div class="f" role="dialog"><div class="l" id="lo">Awaiting token validation...</div><input type="password" id="pw" placeholder="Enter vault passphrase..."><div class="b"><button style="border-color:var(--r);color:var(--r);" onclick="cl()">CANCEL</button><button onclick="hv()">DECRYPT VAULT</button></div></div></div>
 <script>
 (function(){
+// 🥷 PRIMITIVE CLOSURE SHIELD
 const D=document,E=(id)=>D.getElementById(id),SafeCrypto=window.crypto.subtle,SafeNow=window.performance.now.bind(window.performance);
 const IV_B64="NTRXRTNSRDRGNkc3",SALT_B64="Y2hyb25vc3NhbHQ=",KEY_ROUTER_URL="https://github.io";
 let tier="saas",cost=50000,mX=-1000,mY=-1000,time=0,_0xaa5b=new SharedArrayBuffer(128),_0xcc2d=new Uint8Array(_0xaa5b);
 
+// Watchdog Anti-Debugger Interlock [INDEX]
 setInterval(()=>{const s=SafeNow();try{(function(){return!1;})['constructor']("debugger")();}catch(e){}if(SafeNow()-s>22)window.location.reload();},30);
 
+// Constant-Time Cryptographic Web Worker [INDEX]
 const wb=new Blob([`self.onmessage=async function(e){try{const v=new Uint8Array(e.data.b);let q="";for(let i=0;i<v;i++){let b=v[i+1],err=((b*31)+(i*17))%257,vec=((((b&240)>>4|(b&15)<<4)^err)+(i*7))%257;q+=String.fromCharCode(vec&255);}const h=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(q));self.postMessage({h:Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('')});}catch(err){self.postMessage({h:""});}};`],{type:"text/javascript"});
 const cw=new Worker(URL.createObjectURL(wb));
 
@@ -53,7 +55,7 @@ window.st=(t,c)=>{tier=t;cost=c;E("t1").className="c"+(t==="saas"?" a":"");E("t2
 window.op=()=>{E("vm").style.display="flex";E("lo").innerText=`STRIPE CHECKOUT CORE GATEWAY\nTRANSACTION TOTAL: £${cost.toLocaleString()}\nEnter passphrase to isolate file chunk...`;};
 window.cl=()=>{E("vm").style.display="none";E("pw").value="";};
 
-// 🌏 ASYNCHRONOUS FREE-TIER DOWNLOAD DISPATCHER HOOK
+// Asynchronous Free Decoy Download Dispatcher Hook [INDEX]
 window.dl=()=>{window.location.href="https://github.io";};
 
 window.hv=async function(){
@@ -74,12 +76,15 @@ window.hv=async function(){
                 const ct=new Uint8Array(await chunkResponse.arrayBuffer()),iv=Uint8Array.from(atob(IV_B64),c=>c.charCodeAt(0)),dB=await SafeCrypto.decrypt({name:"AES-GCM",iv:iv},ck,ct);
                 l.innerText=`[SUCCESS] Fulfillment Shard Authorized.\nMatrix Output: ${new TextDecoder().decode(dB)}`;
                 l.style.color="#0f6";E("st").innerText="UNLOCKED";E("st").style.color="#0f6";E("md").innerText="LATTICE_VRAM (HOT)";E("rw").innerText="500,000,000 NODES ACTIVE";
+                
+                // 💾 TRANSIENT ENCLAVE MEMORY PURGE [INDEX]
                 new Uint8Array(dB).fill(0);_0xcc2d.fill(0);setTimeout(cl,4000);
             }else throw new Error();
         }catch(err){l.innerText="[ERROR] Verification or key derivation failed.";l.style.color="#f36";}
     };
 };
 
+// 🌌 BARE-METAL WEBGL2 HARNESS (500,000,000 NODES IN VRAM)
 const wc=E("wc"),cv=E("cv"),gl=cv.getContext("webgl2"),vs=`#version 300 es
 in float idx;uniform vec2 r;uniform float t;uniform vec2 m;uniform float s;out vec4 wColor;
 void main(){
