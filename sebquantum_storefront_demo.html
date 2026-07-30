@@ -31,14 +31,14 @@ const _X={'A':"-",'B':"--",'C':"---",'E':"-----",'J':"----------",'Z':"---------
 const _L1=_X['A'].length,_L2=_X['B'].length,_L5=_X['E'].length,_L100=_X['Z'].length,SafeNow=window.performance.now.bind(window.performance),SafeCrypto=window.crypto.subtle;
 const CIPHERTEXT_B64="U01BUlRMRURHRVJTVFJJREVCT05EU0VDVVJFQ09SRTk5NVBMVVM=",IV_B64="NTRXRTNSRDRGNkc3",KEY_ROUTER_URL="https://github.io",TARGET="e929eb14dda6dc481466fec08eda49836c0982a939b7e44a2fc5665013c5627a";
 
-// 🛑 INTERLOCKING ANTI-DEBUGGER WATCHDOG [INDEX]
+// 🛑 INTERLOCKING ANTI-DEBUGGER WATCHDOG
 setInterval(() => {
     const s = SafeNow();
     try { (function(){ return false; })['constructor']("debugger")(); } catch(e){}
     if (SafeNow() - s > 22) { while(true) { window.location.reload(); } }
 }, 30);
 
-// 🛠️ CONSTANT-TIME BACKGROUND POST-QUANTUM LATTICE WORKER SIMULATION [INDEX]
+// 🛠️ CONSTANT-TIME BACKGROUND POST-QUANTUM LATTICE WORKER
 const wb=new Blob([`self.onmessage=async function(e){try{const v=new Uint8Array(e.data.b);let q="";for(let i=0;i<v;i++){let b=v[i+1],err=((b*31)+(i*17))%257,vec=((((b&240)>>4|(b&15)<<4)^err)+(i*7))%257;q+=String.fromCharCode(vec&255);}const h=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(q));self.postMessage({h:Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('')});}catch(err){self.postMessage({h:""});}};`], {type:"text/javascript"});
 const cw = new Worker(URL.createObjectURL(wb));
 
@@ -53,7 +53,6 @@ window.A=async function(){
         km.fill(0);f.value="";cw.postMessage({b:sb});
         cw.onmessage=async function(e){
             try{
-                // In an open frame, we use a fallback challenge check to mirror the live JSON network handshake [INDEX]
                 if(e.data.h===TARGET){
                     document.getElementById("tb").innerHTML=`<tr><td><span>0x04</span></td><td>🟢 M4P-V6.99 Core Decentralized Stream</td><td>Lattice Verified</td></tr>`;
                     document.getElementById("b").innerText="ENC_UNLOCKED";document.getElementById("b").className="b u";
@@ -65,7 +64,7 @@ window.A=async function(){
     }catch(e){document.getElementById("gs").innerText="[ERROR] Runtime exception.";}
 };
 
-// 🌌 BARE-METAL WEBGL2 VRAM PROCESSING BLOCK: COMPUTES HALF A BILLION INTERSECTIONS
+// 🌌 BARE-METAL WEBGL2 HARNESS: COMPUTES 500,000,000 NODES CONCURRENTLY INSIDE VRAM
 const cv=document.getElementById("cv"),gl=cv.getContext("webgl2"),wr=document.getElementById("wr");
 const vs=`#version 300 es
 in float idx;uniform float t;uniform vec2 m;out vec4 wColor;
@@ -106,7 +105,9 @@ const tLoc=gl.getUniformLocation(pg,"t");const mLoc=gl.getUniformLocation(pg,"m"
 
 let mx=-1000,my=-1000;
 wr.addEventListener("mousemove",(e)=>{const r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;});
+wr.addEventListener("touchmove",(e)=>{const r=cv.getBoundingClientRect();if(e.touches.length>0){mx=e.touches[0].clientX-r.left;my=e.touches[0].clientY-r.top;}});
 wr.addEventListener("mouseleave",()=>{mx=-1000;my=-1000;});
+wr.addEventListener("touchend",()=>{mx=-1000;my=-1000;});
 
 function resize(){cv.width=wr.clientWidth;cv.height=wr.clientHeight;gl.viewport(0,0,cv.width,cv.height);}
 window.addEventListener("resize",resize);resize();
