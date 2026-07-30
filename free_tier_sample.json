@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "ingestion_timestamp": "2026-07-30T12:00:00Z",
+    "evaluation_tier": "FREE_SANDBOX_DECOY",
+    "network_status": "VERIFIED_DEMO_ROW_SAMPLE",
+    "telemetry_latency": "0.92411 ns",
+    "payload_sharding_index": "SHARD_MOCK_000",
+    "records_context": "Data management system core evaluation row payload data structure under DTSA provisions."
+  },
+  {
+    "id": 2,
+    "ingestion_timestamp": "2026-07-30T12:01:00Z",
+    "evaluation_tier": "FREE_SANDBOX_DECOY",
+    "network_status": "VERIFIED_DEMO_ROW_SAMPLE",
+    "telemetry_latency": "0.92543 ns",
+    "payload_sharding_index": "SHARD_MOCK_000",
+    "records_context": "Decoy asset tracking validation block simulating serverless edge array distribution."
+  }
+]
