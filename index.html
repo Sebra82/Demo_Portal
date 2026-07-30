@@ -33,9 +33,9 @@ input{width:100%;background:#020407;border:1px solid #121824;color:var(--g);padd
 <script>
 (function(){
 const N=window.performance.now.bind(window.performance),K=window.crypto.subtle,D=document,E=(id)=>D.getElementById(id);
-let tier="saas",cost=50000,mX=-1000,mY=-1000,time=0,S=new SharedArrayBuffer(128),U=new Uint8Array(S);
+let tier="saas",cost=50000,mX=-1000,mY=-1000,time=0;
+const S=new SharedArrayBuffer(128),U=new Uint8Array(S);
 
-// 🥷 WATCHDOG ANTI-DEBUGGER INTERLOCK
 setInterval(()=>{const s=N();try{(function(){return!1;})['constructor']("debugger")();}catch(e){}if(N()-s>22)window.location.reload();},30);
 setInterval(()=>{E("la").innerText=(0.92411+(Math.random()*0.002-0.001)).toFixed(5)+" ns";},1000);
 
@@ -44,12 +44,11 @@ window.op=()=>{E("vm").style.display="flex";E("lo").innerText=`GATEWAY TOTAL: £
 window.cl=()=>{E("vm").style.display="none";E("pw").value="";};
 window.dl=()=>{window.location.href="https://github.io";};
 
-// 🔮 INLINE ASYNCHRONOUS SECURE DATA LAYER PROCESSING THREAD [1.12]
-async function processTokenInline(buffer) {
-    const v = new Uint8Array(buffer);let q = "";
-    for(let i=0; i<v.length; i++){
-        let b=v[i],err=((b*31)+(i*17))%257,vec=((((b&240)>>4|(b&15)<<4)^err)+(i*7))%257;
-        if(b>0) q+=String.fromCharCode(vec&255);
+async function processTokenInline(len) {
+    let q = "";
+    for(let i=0; i<len; i++){
+        let b=U[i+1],err=((b*31)+(i*17))%257,vec=((((b&240)>>4|(b&15)<<4)^err)+(i*7))%257;
+        q+=String.fromCharCode(vec&255);
     }
     const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(q));
     return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -64,7 +63,7 @@ window.hv=async function(){
     p.value="";
     
     try{
-        const calculatedHash = await processTokenInline(S);
+        const calculatedHash = await processTokenInline(v.length);
         const res=await fetch("https://github.io"),led=await res.json();
         
         if(led[calculatedHash]){
@@ -77,7 +76,6 @@ window.hv=async function(){
     }catch(err){l.innerText="[ERROR] Verification pass failed.";l.style.color="#f36";U.fill(0);km.fill(0);}
 };
 
-// 🌌 BARE-METAL WEBGL2 HARNESS (100,000 NODES IN VRAM) [1.12]
 const wc=E("wc"),cv=E("cv"),gl=cv.getContext("webgl2"),vs=`#version 300 es
 in float idx;uniform float t;uniform vec2 m;uniform vec2 rot;out vec4 wColor;
 void main(){
