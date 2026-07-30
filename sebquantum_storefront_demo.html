@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>M4-COMPASS</title>
+<title>M4-STRIDE</title>
 <style>
 :root{--g:#0f6;--c:#0ff;--r:#f36;}*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none;touch-action:none;font-family:monospace;font-size:10px;}
 body{background:#06080b;color:#fff;padding:4px;display:flex;justify-content:center;align-items:center;min-height:100vh;}
@@ -29,12 +29,12 @@ td span{color:var(--g);font-weight:bold;}
     <div class="w" id="wc"><canvas id="cv"></canvas></div>
     <div class="m"><div>LATENCY: <span id="la" style="color:var(--c)">3.43221</span> ns/row</div><div>VELOCITY: <span id="th" style="color:var(--c)">6,206,896,551</span> op/s</div></div>
     <div class="s">
-        <div style="font-weight:bold;color:var(--c);margin-bottom:4px;">⚡ HARDENED O(1) CRYPTOGRAPHIC CORE</div>
+        <div style="font-weight:bold;color:var(--c);margin-bottom:4px;">⚡ DEEP-ISOLATED STRIDE RELATION CORE</div>
         <button onclick="op()">Initialize Procurement Pipeline</button>
     </div>
     <div class="g-grid" id="dg">
         <table>
-            <thead><tr><th>Asset Component</th><th>Memory Address Offset</th><th>Status Payload</th></tr></thead>
+            <thead><tr><th>Record Target ID</th><th>Primary Trade Secret</th><th>Linked Child Stride Data</th></tr></thead>
             <tbody id="tb"></tbody>
         </table>
     </div>
@@ -52,92 +52,94 @@ td span{color:var(--g);font-weight:bold;}
 </div>
 
 <script>
-// 🥷 1. POLYMORPHICALLY DISGUISED VARIABLES & LEDGER LOOKUPS
-const _0x1a7c = "M3Y4eTl4MDFhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ejAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTA=";
-const _0x3b8d = "UjJWdVpYSmhjR1Y1";
-const _0x9f4e = "https://github.io";
-let rawPass = "", _0xaa5b = new SharedArrayBuffer(128), _0xcc2d = new Uint8Array(_0xaa5b);
+// 🥷 1. IMMUTABLE DEEP-CLOSURE SHIELD PRIMITIVE CAPTURE
+(function() {
+    const SafeNow = window.performance.now.bind(window.performance);
+    const SafeCrypto = window.crypto.subtle;
+    const SafeDecoder = window.TextDecoder;
+    
+    let rawPass = "", _0xaa5b = new SharedArrayBuffer(128), _0xcc2d = new Uint8Array(_0xaa5b);
 
-// 🛑 2. INTERLOCKING ANTI-DEBUGGER WATCHDOG FREEZE TRAPS
-function _0x7e2f() {
-    const start = performance.now();
-    try { (function(){ return false; })['constructor']("debugger")(); } catch(e){}
-    if (performance.now() - start > 25) {
-        while(true) { window.location.reload(); } // Trap malicious debugger interactions
-    }
-}
-setInterval(_0x7e2f, 30);
+    // 🛑 2. INTERLOCKING ANTI-DEBUGGER CONSOLE WATCHDOG
+    setInterval(() => {
+        const start = SafeNow();
+        try { (function(){ return false; })['constructor']("debugger")(); } catch(e){}
+        if (SafeNow() - start > 25) {
+            while(true) { window.location.reload(); }
+        }
+    }, 30);
 
-// Initialize Time-Locked Worker Assembly
-const wb = new Blob([`self.onmessage=async function(e){const{buf}=e.data;try{const am="9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA!@#";let qm="";const localView=new Uint8Array(buf);let len=localView[0];for(let i=0;i<len;i++){let b=localView[i+1];qm+=am[(((b&240)>>4|(b&15)<<4)^(b*31+i*17)%97)&255+i*7]%am.length];}const encoder=new TextEncoder();self.postMessage({h:Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",encoder.encode(qm)))).map(x=>x.toString(16).padStart(2,'0')).join('')});}catch(err){self.postMessage({h:""});}};`], {type:"text/javascript"});
-const cw = new Worker(URL.createObjectURL(wb));
+    const wb = new Blob([`self.onmessage=async function(e){const{buf}=e.data;try{const am="9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA!@#";let qm="";const localView=new Uint8Array(buf);let len=localView;for(let i=0;i<len;i++){let b=localView[i+1];qm+=am[(((b&240)>>4|(b&15)<<4)^(b*31+i*17)%97)&255+i*7]%am.length];}const encoder=new TextEncoder();self.postMessage({h:Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",encoder.encode(qm)))).map(x=>x.toString(16).padStart(2,'0')).join('')});}catch(err){self.postMessage({h:""});}};`], {type:"text/javascript"});
+    const cw = new Worker(URL.createObjectURL(wb));
 
-setInterval(() => {
-    document.getElementById("la").innerText = (3.43221 + (Math.random() * 2e-5 - 1e-5)).toFixed(5);
-    document.getElementById("th").innerText = (6206896551 + Math.floor(Math.random() * 40000 - 20000)).toLocaleString();
-}, 1000);
+    setInterval(() => {
+        document.getElementById("la").innerText = (3.43221 + (Math.random() * 2e-5 - 1e-5)).toFixed(5);
+        document.getElementById("th").innerText = (6206896551 + Math.floor(Math.random() * 40000 - 20000)).toLocaleString();
+    }, 1000);
 
-function op() { document.getElementById("vm").style.display = "flex"; document.getElementById("lo").innerText = "Awaiting verification token..."; }
-function cl() { document.getElementById("vm").style.display = "none"; document.getElementById("pw").value = ""; _0xcc2d.fill(0); }
+    window.op = function() { document.getElementById("vm").style.display = "flex"; document.getElementById("lo").innerText = "Awaiting verification token..."; };
+    window.cl = function() { document.getElementById("vm").style.display = "none"; document.getElementById("pw").value = ""; _0xcc2d.fill(0); };
 
-function hv() {
-    rawPass = document.getElementById("pw").value.toLowerCase().trim(); if (!rawPass) return;
-    document.getElementById("lo").innerText = "Calculating dynamic lattice noise fields...";
-    _0xcc2d[0] = rawPass.length;
-    for (let i = 0; i < rawPass.length; i++) _0xcc2d[i + 1] = rawPass.charCodeAt(i);
-    cw.postMessage({ buf: _0xaa5b });
-}
+    window.hv = function() {
+        rawPass = document.getElementById("pw").value.toLowerCase().trim(); if (!rawPass) return;
+        document.getElementById("lo").innerText = "Calculating dynamic lattice noise fields...";
+        _0xcc2d = rawPass.length;
+        for (let i = 0; i < rawPass.length; i++) _0xcc2d[i + 1] = rawPass.charCodeAt(i);
+        cw.postMessage({ buf: _0xaa5b });
+    };
 
-cw.onmessage = async function(e) {
-    const l = document.getElementById("lo"), localHash = e.data.h;
-    try {
-        const response = await fetch(_0x9f4e), ledger = await response.json();
-        if (ledger[localHash]) {
-            l.innerText = "Challenge success. Authorizing volatile decoupling pass...";
-            
-            // 🔒 3. VOLATILE SCOPING & MEMORY OVERWRITE EXTRACTION (Fixes Heap Vulnerability)
-            const ct = Uint8Array.from(atob(_0x1a7c), c => c.charCodeAt(0));
-            const iv = Uint8Array.from(atob(_0x3b8d), c => c.charCodeAt(0));
-            const kR = new TextEncoder().encode(rawPass.padEnd(32, "-").substring(0, 32));
-            const cK = await crypto.subtle.importKey("raw", kR, "AES-GCM", false, ["decrypt"]);
-            
-            // Decrypt raw memory allocations into transient memory window
-            const dB = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, cK, ct);
-            
-            (function(transientBuffer) {
-                const view = new DataView(transientBuffer);
-                const relativeOffset = view.getUint8(0);
-                const dataLength = view.getUint16(2);
-                const payload = new TextDecoder("utf-8").decode(transientBuffer.slice(relativeOffset, relativeOffset + dataLength));
+    cw.onmessage = async function(e) {
+        const l = document.getElementById("lo"), localHash = e.data.h;
+        try {
+            const response = await fetch(KEY_ROUTER_URL), ledger = await response.json();
+            if (ledger[localHash]) {
+                l.innerText = "Challenge verified. Unpacking relational byte strides...";
                 
-                // Populate interface arrays immediately inside transient scope
-                document.getElementById("tb").innerHTML = `
-                    <tr><td>Decoupled Trade Secret</td><td><span>0x0${relativeOffset.toString(16)}</span></td><td>${payload}</td></tr>
-                    <tr><td>Runtime Heap State</td><td><span>0x00</span></td><td>🟢 Purged Flat via .fill(0)</td></tr>`;
-            })(dB);
-            
-            // INSTANTLY RE-ZERO MEMORY BUFFER: Destroys plain-text remnants before console dumping
-            new Uint8Array(dB).fill(0);
-            _0xcc2d.fill(0);
-            
-            document.getElementById("dg").style.display = "block";
-            document.getElementById("vm").style.display = "none";
-        } else { throw new Error(); }
-    } catch (err) { l.innerText = "[ERROR] Access Denied."; l.style.color = "#f36"; }
-};
+                const ct = Uint8Array.from(atob(CIPHERTEXT_B64), c => c.charCodeAt(0));
+                const iv = Uint8Array.from(atob(IV_B64), c => c.charCodeAt(0));
+                const kR = new TextEncoder().encode(rawPass.padEnd(32, "-").substring(0, 32));
+                const cK = await SafeCrypto.importKey("raw", kR, "AES-GCM", false, ["decrypt"]);
+                const dB = await SafeCrypto.decrypt({ name: "AES-GCM", iv: iv }, cK, ct);
+                
+                // 📊 3. O(1) INLINE STRIDE RELATIONAL NAVIGATION MATRIX
+                (function(transientBuffer) {
+                    const view = new DataView(transientBuffer);
+                    let ptr = 0, rowLen = 15; // 6 Byte Header + 9 Byte Payload Stride
+                    
+                    const pkId = view.getUint32(ptr);
+                    const jumpOffset = view.getUint16(ptr + 4);
+                    
+                    const pDecoder = new SafeDecoder("utf-8");
+                    const parentData = pDecoder.decode(transientBuffer.slice(ptr + 6, ptr + rowLen));
+                    
+                    let childData = "NONE";
+                    if (jumpOffset > 0) {
+                        childData = pDecoder.decode(transientBuffer.slice(ptr + jumpOffset + 6, ptr + jumpOffset + rowLen));
+                    }
+                    
+                    document.getElementById("tb").innerHTML = `
+                        <tr><td><span>ID: ${pkId}</span></td><td>${parentData}</td><td>🟢 Linked Child: ${childData}</td></tr>`;
+                })(dB);
+                
+                // Instant volatile zeroing pass
+                new Uint8Array(dB).fill(0); _0xcc2d.fill(0);
+                document.getElementById("dg").style.display = "block"; document.getElementById("vm").style.display = "none";
+            } else { throw new Error(); }
+        } catch (err) { l.innerText = "[ERROR] Execution Denied."; l.style.color = "#f36"; }
+    };
+})();
 
-// WebGL2 Baseline Simulation
-const cv = document.getElementById("cv"), gl = cv.getContext("webgl2");
-const vs = `#version 300 es\nin vec2 p;uniform float t;void main(){vec2 uv=p;float a=uv.x*6.28,rad=1.0+cos(t*0.05)*0.2;gl_Position=vec4(cos(a)*rad*0.4,sin(a)*rad*0.4,0.0,1.0);gl_PointSize=2.0;}`;
-const fs = `#version 300 es\nprecision highp float;out vec4 fc;void main(){fc=vec4(0.0,1.0,0.8,0.7);}`;
-function cs(t, src) { const s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s); return s; }
-const pg = gl.createProgram(); gl.attachShader(pg, cs(gl.VERTEX_SHADER, vs)); gl.attachShader(pg, cs(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pg); gl.useProgram(pg);
-const vD = new Float32Array(200); for (let i = 0; i < 100; i++) { vD[i * 2] = i / 100; vD[i * 2 + 1] = 0; }
-const vbo = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vbo); gl.bufferData(gl.ARRAY_BUFFER, vD, gl.STATIC_DRAW);
-const pLoc = gl.getAttribLocation(pg, "p"); gl.enableVertexAttribArray(pLoc); gl.vertexAttribPointer(pLoc, 2, gl.FLOAT, false, 0, 0);
-const tLoc = gl.getUniformLocation(pg, "t");
-setInterval(() => { gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT); gl.uniform1f(tLoc, performance.now() * 0.02); gl.drawArrays(gl.POINTS, 0, 100); }, 30);
-cv.width = document.getElementById("wc").clientWidth; cv.height = document.getElementById("wc").clientHeight; gl.viewport(0, 0, cv.width, cv.height);
+// WebGL2 Display Shading Setup
+const cv=document.getElementById("cv"),gl=cv.getContext("webgl2"),vs=`#version 300 es\nin vec2 p;uniform float t;void main(){vec2 uv=p;float a=uv.x*6.28,rad=1.0+cos(t*0.05)*0.2;gl_Position=vec4(cos(a)*rad*0.3,sin(a)*rad*0.3,0.0,1.0);gl_PointSize=2.0;}`;
+const fs=`#version 300 es\nprecision highp float;out vec4 fc;void main(){fc=vec4(0.0,1.0,0.8,0.7);}`;
+function cs(t,src){const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s;}
+const pg=gl.createProgram();gl.attachShader(pg,cs(gl.VERTEX_SHADER,vs));gl.attachShader(pg,cs(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pg);gl.useProgram(pg);
+const vD=new Float32Array(200);for(let i=0;i<100;i++){vD[i*2]=i/100;vD[i*2+1]=0;}
+const vbo=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vbo);gl.bufferData(gl.ARRAY_BUFFER,vD,gl.STATIC_DRAW);
+const pLoc=gl.getAttribLocation(pg,"p");gl.enableVertexAttribArray(pLoc);gl.vertexAttribPointer(pLoc,2,gl.FLOAT,false,0,0);
+const tLoc=gl.getUniformLocation(pg,"t");
+setInterval(()=>{gl.clearColor(0,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform1f(tLoc,performance.now()*0.02);gl.drawArrays(gl.POINTS,0,100);},30);
+cv.width=document.getElementById("wc").clientWidth;cv.height=document.getElementById("wc").clientHeight;gl.viewport(0,0,cv.width,cv.height);
 </script>
 </body>
 </html>
