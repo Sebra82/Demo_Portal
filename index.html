@@ -1,72 +1,62 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><title>M4</title><style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:monospace;font-size:9px;}
-body{background:#010204;color:#fff;padding:4px;display:flex;justify-content:center;background-image:radial-gradient(#040c1a,#010204);}
-.d{width:100%;max-width:800px;display:flex;flex-direction:column;gap:4px;background:rgba(3,6,12,.9);border:1px solid #0ff;padding:8px;border-radius:4px;box-shadow:0 0 15px rgba(0,240,255,.2);}
-header,.m{display:flex;justify-content:space-between;font-weight:bold;color:#0ff;}
-.t{background:#000;border:1px solid rgba(0,240,255,.1);padding:4px;color:#4a658a;flex:1;text-align:center;}
-.w{width:100%;height:200px;background:#000;border:1px solid #0ff;position:relative;cursor:grab;}canvas{width:100%;height:100%;display:block;}
-.c{border:1px solid rgba(0,240,255,.15);background:rgba(2,4,8,.9);padding:6px;cursor:pointer;flex:1;text-align:center;}.c.a{border-color:#0f6;}
-button{background:transparent;border:1px solid #0ff;color:#0ff;padding:6px;cursor:pointer;font-weight:bold;text-transform:uppercase;width:100%;}
-.v{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(1,2,4,.95);z-index:99;align-items:center;justify-content:center;}
-.f{background:#030611;border:1px solid #0ff;padding:12px;width:280px;display:flex;flex-direction:column;gap:6px;}
-input{width:100%;background:#000;border:1px solid #0ff;color:#0f6;padding:6px;outline:none;}
-</style></head><body>
-<div class="d">
-    <header><div>⚡ QUANTUM CORE</div><div id="st" style="color:#f0f">LOCKED</div></header>
+:root{--b:#0ff;--g:#0f6;--p:#f0f;}*{box-sizing:border-box;margin:0;padding:0;font-family:monospace;font-size:9px;}
+body{background:#020408;color:#fff;padding:4px;display:flex;justify-content:center;background-image:linear-gradient(rgba(10,15,30,.2) 1px,transparent 1px),linear-gradient(90deg,rgba(10,15,30,.2) 1px,transparent 1px),radial-gradient(#051124,#020408);background-size:24px 24px;}
+.d{width:100%;max-width:850px;display:flex;flex-direction:column;gap:4px;background:rgba(4,8,16,.8);border:1px solid rgba(0,240,255,.2);padding:10px;border-radius:4px;}
+header{border-bottom:1px solid rgba(0,240,255,.2);padding-bottom:2px;display:flex;justify-content:space-between;color:var(--b);font-weight:bold;}
+.m{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;}
+.t{background:rgba(1,2,5,.8);border:1px solid rgba(0,240,255,.1);padding:4px;border-radius:2px;color:#4a658a;}span{color:var(--g);font-weight:bold;}
+.w{width:100%;height:240px;background:#000;border:1px solid rgba(0,240,255,.2);position:relative;cursor:move;}canvas{width:100%;height:100%;display:block;}
+.s{display:flex;flex-direction:column;gap:4px;}.l{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.c{border:1px solid rgba(0,240,255,.15);background:rgba(2,4,8,.9);padding:6px;cursor:pointer;border-radius:2px;}.c.a{border-color:var(--g);}
+button{background:transparent;border:1px solid var(--b);color:var(--b);padding:8px;cursor:pointer;font-weight:bold;width:100%;}
+.v{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,4,8,.95);z-index:99;align-items:center;justify-content:center;}
+.f{background:#040812;border:1px solid var(--b);padding:12px;width:300px;display:flex;flex-direction:column;gap:6px;}
+input{width:100%;background:#010205;border:1px solid rgba(0,240,255,.2);color:var(--g);padding:6px;outline:none;}
+</style></head><body><div class="d">
+    <header><div>⚡ QUANTUM LAYER OVERHAUL</div><div id="st" style="color:var(--p)">LOCKED</div></header>
     <div class="m">
-        <div class="t">LATENCY: <span id="la" style="color:#0f6">0.92 ns</span></div>
-        <div class="t">NODES: <span style="color:#0ff">1,000 ACTIVE</span></div>
+        <div class="t">LATENCY: <span id="la">0.924 ns</span></div>
+        <div class="t">GEOMETRY: <span style="color:var(--b)">500k_NODES</span></div>
+        <div class="t">CONTROL: <span style="color:var(--g)">DRAG_TO_ROT</span></div>
+        <div class="t">STRIDES: <span style="color:var(--b)">100k_ROWS</span></div>
     </div>
     <div class="w" id="wc"><canvas id="cv"></canvas></div>
-    <div style="display:flex;gap:4px;">
-        <div class="c a" id="t1" onclick="st('saas',50000)"><b>SaaS Fleet</b><div style="color:#0ff">£50k</div></div>
-        <div class="c" id="t2" onclick="st('flat',157600)"><b>Node DLL</b><div style="color:#0f6">£157.6k</div></div>
+    <div class="s"><div class="l">
+        <div class="c a" id="t1" onclick="st('saas',50000)"><b>SaaS module</b><div style="color:var(--b)">£50k/mo</div></div>
+        <div class="c" id="t2" onclick="st('flat',157600)"><b>Node DLL</b><div style="color:var(--g)">£157.6k flat</div></div>
     </div>
-    <button onclick="op()">Initialize Procurement Pipeline</button>
-    <button style="border-color:#ffa500;color:#ffa500;" onclick="location.href='free_tier_sample.json'">Download Free 1k Sample (.JSON)</button>
+    <button onclick="op()">Procurement Pipeline</button>
+    <button style="border-color:#ffa500;color:#ffa500;" onclick="location.href='free_tier_sample.json'">Download Free 1k Sample (.JSON)</button></div>
 </div>
-<div class="v" id="vm"><div class="f"><div id="lo" style="color:#4a658a;font-size:8px;">Awaiting token...</div><input type="password" id="pw" placeholder="Passphrase..."><div style="display:flex;gap:4px;"><button style="border-color:#f0f;color:#f0f;" onclick="cl()">CANCEL</button><button onclick="hv()">RESOLVE</button></div></div></div>
+<div class="v" id="vm"><div class="f"><div id="lo" style="color:#4a658a;font-size:8px;">Awaiting token...</div><input type="password" id="pw" placeholder="Passphrase..."><div style="display:flex;gap:4px;"><button style="border-color:var(--p);color:var(--p);" onclick="cl()">CANCEL</button><button onclick="hv()">RESOLVE</button></div></div></div>
 <script>
 (function(){
-const N=window.performance.now.bind(window.performance),K=window.crypto.subtle,D=document,E=(id)=>D.getElementById(id);
-let tier="saas",cost=50000,mx=-1000,my=-1000,rx=0.6,ry=0.4,isD=false,lx=0,ly=0;
+const N=performance.now.bind(performance),K=crypto.subtle,D=document,E=(id)=>D.getElementById(id);
+let tier="saas",cost=50000,mx=-1000,my=-1000,time=0,rx=0.6,ry=0.4,isD=false,lx=0,ly=0;const S=new SharedArrayBuffer(128),U=new Uint8Array(S);
 setInterval(()=>E("la").innerText=(0.924+(Math.random()*0.002-0.001)).toFixed(4)+" ns",1000);
 window.st=(t,c)=>{tier=t;cost=c;E("t1").className="c"+(t==="saas"?" a":"");E("t2").className="c"+(t==="flat"?" a":"");};
-window.op=()=>{E("vm").style.display="flex";E("lo").innerText=`TOTAL: £${cost.toLocaleString()}\nEnter validation signature...`;};
+window.op=()=>{E("vm").style.display="flex";E("lo").innerText=`TOTAL: £${cost.toLocaleString()}\nEnter passphrase...`;};
 window.cl=()=>{E("vm").style.display="none";E("pw").value="";};
 window.hv=async function(){
-    const p=E("pw"),v=p.value.toLowerCase().trim(),l=E("lo");if(!v)return;
-    l.innerText="Verifying shards...";p.value="";
+    const p=E("pw"),v=p.value.toLowerCase().trim(),l=E("lo");if(!v)return;l.innerText="Verifying shards...";U.fill(0);for(let i=0;i<v.length;i++)U[i+1]=v.charCodeAt(i);
     try{
-        const h=Array.from(new Uint8Array(await K.digest("SHA-256",new TextEncoder().encode(v)))).map(x=>x.toString(16).padStart(2,'0')).join('');
+        let q="";for(let i=0;i<v.length;i++)q+=String.fromCharCode((((U[i+1]&240)>>4|(U[i+1]&15)<<4)^(((U[i+1]*31)+(i*17))%257))+(i*7)%257&255);
+        const h=Array.from(new Uint8Array(await K.digest("SHA-256",new TextEncoder().encode(q)))).map(x=>x.toString(16).padStart(2,'0')).join('');
         const res=await fetch("verify.json"),led=await res.json();
         if(led[h]){
-            l.innerText="[SUCCESS] Authorized.";l.style.color="#0f6";E("st").innerText="UNLOCKED";E("st").style.color="#0f6";setTimeout(cl,3000);
+            const cid=String((v.length%5)+1).padStart(3,'0'),cr=await fetch(`payload_${cid}.bin`),ct=new Uint8Array(await cr.arrayBuffer()),dB=await K.decrypt({name:"AES-GCM",iv:Uint8Array.from(atob("NTRXRTNSRDRGNkc3"),c=>c.charCodeAt(0))},await K.importKey("raw",new TextEncoder().encode(v.padEnd(32,"-").substring(0,32)),"AES-GCM",!1,["decrypt"]),ct);
+            l.innerText=`[SUCCESS]\nUnlocked Matrix:\n${new TextDecoder().decode(dB)}`;l.style.color="#0f6";E("st").innerText="UNLOCKED";E("st").style.color="#0f6";new Uint8Array(dB).fill(0);U.fill(0);setTimeout(cl,5000);
         }else throw 0;
-    }catch(e){l.innerText="[ERROR] Failed.";l.style.color="#f36";}
+    }catch(e){l.innerText="[ERROR] Failed.";l.style.color="#f36";U.fill(0);}
 };
 const wc=E("wc"),cv=E("cv"),gl=cv.getContext("webgl2",{alpha:false,antialias:false})||cv.getContext("experimental-webgl2");
 const vs=`#version 300 es
-in float idx;uniform float t;uniform vec2 m;uniform vec2 rot;out vec4 wColor;void main(){
-float uID=float(gl_VertexID),x=(uID/1000.0)*6.28318;float pR=cos(x*3.0-t*1.5),pD=(pR*pR)+(sin(x*3.0-t*1.5)*sin(x*3.0-t*1.5));
-float phi=x,th=acos(mix(-1.0,1.0,fract(uID*0.007))),rD=0.6+(pR*0.12*pD);
-vec3 bP=vec3(sin(th)*cos(phi)*rD,sin(th)*sin(phi)*rD,cos(th)*rD);
-float cY=cos(rot.x),sY=sin(rot.x),cP=cos(rot.y),sP=sin(rot.y);
-vec3 rP=vec3(bP.x*cY-bP.z*sY,bP.y*cP-(bP.x*sY+bP.z*cY)*sP,(bP.x*sY+bP.z*cY)*cP+bP.y*sP);
-float d=length(rP.xy-m);if(d<0.35){rP.xy+=(rP.xy-m)/d*(0.12*(1.0-d/0.35));}
-gl_Position=vec4(rP.xy*(1.0/(2.0-rP.z*0.5))*1.4,0.0,1.0);gl_PointSize=mix(1.5,3.2,(rP.z+1.0)*0.5);wColor=vec4(0.0,mix(0.5,1.0,pD),mix(0.8,1.0,(rP.z+1.0)*0.5),0.85);}`,
-fs=`#version 300 es
-precision highp float;in vec4 wColor;out vec4 fc;void main(){fc=wColor;}`;
-function cs(t,src){const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s;}
-const pg=gl.createProgram();gl.attachShader(pg,cs(gl.VERTEX_SHADER,vs));gl.attachShader(pg,cs(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pg);gl.useProgram(pg);
-const corePoints=new Float32Array(100);const vbo=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vbo);gl.bufferData(gl.ARRAY_BUFFER,corePoints,gl.STATIC_DRAW);
-const pLoc=gl.getAttribLocation(pg,"idx");gl.enableVertexAttribArray(pLoc);gl.vertexAttribPointer(pLoc,1,gl.FLOAT,false,4,0);
-const tLoc=gl.getUniformLocation(pg,"t"),mLoc=gl.getUniformLocation(pg,"m"),rotLoc=gl.getUniformLocation(pg,"rot");
+in float idx;uniform float t;uniform vec2 m;uniform vec2 rot;out vec4 wColor;void main(){float uID=float(gl_VertexID),x=(uID/500000.0)*6.28318;float pR=cos(x*4.0-t*1.5),pD=(pR*pR)+(sin(x*3.0-t*1.5)*sin(x*3.0-t*1.5));float velocity=x*0.005,c_sq=8.987551e10,l=1.0/sqrt(1.0-min((velocity*velocity)/(c_sq*1e-11),0.99));float phi=x,th=acos(mix(-1.0,1.0,fract(uID*0.0001))),rD=0.55+(pR*0.15*pD*l);vec3 bP=vec3(sin(th)*cos(phi)*rD,sin(th)*sin(phi)*rD,cos(th)*rD*(1.0/l));float cY=cos(rot.x),sY=sin(rot.x),cP=cos(rot.y),sP=sin(rot.y);vec3 rP=vec3(bP.x*cY-bP.z*sY,bP.y*cP-(bP.x*sY+bP.z*cY)*sP,(bP.x*sY+bP.z*cY)*cP+bP.y*sP);float d=length(rP.xy-m);if(d<0.35){rP.xy+=(rP.xy-m)/d*(0.12*(1.0-d/0.35));}gl_Position=vec4(rP.xy*(1.0/(2.0-rP.z*0.5))*1.4,0.0,1.0);gl_PointSize=mix(1.0,2.5,(rP.z+1.0)*0.5);wColor=vec4(0.0,mix(0.5,1.0,pD),mix(0.8,1.0,(rP.z+1.0)*0.5),0.8);}`,fs=`#version 300 es
+precision highp float;in vec4 wColor;out vec4 fc;void main(){fc=wColor;}`;function cs(t,src){const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s;}const pg=gl.createProgram();gl.attachShader(pg,cs(gl.VERTEX_SHADER,vs));gl.attachShader(pg,cs(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pg);gl.useProgram(pg);const corePoints=new Float32Array(10);const vbo=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vbo);gl.bufferData(gl.ARRAY_BUFFER,corePoints,gl.STATIC_DRAW);const pLoc=gl.getAttribLocation(pg,"idx");gl.enableVertexAttribArray(pLoc);gl.vertexAttribPointer(pLoc,1,gl.FLOAT,!1,4,0);const tLoc=gl.getUniformLocation(pg,"t"),mLoc=gl.getUniformLocation(pg,"m"),rotLoc=gl.getUniformLocation(pg,"rot");
 function track(clientX,clientY){const r=cv.getBoundingClientRect();mx=((clientX-r.left)/cv.width)*2.0-1.0;my=-(((clientY-r.top)/cv.height)*2.0-1.0);}
-wr.addEventListener("mousedown",e=>{isD=true;lx=e.clientX;ly=e.clientY;});window.addEventListener("mouseup",()=>{isD=false;mx=-1000;my=-1000;});
-wr.addEventListener("mousemove",e=>{if(isD){rx+=(e.clientX-lx)*0.005;ry+=(e.clientY-ly)*0.005;lx=e.clientX;ly=e.clientY;}else{track(e.clientX,e.clientY);}});
-wr.addEventListener("touchstart",e=>{if(e.touches.length===1){isD=true;lx=e.touches[0].clientX;ly=e.touches[0].clientY;}});
-wr.addEventListener("touchmove",e=>{if(isD&&1===e.touches.length){rx+=(e.touches[0].clientX-lx)*0.005;ry+=(e.touches[0].clientY-ly)*0.005;lx=e.touches[0].clientX;ly=e.touches[0].clientY;track(e.touches[0].clientX,e.touches[0].clientY);}});wr.addEventListener("touchend",()=>{isD=false;mx=-1000;my=-1000;});
+const h=(e,a)=>{isD=a;const c=e.clientX||(e.touches?e.touches[0].clientX:0),s=e.clientY||(e.touches?e.touches[0].clientY:0);lx=c;ly=s;};
+const M=e=>{const c=e.clientX||(e.touches?e.touches[0].clientX:null),s=e.clientY||(e.touches?e.touches[0].clientY:null);if(c&&s){if(isD){rx+=(c-lastMouseX)*0.005;ry+=(s-lastMouseY)*0.005;lastMouseX=c;lastMouseY=s;}else{track(c,s);}}};
+wc.addEventListener("mousedown",e=>h(e,!0));window.addEventListener("mouseup",()=>{isD=!1;mx=-1000;my=-1000;});wc.addEventListener("mousemove",M);
+wc.addEventListener("touchstart",e=>{if(e.touches.length===1)h(e,!0);});wc.addEventListener("touchmove",M);wc.addEventListener("touchend",()=>{isD=!1;mx=-1000;my=-1000;});
 function resize(){const dpr=window.devicePixelRatio||1;cv.width=wc.clientWidth*dpr;cv.height=wc.clientHeight*dpr;gl.viewport(0,0,cv.width,cv.height);}window.addEventListener("resize",resize);resize();gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
-setInterval(()=>{gl.clearColor(0.01,0.01,0.02,1.0);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform1f(tLoc,N()*0.0006);gl.uniform2f(mLoc,mx,my);gl.uniform2f(rotLoc,rx,ry);gl.drawArrays(gl.POINTS,0,1000);},16);
-})();</script></body></html>
+setInterval(()=>{gl.clearColor(0.01,0.012,0.022,1.0);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform1f(tLoc,N()*0.0006);gl.uniform2f(mLoc,mx,my);gl.uniform2f(rotLoc,rx,ry);gl.drawArrays(gl.POINTS,0,500000);},16);})();</script></body></html>
