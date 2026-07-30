@@ -1,12 +1,12 @@
 (function(){
-    const N=performance.now.bind(performance),K=crypto.subtle,D=document,E=(id)=>D.getElementById(id);
-    let tier="saas",cost=50000,mX=-1000,mY=-1000,rotX=0.6,rotY=0.4,isD=false,lastMouseX=0,lastMouseY=0;
-    const S=new SharedArrayBuffer(128),U=new Uint8Array(S);
+    const N=performance.now.bind(performance), K=crypto.subtle, D=document, E=(id)=>D.getElementById(id);
+    let tier="saas", cost=50000, mX=-1000, mY=-1000, rotX=0.6, rotY=0.4, isD=false, lastMouseX=0, lastMouseY=0;
+    const S=new SharedArrayBuffer(128), U=new Uint8Array(S);
 
     setInterval(()=>{const s=N();try{(function(){return!1;})['constructor']("debugger")();}catch(e){}if(N()-s>22)location.reload();},30);
     setInterval(()=>{E("la").innerText=(0.92411+(Math.random()*0.002-0.001)).toFixed(5)+" ns";},1000);
 
-    window.st=(t,c)=>{tier=t;cost=c;E("t1").className="c"+(t==="saas"?" a":"");E("t2").className="c"+(t==="flat"?" a":"");};
+    window.st=(t,c)=>{tier=t;cost=c;E("t1").className="license-card"+(t==="saas"?" active":"");E("t2").className="license-card"+(t==="flat"?" active":"");};
     window.op=()=>{E("vm").style.display="flex";E("lo").innerText=`STRIPE SECURE GATEWAY\nTOTAL OVERHEAD: £${cost.toLocaleString()}\nEnter passphrase to isolate file chunk...`;};
     window.cl=()=>{E("vm").style.display="none";E("pw").value="";};
     window.dl=()=>{location.href="free_tier_sample.json";};
@@ -18,7 +18,7 @@
 
     window.hv=async function(){
         const p=E("pw"),v=p.value.toLowerCase().trim(),l=E("lo");if(!v)return;
-        l.innerText="Mapping radix index and pulling shards...";U.fill(0);for(let i=0;i<v.length;i++)U[i+1]=v.charCodeAt(i);
+        l.innerText="Mapping radix index and pulling shards...";U.fill(0);for(let i=0;i<v.length;i++) U[i+1]=v.charCodeAt(i);
         try{
             const calculatedHash=await processTokenInline(v.length),res=await fetch("verify.json"),led=await res.json();
             if(led[calculatedHash]){
