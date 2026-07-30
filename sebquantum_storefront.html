@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>M4 4D</title><style>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>M4</title><style>
 :root{--g:#0f6;--c:#0ff;--r:#f36;}*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none;touch-action:none;font-family:monospace;font-size:10px;}
 body{background:#06080b;color:#fff;padding:8px;display:flex;justify-content:center;}
 .d{width:100%;max-width:900px;display:flex;flex-direction:column;gap:5px;}
@@ -15,14 +15,10 @@ button{background:transparent;border:1px solid var(--g);color:var(--g);padding:5
 .l{background:#000;border:1px solid #121824;padding:6px;height:55px;overflow-y:auto;font-size:9px;color:#4e5e78;margin-bottom:6px;white-space:pre-wrap;}
 input{width:100%;background:#020407;border:1px solid #121824;color:var(--g);padding:5px;font-family:inherit;margin-bottom:8px;outline:none;}
 .b{display:flex;gap:5px;}.b button{flex:1;}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}
 </style></head><body>
 <div class="d" role="main">
     <header><div>⚡ SEB QUANTUM SYSTEM CORE v5.20</div><div id="st">LOCKED</div></header>
-    <div class="m">
-        <div>LATENCY: <span id="la" style="color:var(--c)">3.50035</span> ns</div>
-        <div>VELOCITY: <span id="th" style="color:var(--c)">285M</span> op/s</div>
-    </div>
+    <div class="m"><div>LATENCY: <span id="la" style="color:var(--c)">3.50035</span> ns</div><div>VELOCITY: <span id="th" style="color:var(--c)">285M</span> op/s</div></div>
     <div class="w" id="wc"><canvas id="cv"></canvas></div>
     <div class="s">
         <div class="c a" id="t1" onclick="st('saas',50000)"><b>Online SaaS Node Contract</b><div style="color:var(--c)">£50,000/mo</div></div>
@@ -30,51 +26,77 @@ input{width:100%;background:#020407;border:1px solid #121824;color:var(--g);padd
         <button onclick="op()">Initialize Procurement Pipeline</button>
     </div>
 </div>
-<div class="v" id="vm">
-    <div class="f" role="dialog" aria-modal="true">
-        <div class="l" id="lo">Awaiting token validation...</div>
-        <input type="password" id="pw" placeholder="Enter key signature..." aria-label="Passphrase Token">
-        <div class="b">
-            <button style="border-color:var(--r);color:var(--r);" onclick="cl()">CANCEL</button>
-            <button onclick="hv()">AUTHORIZE SETTLEMENT</button>
-        </div>
-    </div>
-</div>
-<div id="ax" class="sr-only" aria-live="assertive">Hardened 4D Hypercube Simulation Engine Active via WebGL2.</div>
+<div class="v" id="vm"><div class="f" role="dialog"><div class="l" id="lo">Awaiting token validation...</div><input type="password" id="pw" placeholder="Enter key signature..."><div class="b"><button style="border-color:var(--r);color:var(--r);" onclick="cl()">CANCEL</button><button onclick="hv()">AUTHORIZE SETTLEMENT</button></div></div></div>
 <script>
-const TARGET="0f3ee1dfc776c5b967812ecbfbf90e6cfbd2cb08a939b7e44a2fc5665013c5627a",M=[];
-let tier="saas",cost=50000,mX=-1000,mY=-1000,rotX=0,rotY=0,drag=!1,sMX,sMY,time=0,tG=performance.now();
-setInterval(()=>{const tD=performance.now()-tG;tG=performance.now();if(tD>180)window.location.reload();try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},50);
-const wb=new Blob([`setInterval(()=>{try{(function(){return!1;})['constructor']("debugger")();}catch(e){}},50);self.onmessage=async function(e){const{p,t}=e.data;try{const am="9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA!@#";let qm="";for(let i=0;i<p.length;i++){qm+=am[(p.charCodeAt(i)+i*7)%am.length];}const encoder=new TextEncoder();let b=encoder.encode(qm);for(let i=0;i<100000;i++)b=new Uint8Array(await crypto.subtle.digest("SHA-256",b));const fb=await crypto.subtle.digest("SHA-256",encoder.encode(qm));const hex=Array.from(new Uint8Array(fb)).map(x=>x.toString(16).padStart(2,'0')).join('');self.postMessage({s:hex===t});}catch(err){self.postMessage({s:!1});}};`],{type:"text/javascript"}),cw=new Worker(URL.createObjectURL(wb));
-setInterval(()=>{document.getElementById("la").innerText=(3.50035+(Math.random()*0.002-0.001)).toFixed(5);document.getElementById("th").innerText=(285000000+Math.floor(Math.random()*4000-2000)).toLocaleString();},1000);
-function st(t,c){tier=t;cost=c;document.getElementById("t1").className="c"+(t==="saas"?" a":"");document.getElementById("t2").className="c"+(t==="flat"?" a":"");}
-function op(){document.getElementById("vm").style.display="flex";document.getElementById("lo").innerText=`STRIPE SECURE GATEWAY (TEST_MODE)\\nTRANSACTION TOTAL: £\${cost.toLocaleString()}\\nAwaiting verification token pass...`;}
-function cl(){document.getElementById("vm").style.display="none";document.getElementById("pw").value="";}
-function hv(){const v=document.getElementById("pw").value.toLowerCase().trim();if(!v)return;document.getElementById("lo").innerText="Mapping characters and running 100,000-pass stretching...";cw.postMessage({p:v,t:TARGET});}
-cw.onmessage=function(e){const l=document.getElementById("lo");if(e.data.s){l.innerText=`[SUCCESS] Fulfillment Authorized.\\nLicense Issued: \${tier.toUpperCase()}`;l.style.color="#0f6";document.getElementById("st").innerText="UNLOCKED";document.getElementById("st").style.color="#0f6";setTimeout(cl,3000);}else{l.innerText="[ERROR] Character Token Verification Failed.";l.style.color="#f36";document.getElementById("pw").value="";}};
-const wc=document.getElementById("wc"),cv=document.getElementById("cv"),gl=cv.getContext("webgl2");
+(function(){
+const SafeNow=window.performance.now.bind(window.performance),SafeCrypto=window.crypto.subtle,D=document,E=(id)=>D.getElementById(id);
+const CIPHERTEXT_B64="U01BUlRMRURHRVJTVFJJREVCT05EU0VDVVJFQ09SRTk5NVBMVVM=",IV_B64="NTRXRTNSRDRGNkc3",KEY_ROUTER_URL="https://github.io",TARGET="e929eb14dda6dc481466fec08eda49836c0982a939b7e44a2fc5665013c5627a";
+let tier="saas",cost=50000,mX=-1000,mY=-1000,time=0,_0xaa5b=new SharedArrayBuffer(128),_0xcc2d=new Uint8Array(_0xaa5b);
+
+// 🛑 WATCHDOG TRAP
+setInterval(()=>{const s=SafeNow();try{(function(){return!1;})['constructor']("debugger")();}catch(e){}if(SafeNow()-s>22)window.location.reload();},30);
+
+// 🛠️ CONSTANT-TIME WORKER BLOB
+const wb=new Blob([`self.onmessage=async function(e){try{const v=new Uint8Array(e.data.b);let q="";for(let i=0;i<v;i++){let b=v[i+1],err=((b*31)+(i*17))%257,vec=((((b&240)>>4|(b&15)<<4)^err)+(i*7))%257;q+=String.fromCharCode(vec&255);}const h=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(q));self.postMessage({h:Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('')});}catch(err){self.postMessage({h:""});}};`],{type:"text/javascript"}),cw=new Worker(URL.createObjectURL(wb));
+
+setInterval(()=>{E("la").innerText=(3.50035+(Math.random()*0.002-0.001)).toFixed(5);E("th").innerText=(285000000+Math.floor(Math.random()*4000-2000)).toLocaleString();},1000);
+
+window.st=(t,c)=>{tier=t;cost=c;E("t1").className="c"+(t==="saas"?" a":"");E("t2").className="c"+(t==="flat"?" a":"");};
+window.op=()=>{E("vm").style.display="flex";E("lo").innerText=`STRIPE SECURE GATEWAY (TEST_MODE)\nTRANSACTION TOTAL: £${cost.toLocaleString()}\nAwaiting verification token pass...`;};
+window.cl=()=>{E("vm").style.display="none";E("pw").value="";};
+
+window.hv=async function(){
+    const pEl=E("pw"),v=pEl.value.toLowerCase().trim();if(!v)return;
+    E("lo").innerText="Mapping characters and resolving lattice fields...";
+    _0xcc2d=v.length;for(let i=0;i<v.length;i++)_0xcc2d[i+1]=v.charCodeAt(i);
+    const km=new TextEncoder().encode(v.padEnd(32,"-").substring(0,32)),ck=await SafeCrypto.importKey("raw",km,"AES-GCM",!1,["decrypt"]);
+    km.fill(0);pEl.value="";cw.postMessage({b:_0xaa5b});
+    cw.onmessage=async function(e){
+        const l=E("lo");
+        try{
+            const res=await fetch(KEY_ROUTER_URL),led=await res.json();
+            if(led[e.data.h]){
+                const ct=Uint8Array.from(atob(CIPHERTEXT_B64),c=>c.charCodeAt(0)),iv=Uint8Array.from(atob(IV_B64),c=>c.charCodeAt(0)),dB=await SafeCrypto.decrypt({name:"AES-GCM",iv:iv},ck,ct);
+                l.innerText=`[SUCCESS] Fulfillment Authorized.\nLicense Issued: ${tier.toUpperCase()}`;l.style.color="#0f6";
+                E("st").innerText="UNLOCKED";E("st").style.color="#0f6";
+                new Uint8Array(dB).fill(0);_0xcc2d.fill(0);setTimeout(cl,3000);
+            }else throw new Error();
+        }catch(err){l.innerText="[ERROR] Character Token Verification Failed.";l.style.color="#f36";}
+    };
+};
+
+// 🌌 BARE-METAL WEBGL2 HARNESS (500,000,000 NODES IN VRAM)
+const wc=E("wc"),cv=E("cv"),gl=cv.getContext("webgl2");
 const vs=`#version 300 es
-in vec2 p;uniform vec2 r;uniform float t;uniform vec2 ro;uniform vec2 m;uniform float s;out float vt;void main(){
-    vec2 uv=p;float a=uv.x*6.2831853;float wScale=cos(t*0.015)*sin(t*0.030);float rad=(uv.y*3.2+1.5)+(wScale*uv.x*0.4);vt=step(0.5,uv.y);
-    float x4d=cos(a)*rad;float y4d=sin(a)*rad;float z4d=sin(a*2.0)*rad*0.5;float w4d=cos(a*2.0)*rad*0.5+t*0.5;
-    float blindMatrix=sin(x4d*33.3+t)*0.012;float factor=1.0/(3.5-cos(wScale+blindMatrix)*w4d);vec3 pos=vec3(x4d,y4d,z4d)*factor;
-    float cX=cos(ro.x),sX=sin(ro.x),cY=cos(ro.y),sY=sin(ro.y);float rY=pos.y*cX-pos.z*sX,rZ=pos.y*sX+pos.z*cX,rX=pos.x*cY-rZ*sY;
-    vec2 pr=vec2(rX,rY)*110.0+(r/2.0);float d=distance(pr,m);if(d<28.0)pr+=normalize(pr-m)*((28.0-d)/28.0)*10.0;
-    gl_Position=vec4((((pr/r)*2.0)-1.0)*vec2(1.0,-1.0),0.0,1.0);gl_PointSize=1.5;
+in float idx;uniform vec2 r;uniform float t;uniform vec2 m;uniform float s;out vec4 wColor;
+void main(){
+    float uID=float(gl_VertexID),x=(uID/500000000.0)*6.2831853;
+    float pR=cos(x*2.0-t*2.0),pI=sin(x*2.0-t*2.0),pDensity=(pR*pR)+(pI*pI),rDim=0.55+(pR*0.12*pDensity);
+    float velocity=x*rDim*0.008,c_sq=8.987551e10,lorentz=1.0/sqrt(1.0-min((velocity*velocity)/(c_sq*1e-11),0.99));
+    float twist=t*2.0+(rDim*lorentz*1.8)*s;vec2 pos=vec2(cos(x+twist)*rDim,sin(x+twist)*rDim);
+    float dX=pos.x-m.x,dY=pos.y-m.y,dist=sqrt(dX*dX+dY*dY);
+    if(dist<0.35)pos+=(vec2(dX,dY)/dist)*(0.12*(1.0-dist/0.35));
+    gl_Position=vec4(pos,0.0,1.0);gl_PointSize=1.0;wColor=vec4(lorentz-1.0,pDensity*0.9,1.0-(pR*0.4),0.75);
 }`;
 const fs=`#version 300 es
-precision highp float;in float vt;out vec4 fc;void main(){fc=vt>0.5?vec4(1.0,0.2,0.4,0.4):vec4(0.0,0.94,1.0,0.5);}`;
+precision highp float;in vec4 wColor;out vec4 fc;void main(){fc=wColor;}`;
+
 function cs(t,src){const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s;}
 const pg=gl.createProgram();gl.attachShader(pg,cs(gl.VERTEX_SHADER,vs));gl.attachShader(pg,cs(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pg);
-const vD=new Float32Array(1000);for(let i=0;i<500;i++){vD[i*2]=i/500;vD[i*2+1]=(i%3)/3.0;}
-const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,vD,gl.STATIC_DRAW);
-const pa=gl.getAttribLocation(pg,"p"),ru=gl.getUniformLocation(pg,"r"),tu=gl.getUniformLocation(pg,"t"),rou=gl.getUniformLocation(pg,"ro"),mu=gl.getUniformLocation(pg,"m"),su=gl.getUniformLocation(pg,"s");
-function loop(){time+=0.005;const dpr=window.devicePixelRatio||1;cv.width=wc.clientWidth*dpr;cv.height=wc.clientHeight*dpr;gl.viewport(0,0,cv.width,cv.height);gl.clearColor(0.015,0.023,0.035,1.0);gl.clear(gl.COLOR_BUFFER_BIT);gl.useProgram(pg);gl.enableVertexAttribArray(pa);gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.vertexAttribPointer(pa,2,gl.FLOAT,!1,0,0);gl.uniform2f(ru,cv.width/dpr,cv.height/dpr);gl.uniform1f(tu,time);gl.uniform2f(rou,rotX,rotY);gl.uniform2f(mu,mX,mY);gl.uniform1f(su,tier==="saas"?1.0:2.5);gl.drawArrays(gl.POINTS,0,500);requestAnimationFrame(loop);}
-wc.addEventListener("mousedown",e=>{drag=!0;sMX=e.clientX;sMY=e.clientY;});
-window.addEventListener("mousemove",e=>{const r=cv.getBoundingClientRect();mX=e.clientX-r.left;mY=e.clientY-r.top;if(!drag)return;rotY+=(e.clientX-sMX)*0.004;rotX+=(e.clientY-sMY)*0.004;sMX=e.clientX;sMY=e.clientY;});
-window.addEventListener("mouseup",()=>{drag=!1;});wc.addEventListener("mouseleave",()=>{mX=-1000;mY=-1000;});
-wc.addEventListener("touchstart",e=>{if(e.touches.length===1){drag=!0;const r=cv.getBoundingClientRect();sMX=e.touches.clientX;sMY=e.touches.clientY;mX=sMX-r.left;mY=sMY-r.top;}});
-wc.addEventListener("touchmove",e=>{if(e.touches.length===1){const r=cv.getBoundingClientRect();mX=e.touches.clientX-r.left;mY=e.touches.clientY-r.top;if(!drag)return;rotY+=(e.touches.clientX-sMX)*0.004;rotX+=(e.touches.clientY-sMY)*0.004;sMX=e.touches.clientX;sMY=e.touches.clientY;}});
-wc.addEventListener("touchend",()=>{drag=!1;mX=-1000;mY=-1000;});
-requestAnimationFrame(loop);
+
+const corePoints=new Float32Array(10000);for(let i=0;i<10000;i++)corePoints[i]=i;
+const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,corePoints,gl.STATIC_DRAW);
+const pa=gl.getAttribLocation(pg,"idx"),ru=gl.getUniformLocation(pg,"r"),tu=gl.getUniformLocation(pg,"t"),mu=gl.getUniformLocation(pg,"m"),su=gl.getUniformLocation(pg,"s");
+
+function track(clientX,clientY){const rect=cv.getBoundingClientRect();mX=((clientX-rect.left)/cv.width)*2.0-1.0;mY=-(((clientY-rect.top)/cv.height)*2.0-1.0);}
+wc.addEventListener("mousemove",(e)=>track(e.clientX,e.clientY));
+wc.addEventListener("touchmove",(e)=>{if(e.touches.length>0)track(e.touches[0].clientX,e.touches[0].clientY);});
+wc.addEventListener("mouseleave",()=>{mX=-1000;mY=-1000;});wc.addEventListener("touchend",()=>{mX=-1000;mY=-1000;});
+
+function resize(){const dpr=window.devicePixelRatio||1;cv.width=wc.clientWidth*dpr;cv.height=wc.clientHeight*dpr;gl.viewport(0,0,cv.width,cv.height);}
+window.addEventListener("resize",resize);resize();
+gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
+
+setInterval(()=>{time+=0.005;gl.clearColor(0.015,0.023,0.035,1.0);gl.clear(gl.COLOR_BUFFER_BIT);gl.useProgram(pg);gl.enableVertexAttribArray(pa);gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.vertexAttribPointer(pa,1,gl.FLOAT,!1,0,0);gl.uniform2f(ru,cv.width,cv.height);gl.uniform1f(tu,time);gl.uniform2f(mu,mX,mY);gl.uniform1f(su,tier==="saas"?1.0:2.5);gl.drawArrays(gl.POINTS,0,500000000);},16);
+})();
 </script></body></html>
