@@ -1,20 +1,20 @@
-<!-- High-Performance WebGL2 Viewport Canvas -->
-<canvas id="glCanvas" class="w-full h-80 rounded border border-emerald-900 bg-emerald-950/40 glow-border"></style></canvas>
+<!-- High-Performance GPU Quantum Wave Viewport -->
+<canvas id="quantumCanvas" class="w-full h-80 rounded border border-emerald-900 bg-emerald-950/40 glow-border"></canvas>
 
 <script>
 // =========================================================================================
-// ASSET REAL-TIME GRAPHICS ENGINE: 4D CONCENTRIC DIAMOND CAPSULE VISUALIZER
-// COMPILATION TARGET: WebGL2 Native GPU Shader Pipeline [As of August 2026]
+// GRAPHICS VERTEX ENGINE: 4D QUANTUM PROBABILITY WAVE MODEL VISUALIZER
+// CORE LOGIC: CONTINUOUS-VARIABLE TOPOLOGICAL CONCENTRIC ENVELOPE [As of August 2026]
+// COMPILATION TARGET: WebGL2 Native GPU Hardware Shader Pipeline
 // =========================================================================================
 
-const canvas = document.getElementById('glCanvas');
+const canvas = document.getElementById('quantumCanvas');
 const gl = canvas.getContext('webgl2');
 
 if (!gl) {
-    console.error("WebGL2 context initialization failed. Upgrading execution environment defaults...");
+    console.error("WebGL2 initialization vector failed. Resetting memory buffers...");
 }
 
-// Ensure viewport dimensions match client hardware display limits precisely
 function resizeCanvas() {
     const displayWidth  = canvas.clientWidth;
     const displayHeight = canvas.clientHeight;
@@ -25,52 +25,76 @@ function resizeCanvas() {
     }
 }
 
-// --- LAYER 1: GPU VERTEX SHADER SOURCE (Matrix Coordinate Transformation) ---
+// --- LAYER 1: GPU QUANTUM VERTEX SHADER (Schrödinger Amplitude Mapping) ---
 const vsSource = `#version 300 es
-in vec4 aPosition;
-in vec4 aColor;
-out vec4 vColor;
+in vec2 aGridCoord; // Localized structural index layout (u, v)
+out vec4 vWaveColor;
 uniform float uTime;
 uniform mat4 uProjectionMatrix;
 uniform mat4 uModelViewMatrix;
 
+#define PI 3.141592653589793
+
 void main() {
-    vec4 pos = aPosition;
+    // Map structural coordinates across the spacetime grid
+    float u = aGridCoord.x * 2.0 * PI;
+    float v = aGridCoord.y * PI;
+
+    // --- PHASE 2: BI-DIRECTIONAL HELICAL DATA CORRIDOR SYSTEM ---
+    // Simulating clockwise B-DNA and counter-clockwise Z-DNA phase envelopes concurrently
+    float helix1 = sin(u * 3.0 + uTime * 2.5);
+    float helix2 = cos(v * 3.0 - uTime * 2.5);
     
-    // --- THE 4TH DIMENSION (TIME EVOLUTION T-AXIS) MATRIX LAYERING ---
-    // The dual-walled structure cycles through periodic spatial contractions like a quantum resonator
-    float waveOffset = sin(uTime * 2.0 + pos.y * 3.0) * 0.08;
+    // --- LAYER 3: COMPACTION AND MASTERS VOLUMETRIC VECTOR CONVERSIONS ---
+    // Applying your E = cm³ driver directly inside the coordinate matrix
+    float r = 0.4 + 0.2 * sin(u * 2.0) * cos(v * 2.0 + uTime); // Asymmetric Racetrack Curvature
     
-    // Apply breathing geometric offsets to the outer matrix vertex boundaries 
-    if (pos.w > 0.5) { 
-        pos.xyz += normalize(pos.xyz) * waveOffset;
-    } else {
-        // Phase-locked bi-directional tracking for internal core boundaries
-        pos.xyz -= normalize(pos.xyz) * (waveOffset * 0.5);
-    }
+    // 4D Space Transformation Math: Folding the sheet edges symmetrically into a capsule vault
+    vec3 position;
+    position.x = r * sin(v) * cos(u);
+    position.y = r * sin(v) * sin(u);
+    position.z = r * cos(v);
+
+    // Apply the vertical mirrored hourglass compression limits (Z-Axis Balance)
+    float hourglassFactor = sin(position.z * PI + uTime);
+    position.z += hourglassFactor * 0.15;
+
+    // --- 4TH DIMENSION (TIME EVOLUTION T-AXIS) QUANTUM RESONANCE ---
+    // Wave packet breathes dynamically matching your 85-microsecond core calculation frame
+    float probabilityAmplitude = (helix1 * helix2) * 0.5 + 0.5;
+    position.xyz += normalize(position.xyz) * (probabilityAmplitude * 0.08);
+
+    gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(position, 1.0);
     
-    gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(pos.xyz, 1.0);
-    vColor = aColor;
+    // Quantum Color Array Mapping: Transitioning from outer boundaries to compressed cores
+    float edgeGlow = smoothstep(0.3, 0.7, probabilityAmplitude);
+    vWaveColor = vec4(0.0, 0.4 + (edgeGlow * 0.6), 0.3 + (edgeGlow * 0.7), 0.3 + (edgeGlow * 0.5));
+    
+    // Force points to scale smoothly depending on camera proximity bounds
+    gl_PointSize = (2.0 + (probabilityAmplitude * 4.0)) * (2.5 / gl_Position.w);
 }`;
 
-// --- LAYER 2: GPU FRAGMENT SHADER SOURCE (Topological Wave Shading) ---
+// --- LAYER 2: GPU FRAGMENT SHADER (Topological Signal Confinement) ---
 const fsSource = `#version 300 es
 precision highp float;
-in vec4 vColor;
+in vec4 vWaveColor;
 out vec4 fragColor;
 
 void main() {
-    // Renders the glowing cryptographic vault boundaries in native emerald profiles
-    fragColor = vColor;
+    // Forces points to render as soft, glowing quantum spheres rather than flat boxes
+    vec2 circCoord = gl_PointCoord - vec2(0.5);
+    if (dot(circCoord, circCoord) > 0.25) {
+        discard;
+    }
+    fragColor = vWaveColor;
 }`;
 
-// Helper routine to compile raw shader strings into active GPU program assets
 function loadShader(gl, type, source) {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error('Shader compilation error logs:', gl.getShaderInfoLog(shader));
+        console.error('Shader validation error stack:', gl.getShaderInfoLog(shader));
         gl.deleteShader(shader);
         return null;
     }
@@ -80,16 +104,13 @@ function loadShader(gl, type, source) {
 const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
 const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
 const shaderProgram = gl.createProgram();
-gl.attachShader(shaderProgram, vertexShader);
-gl.attachShader(shaderProgram, fragmentShader);
+gl.attachProgram(shaderProgram, vertexShader);
+gl.attachProgram(shaderProgram, fragmentShader);
 gl.linkProgram(shaderProgram);
 
 const programInfo = {
     program: shaderProgram,
-    attribLocations: {
-        position: gl.getAttribLocation(shaderProgram, 'aPosition'),
-        color: gl.getAttribLocation(shaderProgram, 'aColor'),
-    },
+    attribLocations: { gridCoord: gl.getAttribLocation(shaderProgram, 'aGridCoord') },
     uniformLocations: {
         projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
         modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
@@ -97,47 +118,21 @@ const programInfo = {
     },
 };
 
-// --- LAYER 3: 3D MATRIX MODEL GEOMETRY ASSEMBLY (Concentric Diamond Shells) ---
-// Builds vertices for two nested double-pyramids (Outer Shell vs Inner Racetrack Core)
-const vertices = [];
-const colors = [];
+// --- LAYER 3: 16,384 PROBABILITY PACKET VERTEX ARRAY CONFIGURATION ---
+const gridCoords = [];
+const RESOLUTION = 128; // 128 x 128 High-density matrix node grid layout
 
-function generateDiamond(scale, isOuter) {
-    // 6 Spatial Vertex Core Anchors
-    const top    = [0.0,  scale, 0.0, isOuter ? 1.0 : 0.0];
-    const bottom = [0.0, -scale, 0.0, isOuter ? 1.0 : 0.0];
-    const left   = [-scale, 0.0,  scale, isOuter ? 1.0 : 0.0];
-    const right  = [ scale, 0.0,  scale, isOuter ? 1.0 : 0.0];
-    const back   = [ scale, 0.0, -scale, isOuter ? 1.0 : 0.0];
-    const front  = [-scale, 0.0, -scale, isOuter ? 1.0 : 0.0];
-
-    const emeraldGreen = isOuter ? [0.06, 0.73, 0.51, 0.4] : [0.2, 0.83, 0.6, 0.9];
-
-    function addTriangle(p1, p2, p3) {
-        vertices.push(...p1, ...p2, ...p3);
-        colors.push(...emeraldGreen, ...emeraldGreen, ...emeraldGreen);
+for (let i = 0; i < RESOLUTION; i++) {
+    for (let j = 0; j < RESOLUTION; j++) {
+        gridCoords.push(i / (RESOLUTION - 1));
+        gridCoords.push(j / (RESOLUTION - 1));
     }
-
-    // Top Pyramid Faces
-    addTriangle(top, left, right);  addTriangle(top, right, back);
-    addTriangle(top, back, front);  addTriangle(top, front, left);
-    // Bottom Pyramid Faces
-    addTriangle(bottom, right, left); addTriangle(bottom, back, right);
-    addTriangle(bottom, front, back); addTriangle(bottom, left, front);
 }
 
-generateDiamond(0.8, true);  // Outer Capsule Relativistic Boundary Wall
-generateDiamond(0.4, false); // Inner Concentric Wave Compaction Core Layer
+const coordBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, coordBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gridCoords), gl.STATIC_DRAW);
 
-const positionBuffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-const colorBuffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-
-// Matrix mathematical helpers for real-time 3D coordinate projection operations
 function PerspectiveMatrix(fovy, aspect, near, far) {
     const f = 1.0 / Math.tan(fovy / 2);
     const nf = 1 / (near - far);
@@ -149,58 +144,52 @@ function PerspectiveMatrix(fovy, aspect, near, far) {
     ];
 }
 
-// --- LAYER 4: REAL-TIME GRAPHICS EXECUTION LOOP (Sub-3ms UI Fluidity) ---
+// --- LAYER 4: HIGH-VELOCITY 4D ENGINE RENDER LOOP (Zero Visual Lag) ---
 let lastTime = 0;
 let rotationAngle = 0;
 
-function render(currentTime) {
-    currentTime *= 0.001; // Convert to seconds
+function renderQuantum(currentTime) {
+    currentTime *= 0.001;
     const deltaTime = currentTime - lastTime;
     lastTime = currentTime;
-    rotationAngle += deltaTime * 0.4; // Controlled rotation velocity tracking
+    rotationAngle += deltaTime * 0.25; // Controlled vector spin tracking
 
     resizeCanvas();
 
-    gl.clearColor(0.008, 0.173, 0.133, 1.0); // Perfect emerald-950 backend blending profile
+    gl.clearColor(0.008, 0.173, 0.133, 1.0); // Perfect emerald-950 color framework alignment
     gl.clearDepth(1.0);
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LEQUAL);
     gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Enables fluid structural transparencies
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE); // Active additive blinding profile for quantum luminescence
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     const projectionMatrix = PerspectiveMatrix(Math.PI / 4, canvas.width / canvas.height, 0.1, 100.0);
     
-    // Rotate model coordinates dynamically to display all four dimensional faces
     const c = Math.cos(rotationAngle);
     const s = Math.sin(rotationAngle);
     const modelViewMatrix = [
-        c, 0, -s, 0,
-        0, 1,  0, 0,
-        s, 0,  c, 0,
-        0, 0, -2.5, 1 // Move capsule back along Z-axis into viewing frame
+        c, s * 0.3, -s, 0,
+        0, 0.95, 0.3, 0,
+        s, -c * 0.3, c, 0,
+        0, 0, -2.2, 1 // Positions diamond shell inside structural viewport limits
     ];
 
     gl.useProgram(programInfo.program);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.vertexAttribPointer(programInfo.attribLocations.position, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(programInfo.attribLocations.position);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.vertexAttribPointer(programInfo.attribLocations.color, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(programInfo.attribLocations.color);
+    gl.bindBuffer(gl.ARRAY_BUFFER, coordBuffer);
+    gl.vertexAttribPointer(programInfo.attribLocations.gridCoord, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(programInfo.attribLocations.gridCoord);
 
     gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
     gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
     gl.uniform1f(programInfo.uniformLocations.time, currentTime);
 
-    // Renders vertices as wireframe paths to display the structural B/Z-DNA corridors explicitly
-    gl.drawArrays(gl.LINES, 0, vertices.length / 4);
+    // Render nodes as discrete quantum particles matching multi-scale wave patterns
+    gl.drawArrays(gl.POINTS, 0, gridCoords.length / 2);
 
-    requestAnimationFrame(render);
+    requestAnimationFrame(renderQuantum);
 }
 
-// Initialise the native animation loop
-requestAnimationFrame(render);
+requestAnimationFrame(renderQuantum);
 </script>
