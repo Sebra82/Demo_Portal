@@ -1,61 +1,168 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Show</title><style>
-body{margin:0;overflow:hidden;background:#000;font-family:monospace}
-#u{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:9}
-button{background:#111;color:#fff;border:1px solid #444;padding:8px 16px;cursor:pointer;font-size:11px}
-#l{position:absolute;top:20px;left:20px;color:#fff;font-size:12px;background:rgba(0,0,0,.7);padding:8px}
-</style></head><body><div id="l">INIT...</div><div id="u">
-<button onclick="s(1)">Act I</button><button onclick="s(2)">Act II</button><button onclick="s(3)">Act III</button>
-</div><script src="https://cloudflare.com"></script><script>
-let scene, camera, renderer, mesh, unif = {uT:{value:0},uA:{value:1}};
-try {
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer({antialias:true});
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-    
-    let mat = new THREE.ShaderMaterial({
-        uniforms: unif,
-        vertexShader: `uniform float uT, uA; varying vec3 vP;
-            void main(){
-                vec3 p = position; float r = length(p.xy);
-                if(uA>=1.0){ p.z-=1.8/(r+0.25); float a=uT*4.0+(p.z*1.8); float c=cos(a),s=sin(a); p.xy=mat2(c,-s,s,c)*p.xy; }
-                if(uA==2.0){ p.x+=sin(p.z*5.0+uT*7.0)*0.12; p.y+=cos(p.z*5.0+uT*7.0)*0.12; }
-                if(uA==3.0){ p.z=-2.5; }
-                vec4 w = instanceMatrix * vec4(p, 1.0);
-                if(uA==2.0){ w.y+=sin(w.x*0.08+uT*2.0)*3.5; w.z+=cos(w.y*0.08+uT*2.0)*3.5; }
-                vP = w.xyz; gl_Position = projectionMatrix * modelViewMatrix * w;
-            }`,
-        fragmentShader: `uniform float uA; void main(){
-                vec3 c = vec3(0,1,0.4); if(uA==2.0)c=vec3(1,0.65,0); if(uA==3.0)c=vec3(1,0,0.2);
-                gl_FragColor = vec4(c, 0.85);
-            }`
-    });
-    
-    mesh = new THREE.InstancedMesh(new THREE.EdgesGeometry(new THREE.CylinderGeometry(1,0.05,3.5,6,6,true)), mat, 1000);
-    let dummy = new THREE.Object3D(), idx=0;
-    for(let x=0;x<10;x++) for(let y=0;y<10;y++) for(let z=0;z<10;z++){
-        dummy.position.set((x-4.5)*6, (y-4.5)*6, (z-4.5)*6); dummy.updateMatrix(); mesh.setMatrixAt(idx++, dummy.matrix);
-    }
-    scene.add(mesh); camera.position.set(40,40,50); camera.lookAt(0,0,0);
-    s(1);
-    
-    let clock = new THREE.Clock();
-    function tick(){
-        requestAnimationFrame(tick); let t = clock.getElapsedTime(); unif.uT.value = t;
-        if(unif.uA.value!==3.0){ mesh.rotation.y=t*0.04; camera.position.x=Math.sin(t*0.15)*60; camera.position.z=Math.cos(t*0.15)*60; camera.lookAt(0,0,0); }
-        else{ camera.position.set(0,75,5); camera.lookAt(0,0,0); }
-        renderer.render(scene, camera);
-    }
-    tick();
-} catch(e) { fallback(); }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Fixed 3D Line Matrix Show</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; font-family: monospace; }
+        #u { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 9; }
+        button { background: #111; color: #fff; border: 1px solid #444; padding: 10px 18px; cursor: pointer; font-size: 11px; text-transform: uppercase; border-radius: 4px; }
+        button:hover { background: #222; border-color: #fff; }
+        #l { position: absolute; top: 20px; left: 20px; color: #fff; font-size: 12px; background: rgba(0,0,0,.75); padding: 10px; border-radius: 4px; border: 1px solid #222; pointer-events: none; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div id="l">SYSTEM RUNNING: DRAWING SHADER WIREFRAMES...</div>
+    <div id="u">
+        <button onclick="s(1)">Act I</button>
+        <button onclick="s(2)">Act II</button>
+        <button onclick="s(3)">Act III</button>
+    </div>
 
-function s(act){
-    unif.uA.value = act * 1.0;
-    document.getElementById('l').innerHTML = act==1 ? "ACT I: GREEN VORTEX ($m=E/c^2$)" : act==2 ? "ACT II: AMBER SUPERPOSITION" : "ACT III: RED REGISTRATION COLLAPSE";
-}
-function fallback(){
-    document.body.innerHTML = "<div id='l'>WEBGL FAILURE. RUNNING SECURE TERMINAL DATA MODE.</div>";
-}
-window.addEventListener('resize', ()=>{ if(camera&&renderer){ camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth,window.innerHeight); }});
-</script></body></html>
+    <!-- Load Three.js Core Framework via CDN -->
+    <script src="https://cloudflare.com"></script>
+    <script>
+        let scene, camera, renderer, lineSegments, unif = { uT: { value: 0 }, uA: { value: 1.0 } };
+
+        try {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.body.appendChild(renderer.domElement);
+            
+            // --- FIXED SHADER MATERIAL (Explicitly requests and handles instanceMatrix attributes) ---
+            let mat = new THREE.ShaderMaterial({
+                uniforms: unif,
+                vertexShader: `
+                    uniform float uT, uA;
+                    // Custom instanced attribute declaration injected manually to support line meshes
+                    attribute mat4 instanceMatrix; 
+                    varying vec3 vP;
+
+                    void main() {
+                        vec3 p = position; 
+                        float r = length(p.xy);
+
+                        // --- Act I: Local Funnel Distortion Rules ($m=E/c^2$) ---
+                        if (uA >= 1.0) { 
+                            p.z -= 1.8 / (r + 0.25); 
+                            float a = uT * 4.0 + (p.z * 1.8); 
+                            float c = cos(a), s = sin(a); 
+                            p.xy = mat2(c, -s, s, c) * p.xy; 
+                        }
+
+                        // --- Act II: Local State Blurring Rules ---
+                        if (uA == 2.0) { 
+                            p.x += sin(p.z * 5.0 + uT * 7.0) * 0.12; 
+                            p.y += cos(p.z * 5.0 + uT * 7.0) * 0.12; 
+                        }
+
+                        // --- Act III: Rigid Matrix Flattening Rules ---
+                        if (uA == 3.0) { 
+                            p.z = -2.5; 
+                        }
+
+                        // Compute global transformation manually using instance matrix math
+                        vec4 w = instanceMatrix * vec4(p, 1.0);
+
+                        // --- Macro Grid Network Connections ---
+                        if (uA == 2.0) { 
+                            w.y += sin(w.x * 0.08 + uT * 2.0) * 3.5; 
+                            w.z += cos(w.y * 0.08 + uT * 2.0) * 3.5; 
+                        }
+
+                        vP = w.xyz; 
+                        gl_Position = projectionMatrix * modelViewMatrix * w;
+                    }
+                `,
+                fragmentShader: `
+                    uniform float uA; 
+                    void main() {
+                        vec3 c = vec3(0.0, 1.0, 0.4); // Act I: Green Lines
+                        if (uA == 2.0) c = vec3(1.0, 0.65, 0.0); // Act II: Amber Blends
+                        if (uA == 3.0) c = vec3(1.0, 0.0, 0.2); // Act III: Red Clamps
+                        gl_FragColor = vec4(c, 0.85);
+                    }
+                `,
+                transparent: true,
+                depthWrite: false
+            });
+            
+            // Build base vector coordinates
+            let baseCylinder = new THREE.CylinderGeometry(1, 0.05, 3.5, 6, 6, true);
+            let edgesGeometry = new THREE.EdgesGeometry(baseCylinder); // Wipes face geometry for raw vector paths
+            
+            // Create an InstancedBufferGeometry to correctly parse attributes inside draw calls
+            let instancedGeometry = new THREE.InstancedBufferGeometry().copy(edgesGeometry);
+            
+            // Generate matrix arrays for 1,000 distinct coordinates
+            const instanceCount = 1000;
+            const matrixArray = new Float32Array(instanceCount * 16);
+            
+            let dummy = new THREE.Object3D(), idx = 0;
+            for (let x = 0; x < 10; x++) {
+                for (let y = 0; y < 10; y++) {
+                    for (let z = 0; z < 10; z++) {
+                        dummy.position.set((x - 4.5) * 6, (y - 4.5) * 6, (z - 4.5) * 6);
+                        dummy.updateMatrix();
+                        // Flatten data transformations directly into array registers
+                        dummy.matrix.toArray(matrixArray, idx * 16);
+                        idx++;
+                    }
+                }
+            }
+            
+            // Inject the data array cleanly into the shader instance context
+            instancedGeometry.setAttribute('instanceMatrix', new THREE.InstancedBufferAttribute(matrixArray, 16));
+            
+            // Instantiate as raw LineSegments to force visible line vector generation
+            lineSegments = new THREE.LineSegments(instancedGeometry, mat);
+            scene.add(lineSegments);
+            
+            camera.position.set(40, 40, 50);
+            camera.lookAt(0, 0, 0);
+            s(1);
+            
+            let clock = new THREE.Clock();
+            function tick() {
+                requestAnimationFrame(tick); 
+                let t = clock.getElapsedTime(); 
+                unif.uT.value = t;
+
+                if (unif.uA.value !== 3.0) { 
+                    lineSegments.rotation.y = t * 0.04; 
+                    camera.position.x = Math.sin(t * 0.15) * 60; 
+                    camera.position.z = Math.cos(t * 0.15) * 60; 
+                    camera.lookAt(0, 0, 0); 
+                } else { 
+                    camera.position.set(0, 75, 5); 
+                    camera.lookAt(0, 0, 0); 
+                }
+                renderer.render(scene, camera);
+            }
+            tick();
+        } catch(e) { 
+            console.error(e);
+            fallback(); 
+        }
+
+        function s(act) {
+            unif.uA.value = act * 1.0;
+            document.getElementById('l').innerHTML = act == 1 ? "ACT I: GREEN WIREFRAME VORTEX<br>RULE: DATA CONVERSION ($m=E/c^2$)" : act == 2 ? "ACT II: AMBER SUPERPOSITION MESH<br>RULE: MASS-RADIATION BLENDING" : "ACT III: RED REGISTRATION COLLAPSE<br>RULE: RIGID HARDWARE STORAGE ADDRESSES";
+        }
+        function fallback() {
+            document.body.innerHTML = "<div id='l'>GRAPHICS FAILURE. RELOADING LOCAL FIELD CORE...</div>";
+        }
+        window.addEventListener('resize', () => { 
+            if (camera && renderer) { 
+                camera.aspect = window.innerWidth / window.innerHeight; 
+                camera.updateProjectionMatrix(); 
+                renderer.setSize(window.innerWidth, window.innerHeight); 
+            }
+        });
+    </script>
+</body>
+</html>
