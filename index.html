@@ -6,188 +6,172 @@
     <title>Fixed 1,000 Line Matrix Show</title>
     <style>
         body { margin: 0; overflow: hidden; background: #000; font-family: monospace; }
-        #u { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 9; }
-        button { background: #111; color: #fff; border: 1px solid #444; padding: 10px 18px; cursor: pointer; font-size: 11px; text-transform: uppercase; border-radius: 4px; }
+        #u { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        button { background: #111; color: #fff; border: 1px solid #444; padding: 12px 20px; cursor: pointer; font-size: 11px; text-transform: uppercase; border-radius: 4px; letter-spacing: 1px; transition: 0.2s; }
         button:hover { background: #222; border-color: #fff; }
-        #l { position: absolute; top: 20px; left: 20px; color: #fff; font-size: 12px; background: rgba(0,0,0,.8); padding: 10px; border-radius: 4px; border: 1px solid #222; pointer-events: none; line-height: 1.5; }
+        #l { position: absolute; top: 20px; left: 20px; color: #fff; font-size: 12px; background: rgba(0,0,0,.85); padding: 12px; border-radius: 4px; border: 1px solid #222; pointer-events: none; line-height: 1.6; z-index: 10; }
     </style>
 </head>
 <body>
-    <div id="l">SYSTEM STATUS: INITIALISING HARDWARE HOOKS...</div>
+    <div id="l">SYSTEM RUNNING: DRAWING SHADER WIREFRAMES...</div>
     <div id="u">
-        <button onclick="s(1)">Act I</button>
-        <button onclick="s(2)">Act II</button>
-        <button onclick="s(3)">Act III</button>
+        <button onclick="s(1)">Act I: Green</button>
+        <button onclick="s(2)">Act II: Amber</button>
+        <button onclick="s(3)">Act III: Red</button>
     </div>
 
-    <!-- Core Three.js Engine Dependency -->
+    <!-- Import Three.js Core Engine via CDN -->
     <script src="https://cloudflare.com"></script>
     <script>
-        let scene, camera, renderer, lineSegments, clock, targetAct = 1.0;
-        
-        // Configuration uniforms safely isolated for runtime modification
-        const customUniforms = {
-            uTime: { value: 0 },
-            uAct: { value: 1.0 }
-        };
+        let scene, camera, renderer, instancedLines, clock, targetAct = 1.0;
+        const unif = { uT: { value: 0 }, uA: { value: 1.0 } };
 
         try {
+            // 1. SCENE ARCHITECTURE SETUP
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
             
-            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             document.body.appendChild(renderer.domElement);
 
-            // Build base cylinder wireframe structure 
-            const baseCylinder = new THREE.CylinderGeometry(1.2, 0.05, 3.5, 6, 6, true);
+            // 2. CONSTRUCT EXPLICIT GEOMETRY BUFFERS
+            // Generate a dense parametric cylinder shape to provide ample vertex line tracks
+            const baseCylinder = new THREE.CylinderGeometry(1.5, 0.1, 4.0, 12, 12, true);
             const edgesGeometry = new THREE.EdgesGeometry(baseCylinder);
+            const instancedGeometry = new THREE.InstancedBufferGeometry().copy(edgesGeometry);
 
-            // --- FIXED NATIVE INSTANCING ENGINE HOOK ---
-            // Modifying a native material ensures three.js injects and handles 'instanceMatrix' automatically
-            const mat = new THREE.LineBasicMaterial({
-                color: 0x00ff66,
-                transparent: true,
-                opacity: 0.85,
-                onBeforeCompile: (shader) => {
-                    // Inject uniforms into native shader instance
-                    shader.uniforms.uTime = customUniforms.uTime;
-                    shader.uniforms.uAct = customUniforms.uAct;
-
-                    // Inject custom vertex modification math directly into the native transform block
-                    shader.vertexShader = `
-                        uniform float uTime;
-                        uniform float uAct;
-                    ` + shader.vertexShader;
-
-                    // Intercept the vertex calculation hook to execute m=E/c² structural physics
-                    shader.vertexShader = shader.vertexShader.replace(
-                        '#include <begin_vertex>',
-                        `
-                        #include <begin_vertex>
-                        float r = length(transformed.xy);
-
-                        // --- Act I: Local Funnel Distortion ($m=E/c^2$) ---
-                        if (uAct >= 1.0) {
-                            transformed.z -= 1.8 / (r + 0.25);
-                            float angle = uTime * 4.0 + (transformed.z * 1.8);
-                            float c = cos(angle); float s = sin(angle);
-                            transformed.xy = mat2(c, -s, s, c) * transformed.xy;
-                        }
-
-                        // --- Act II: Local Superposition Blur ---
-                        if (uAct == 2.0) {
-                            transformed.x += sin(transformed.z * 5.0 + uTime * 7.0) * 0.12;
-                            transformed.y += cos(transformed.z * 5.0 + uTime * 7.0) * 0.12;
-                        }
-
-                        // --- Act III: Zero Amplitude Flattening ---
-                        if (uAct == 3.0) {
-                            transformed.z = -2.5;
-                        }
-                        `
-                    );
-
-                    // Intercept the macro world-position transform to interlink the 1,000 nodes
-                    shader.vertexShader = shader.vertexShader.replace(
-                        '#include <project_vertex>',
-                        `
-                        #ifdef USE_INSTANCING
-                            // Compute individual instance matrices natively supported by Three.js
-                            vec4 worldPosition = instanceMatrix * vec4( transformed, 1.0 );
-                            
-                            // --- Act II: Macro Grid Wave Superposition ---
-                            if (uAct == 2.0) {
-                                worldPosition.y += sin(worldPosition.x * 0.08 + uTime * 2.0) * 3.5;
-                                worldPosition.z += cos(worldPosition.y * 0.08 + uTime * 2.0) * 3.5;
-                            }
-                            
-                            vec4 mvPosition = modelViewMatrix * worldPosition;
-                        #else
-                            vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );
-                        #endif
-                        gl_Position = projectionMatrix * mvPosition;
-                        `
-                    );
-
-                    // Hook the fragment color matrix to automatically track our traffic light categories
-                    shader.fragmentShader = `
-                        uniform float uAct;
-                    ` + shader.fragmentShader;
-
-                    shader.fragmentShader = shader.fragmentShader.replace(
-                        'gl_FragColor = vec4( diffuse, opacity );',
-                        `
-                        vec3 finalColor = vec3(0.0, 1.0, 0.4); // Act I: Green
-                        if (uAct == 2.0) finalColor = vec3(1.0, 0.65, 0.0); // Act II: Amber
-                        if (uAct == 3.0) finalColor = vec3(1.0, 0.0, 0.2); // Act III: Red
-                        gl_FragColor = vec4(finalColor, opacity);
-                        `
-                    );
-                }
-            });
-
-            // Instantiate all 1,000 points cleanly inside a single native line array draw call
-            const instanceCount = 1000;
-            lineSegments = new THREE.InstancedMesh(edgesGeometry, mat, instanceCount);
-
-            const dummy = new THREE.Object3D();
-            const dim = 10;
+            // 3. GENERATE THE 1,000 NODE COORDINATE FIELD ARRAYS
+            const count = 1000;
+            const matA = new Float32Array(count * 4); // Custom instance position offset vector channels
             let idx = 0;
+            const dim = 10; // Stable 10x10x10 configuration matrix
 
             for (let x = 0; x < dim; x++) {
                 for (let y = 0; y < dim; y++) {
                     for (let z = 0; z < dim; z++) {
-                        dummy.position.set((x - 4.5) * 6, (y - 4.5) * 6, (z - 4.5) * 6);
-                        dummy.updateMatrix();
-                        lineSegments.setMatrixAt(idx++, dummy.matrix);
+                        // Spread nodes wide enough across the spatial container to maximize parallax separation
+                        matA[idx * 4 + 0] = (x - 4.5) * 8.0;
+                        matA[idx * 4 + 1] = (y - 4.5) * 8.0;
+                        matA[idx * 4 + 2] = (z - 4.5) * 8.0;
+                        matA[idx * 4 + 3] = idx; // Unique node identification assignment index
+                        idx++;
                     }
                 }
             }
-            
-            scene.add(lineSegments);
-            camera.position.set(40, 40, 50);
+
+            // Bind coordinate offset buffers directly to shader instancing arrays
+            instancedGeometry.setAttribute('aInstPos', new THREE.InstancedBufferAttribute(matA, 4));
+
+            // 4. UNBREAKABLE CORE RAW SHADER MATRIX (Explicitly transforms and handles instances)
+            const lineShaderMaterial = new THREE.ShaderMaterial({
+                uniforms: unif,
+                vertexShader: `
+                    uniform float uT, uA;
+                    attribute vec4 aInstPos; // Custom bound data channel containing coordinates
+                    varying vec3 vWorldPos;
+
+                    void main() {
+                        vec3 localPos = position;
+                        float r = length(localPos.xy);
+
+                        // --- Act I: Local Funnel Distortion ($m=E/c^2$) ---
+                        if (uA >= 1.0) {
+                            localPos.z -= 2.0 / (r + 0.2);
+                            float angle = uT * 3.5 + (localPos.z * 1.5);
+                            float c = cos(angle); float s = sin(angle);
+                            localPos.xy = mat2(c, -s, s, c) * localPos.xy;
+                        }
+
+                        // --- Act II: Local State Blurring ---
+                        if (uA == 2.0) {
+                            localPos.x += sin(localPos.z * 4.0 + uT * 6.0) * 0.15;
+                            localPos.y += cos(localPos.z * 4.0 + uT * 6.0) * 0.15;
+                        }
+
+                        // --- Act III: Rigid Base Flattening ---
+                        if (uA == 3.0) {
+                            localPos.z = -2.0;
+                        }
+
+                        // Apply instance coordinate offsets manually to ensure visibility without native mesh dependencies
+                        vec3 globalOffset = aInstPos.xyz;
+                        
+                        // --- Macro Grid Network Connections ---
+                        if (uA == 2.0) {
+                            globalOffset.y += sin(globalOffset.x * 0.05 + uT * 1.5) * 4.0;
+                            globalOffset.z += cos(globalOffset.y * 0.05 + uT * 1.5) * 4.0;
+                        }
+
+                        vec4 worldPos = modelViewMatrix * vec4(localPos + globalOffset, 1.0);
+                        vWorldPos = worldPos.xyz;
+                        gl_Position = projectionMatrix * worldPos;
+                    }
+                `,
+                fragmentShader: `
+                    uniform float uA;
+                    void main() {
+                        vec3 strokeColor = vec3(0.0, 1.0, 0.45); // Act I: Green Vector Field
+                        if (uA == 2.0) strokeColor = vec3(1.0, 0.65, 0.0); // Act II: Amber Cloud
+                        if (uA == 3.0) strokeColor = vec3(1.0, 0.0, 0.25); // Act III: Red Terminal Slots
+                        gl_FragColor = vec4(strokeColor, 0.85);
+                    }
+                `,
+                transparent: true,
+                depthTest: true,
+                depthWrite: false
+            });
+
+            // Instantiate as raw LineSegments to force visible vector generation paths
+            instancedLines = new THREE.LineSegments(instancedGeometry, lineShaderMaterial);
+            scene.add(instancedLines);
+
+            // Pull back viewport camera to fully scope the 1,000 node matrix deployment
+            camera.position.set(55, 55, 65);
             camera.lookAt(0, 0, 0);
-            
-            s(1); // Boot Act I parameters
+
+            s(1); // Force initialize state bindings
 
             clock = new THREE.Clock();
-            
-            // --- AUTOMATED TICK TIMELINE ---
+
+            // 5. ANIMATION LOGIC ENGINE LOOP
             function tick() {
                 requestAnimationFrame(tick);
-                const t = clock.getElapsedTime();
-                customUniforms.uTime.value = t;
+                const time = clock.getElapsedTime();
+                unif.uT.value = time;
 
                 if (targetAct !== 3.0) {
-                    lineSegments.rotation.y = t * 0.04;
-                    camera.position.x = Math.sin(t * 0.15) * 60;
-                    camera.position.z = Math.cos(t * 0.15) * 60;
+                    // Slowly spiral macro layout camera to showcase 3D depth attributes
+                    instancedLines.rotation.y = time * 0.03;
+                    camera.position.x = Math.sin(time * 0.12) * 85;
+                    camera.position.z = Math.cos(time * 0.12) * 85;
                     camera.lookAt(0, 0, 0);
                 } else {
-                    camera.position.set(0, 75, 5);
+                    // Freeze camera alignment securely on Act III to maintain collapse matrix structure
+                    camera.position.set(0, 110, 5);
                     camera.lookAt(0, 0, 0);
                 }
                 renderer.render(scene, camera);
             }
             tick();
 
-        } catch (e) {
-            console.error("Graphics compilation intercepted. Booting local terminal...", e);
-            document.body.innerHTML = "<div id='l'>HARDWARE INTERACTION TIMEOUT. CHECK WEBGL DEVICE CAPABILITIES.</div>";
+        } catch (err) {
+            console.error(err);
+            document.body.innerHTML = "<div id='l'>GRAPHICS INITIALISATION INTERCEPTED. SECURING COMPILATION FIELD...</div>";
         }
 
-        // State machine manager
+        // State machine switch manager
         function s(act) {
             targetAct = act * 1.0;
-            customUniforms.uAct.value = targetAct;
+            unif.uA.value = targetAct;
             document.getElementById('l').innerHTML = 
-                act == 1 ? "ACT I: GREEN WIREFRAME VORTEX<br>RULE: DATA CONVERSION ($m=E/c^2$)" : 
-                act == 2 ? "ACT II: AMBER SUPERPOSITION MESH<br>RULE: MASS-RADIATION BLENDING" : 
-                           "ACT III: RED REGISTRATION COLLAPSE<br>RULE: RIGID HARDWARE STORAGE ADDRESSES";
+                act == 1 ? "ACT I: GREEN WIREFRAME VORTEX<br>RULE: DATA CONVERSION ($m=E/c^2$)<br>STATUS: 1,000 LOGARITHMIC ACCRETION FUNNELS" : 
+                act == 2 ? "ACT II: AMBER SUPERPOSITION MESH<br>RULE: MASS-RADIATION BLENDING<br>STATUS: GLOBAL CLOSED TIMELIKE CURVE WAVE" : 
+                           "ACT III: RED REGISTRATION COLLAPSE<br>RULE: RIGID HARDWARE STORAGE ADDRESSES<br>STATUS: ZERO AMPLITUDE STABLE BOUNDARY LATTICE";
         }
 
+        // Handle structural resize lifecycle updates safely
         window.addEventListener('resize', () => {
             if (camera && renderer) {
                 camera.aspect = window.innerWidth / window.innerHeight;
