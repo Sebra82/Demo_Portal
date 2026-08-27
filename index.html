@@ -1,11 +1,10 @@
-Here is the fully refined, production-ready SEBRA82 master suite code integrating your robust smart module navigation with advanced infinite scaling and responsive smart minimize/maximize controls.
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none';">
-  <title>SEBRA82 v8.1 - Master Suite with Infinite Model & 3D Matrix</title>
+  <title>SEBRA82 v8.2 - Master Suite with Embedded Module AI Guides</title>
   <style>
     :root {
       --bg-deep: #020408;
@@ -37,7 +36,6 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
       padding: 0.3rem;
     }
 
-    /* Sticky AI Tutor Overlay at Top */
     #stickyTutor {
       position: fixed; top: 6px; left: 4%; width: 92%; z-index: 1000;
       background: rgba(10, 14, 22, 0.98); border: 1px solid var(--neon-cyan); border-radius: 6px;
@@ -49,138 +47,55 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
     .tutor-text { font-size: 0.44rem; color: #fff; font-family: var(--font-mono); line-height: 1.35; }
 
     .platform-container {
-      position: relative;
-      z-index: 10;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 0.8rem;
-      max-width: 650px;
-      width: 100%;
-      min-height: 98vh;
+      position: relative; z-index: 10; background: var(--card-bg); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 0.8rem; max-width: 650px; width: 100%; min-height: 98vh;
       box-shadow: 0 0 45px rgba(0, 243, 255, 0.15), 0 30px 80px rgba(0, 0, 0, 0.95);
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
     }
 
-    /* Smart AI Navigator Guide Box */
+    /* Master Global Navigator */
     .quick-guide-box {
-      background: rgba(0, 243, 255, 0.05);
-      border: 1px dashed var(--neon-cyan);
-      border-radius: 6px;
-      padding: 6px 8px;
-      font-family: var(--font-mono);
-      font-size: 0.45rem;
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+      background: rgba(0, 243, 255, 0.05); border: 1px dashed var(--neon-cyan); border-radius: 6px;
+      padding: 6px 8px; font-family: var(--font-mono); font-size: 0.45rem; color: var(--text-main);
+      display: flex; flex-direction: column; gap: 4px;
     }
     .quick-guide-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: var(--neon-cyan);
-      font-weight: bold;
-      text-transform: uppercase;
-      cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--neon-cyan); font-weight: bold; text-transform: uppercase; cursor: pointer;
     }
-    .quick-guide-content {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      color: var(--text-muted);
-      border-top: 1px dashed rgba(0,243,255,0.2);
-      padding-top: 4px;
-    }
+    .quick-guide-content { display: flex; flex-direction: column; gap: 3px; color: var(--text-muted); border-top: 1px dashed rgba(0,243,255,0.2); padding-top: 4px; }
     .quick-guide-content.collapsed { display: none; }
 
-    .ai-guide-chat {
-      background: rgba(10, 14, 22, 0.95);
-      border: 1px solid rgba(192, 132, 252, 0.4);
-      border-radius: 4px;
-      padding: 5px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-top: 2px;
+    /* Section-Level Embedded AI Guide Box */
+    .section-ai-guide {
+      background: rgba(192, 132, 252, 0.04); border: 1px solid rgba(192, 132, 252, 0.25);
+      border-radius: 5px; padding: 5px; display: flex; flex-direction: column; gap: 3px;
+      font-family: var(--font-mono); font-size: 0.42rem; margin-top: 2px;
     }
-    .ai-chat-stream {
-      background: #010307;
-      border: 1px solid rgba(192, 132, 252, 0.2);
-      border-radius: 3px;
-      padding: 5px;
-      font-size: 0.45rem;
-      color: var(--accent-purple);
-      min-height: 50px;
-      max-height: 95px;
-      overflow-y: auto;
-      line-height: 1.35;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
+    .section-ai-header {
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--accent-purple); font-weight: bold; cursor: pointer;
     }
-    .chat-msg-ai { color: var(--accent-purple); }
-    .chat-msg-user { color: var(--neon-cyan); text-align: right; }
-
-    .predictive-prompt-bar {
-      display: flex;
-      gap: 3px;
-      align-items: center;
-      overflow-x: auto;
-      padding: 1px 0;
-    }
-    .predictive-chip {
-      font-size: 0.4rem;
-      font-family: var(--font-mono);
-      background: rgba(0, 243, 255, 0.12);
-      color: var(--neon-cyan);
-      border: 1px solid rgba(0, 243, 255, 0.3);
-      padding: 2px 5px;
-      border-radius: 3px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .predictive-chip:hover { background: rgba(0, 243, 255, 0.3); color: #fff; }
+    .section-ai-body { color: #d1d5db; line-height: 1.35; padding-top: 2px; border-top: 1px dashed rgba(192, 132, 252, 0.15); }
+    .section-ai-body.collapsed { display: none; }
 
     .widget-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 0.4rem;
-      border-bottom: 1px solid var(--border-color);
-      flex-wrap: wrap;
-      gap: 4px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 0.4rem; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 4px;
     }
-
     .brand-title { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700; color: #fff; }
     .brand-title span { color: var(--neon-cyan); font-weight: 800; text-shadow: 0 0 10px var(--cyan-glow); }
 
     .header-actions { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
     .core-reset-btn { font-size: 0.46rem; background: rgba(255, 51, 68, 0.2); color: var(--crimson-red); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255, 51, 68, 0.4); font-family: var(--font-mono); font-weight: 700; cursor: pointer; }
     .gen-rand-btn { font-size: 0.46rem; background: rgba(0, 243, 255, 0.2); color: var(--neon-cyan); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0, 243, 255, 0.4); font-family: var(--font-mono); font-weight: 700; cursor: pointer; }
-
-    .node-badge {
-      font-size: 0.6rem;
-      background: rgba(31, 41, 61, 0.6);
-      color: var(--text-muted);
-      padding: 2px 6px;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      font-family: var(--font-mono);
-    }
+    .node-badge { font-size: 0.6rem; background: rgba(31, 41, 61, 0.6); color: var(--text-muted); padding: 2px 6px; border-radius: 10px; border: 1px solid var(--border-color); font-family: var(--font-mono); }
 
     .mobile-stack { display: flex; flex-direction: column; gap: 0.45rem; flex: 1; position: relative; }
 
     .panel-card {
-      background: rgba(5, 9, 18, 0.98);
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      padding: 0.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
+      background: rgba(5, 9, 18, 0.98); border-radius: 8px; border: 1px solid var(--border-color);
+      padding: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -195,7 +110,6 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
     #cardAtom { border-left: 3px solid #00f3ff; background: linear-gradient(135deg, rgba(0, 243, 255, 0.03) 0%, rgba(5, 9, 18, 0.98) 50%); }
     #cardFin { border-left: 3px solid #c084fc; background: linear-gradient(135deg, rgba(192, 132, 252, 0.03) 0%, rgba(5, 9, 18, 0.98) 50%); }
 
-    /* Fluid Maximize / Smart Minimize State Engine */
     .panel-card.fluid-maximized {
       flex: 1; min-height: 65vh; border-color: var(--neon-cyan); box-shadow: 0 0 35px rgba(0,243,255,0.5); order: -99;
     }
@@ -257,27 +171,16 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
 <div class="platform-container">
   <div class="quick-guide-box">
     <div class="quick-guide-header" onclick="toggleQuickGuide()">
-      <span>🤖 SEBRA82 Smart AI Tutor & Master Suite</span>
+      <span>🤖 SEBRA82 Smart AI Navigator & Focus Suite</span>
       <span id="guideToggleSign">[-]</span>
     </div>
     <div class="quick-guide-content" id="quickGuideBody">
-      <span>• <strong>Smart Focus Mode:</strong> Clicking any chip instantly maximizes that module and cleanly minimizes all others.</span>
-      <div class="ai-guide-chat">
-        <div class="ai-chat-stream" id="aiChatStream">
-          <div class="chat-msg-ai">🤖 <strong>SEBRA-AI</strong>: Welcome! Select a target matrix below to expand and isolate.</div>
-        </div>
-        <div class="predictive-prompt-bar">
-          <span style="font-size: 0.4rem; color: var(--text-muted);">Isolate:</span>
-          <span class="predictive-chip" onclick="teachAndMaximize('infinite', 'cardInfinite')">Infinite Tensor Model</span>
-          <span class="predictive-chip" onclick="teachAndMaximize('atom', 'cardAtom')">3D Atom Matrix</span>
-          <span class="predictive-chip" onclick="teachAndMaximize('math', 'cardFin')">Math Studio</span>
-        </div>
-      </div>
+      <span>• Select any target below to isolate the module. Every section features its own dedicated embedded AI Guide for real-time mathematical assistance.</span>
     </div>
   </div>
 
   <div class="widget-header">
-    <div class="brand-title">⚡ <span>SEBRA82 v8.1</span> Executive Master Suite</div>
+    <div class="brand-title">⚡ <span>SEBRA82 v8.2</span> Master Suite</div>
     <div class="header-actions">
       <button class="gen-rand-btn" onclick="generateRandomDataEpoch()">🎲 Random Epoch</button>
       <button class="core-reset-btn" onclick="resetStandardView()">↺ Reset View</button>
@@ -287,6 +190,7 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
 
   <div class="mobile-stack" id="mobileStack">
 
+    <!-- Section 0: Infinite Tensor Model -->
     <div class="panel-card" id="cardInfinite">
       <div class="section-category-bar">
         <span class="cat-chip cat-calc">Calculation</span>
@@ -303,6 +207,17 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
         <span>🔍 Toggle View</span>
       </div>
       <div class="collapsible-body collapsed" id="secInfinite">
+        <!-- Embedded Module AI Guide -->
+        <div class="section-ai-guide">
+          <div class="section-ai-header" onclick="toggleSectionAi('infAiBody')">
+            <span>✨ SEBRA-AI Guide: Infinite Tensors</span>
+            <span id="infAiSign">[-]</span>
+          </div>
+          <div class="section-ai-body" id="infAiBody">
+            This module evaluates non-linear asymptotic loops. Adjust recursion depth to observe how recursive harmonic expansion scales field magnitude without loss of coherence.
+          </div>
+        </div>
+
         <div class="canvas-box" style="height: 180px;">
           <canvas id="infiniteCanvas" width="400" height="180"></canvas>
           <div class="hud-tag">♾️ INFINITE RECURSIVE FIELD</div>
@@ -314,6 +229,7 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
       </div>
     </div>
 
+    <!-- Section 1: 3D Quantum Atom Matrix -->
     <div class="panel-card" id="cardAtom">
       <div class="section-category-bar">
         <span class="cat-chip cat-sci">Science</span>
@@ -329,6 +245,17 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
         <span>🔍 Toggle View</span>
       </div>
       <div class="collapsible-body collapsed" id="secAtom">
+        <!-- Embedded Module AI Guide -->
+        <div class="section-ai-guide">
+          <div class="section-ai-header" onclick="toggleSectionAi('atomAiBody')">
+            <span>✨ SEBRA-AI Guide: Quantum Lattices</span>
+            <span id="atomAiSign">[-]</span>
+          </div>
+          <div class="section-ai-body" id="atomAiBody">
+            Simulates a multi-shell nodal matrix with real-time vector rotation. Drag directly across the canvas to manipulate spherical coordinates and review depth scaling metrics.
+          </div>
+        </div>
+
         <div class="canvas-box" style="height: 200px;">
           <canvas id="atom3DCanvas" width="400" height="200"></canvas>
           <div class="hud-tag">✨ BREATHING CORE | Drag to Rotate</div>
@@ -340,9 +267,10 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
       </div>
     </div>
 
+    <!-- Section 2: Calculations & Modeling Studio -->
     <div class="panel-card" id="cardFin">
       <div class="section-category-bar">
-        <span class="cat-chip cat-fin">Finance & Modeling</span>
+        <span class="cat-chip cat-fin">Modeling & Forecasting</span>
       </div>
       <div class="panel-title" onclick="toggleSec('secFin')">
         <span>2. Calculations & Modeling Studio</span>
@@ -355,6 +283,17 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
         <span>🔍 Toggle View</span>
       </div>
       <div class="collapsible-body collapsed" id="secFin">
+        <!-- Embedded Module AI Guide -->
+        <div class="section-ai-guide">
+          <div class="section-ai-header" onclick="toggleSectionAi('finAiBody')">
+            <span>✨ SEBRA-AI Guide: Analytical Studio</span>
+            <span id="finAiSign">[-]</span>
+          </div>
+          <div class="section-ai-body" id="finAiBody">
+            Synthesizes time-series epoch milestones against cryptographic indices. Review structural growth indexes and benchmark metrics dynamically.
+          </div>
+        </div>
+
         <div class="metrics-grid">
           <div class="metric-box">
             <div class="metric-label">Epoch -2</div>
@@ -372,6 +311,7 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
       </div>
     </div>
 
+    <!-- Executive Summary Dashboard -->
     <div class="panel-card summary-dashboard-card" id="cardSummary">
       <div class="section-category-bar">
         <span class="cat-chip cat-calc">Executive Summary</span>
@@ -381,6 +321,17 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
         <button class="pin-btn" onclick="event.stopPropagation(); toggleMax('cardSummary')">⚡ Maximize</button>
       </div>
       <div class="collapsible-body" id="secSummary">
+        <!-- Embedded Module AI Guide -->
+        <div class="section-ai-guide">
+          <div class="section-ai-header" onclick="toggleSectionAi('sumAiBody')">
+            <span>✨ SEBRA-AI Guide: Master Summary</span>
+            <span id="sumAiSign">[-]</span>
+          </div>
+          <div class="section-ai-body" id="sumAiBody">
+            Real-time telemetry aggregator monitoring node health, security encryption parameters, and system-wide synchronization states.
+          </div>
+        </div>
+
         <div class="summary-grid">
           <div class="summary-metric-card">
             <div class="summary-metric-title">Active Quantum Nodes</div>
@@ -405,6 +356,11 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
     sign.innerText = body.classList.contains('collapsed') ? '[+]' : '[-]';
   }
 
+  function toggleSectionAi(bodyId) {
+    const body = document.getElementById(bodyId);
+    body.classList.toggle('collapsed');
+  }
+
   function maximizeAndFocus(cardId) {
     document.querySelectorAll('.panel-card').forEach(c => {
       if (c.id === cardId) {
@@ -423,16 +379,6 @@ Here is the fully refined, production-ready SEBRA82 master suite code integratin
       card.classList.add('nav-highlight');
       setTimeout(() => card.classList.remove('nav-highlight'), 3000);
     }
-  }
-
-  function teachAndMaximize(toolKey, cardId) {
-    const tutor = document.getElementById('stickyTutor');
-    const content = document.getElementById('tContent');
-    let explanation = toolKey === 'infinite' ? "<strong>Infinite Tensor Model</strong>: Visualizes recursive asymptotic expansion." : "<strong>3D Atom Matrix</strong>: Multi-shell particle lattice simulation.";
-    content.innerHTML = `🤖 <strong>SEBRA-AI</strong>: ${explanation}`;
-    tutor.style.display = 'block';
-    maximizeAndFocus(cardId);
-    setTimeout(() => { tutor.style.display = 'none'; }, 6000);
   }
 
   function toggleSec(id) { document.getElementById(id).classList.toggle('collapsed'); }
