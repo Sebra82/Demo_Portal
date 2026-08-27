@@ -2,172 +2,600 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predictive Analog Forecasting Studio - SEBRA82</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SEBRA82 // Universal Compute Studio (Noise-Injected Engine)</title>
     <style>
-        body {
-            margin: 0;
-            background: #010103;
-            color: #00ffcc;
-            font-family: 'Courier New', Courier, monospace;
-            overflow: hidden;
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background: #010103; font-family: 'Courier New', monospace; user-select: none; -webkit-user-select: none; }
+        
+        #loader {
+            position: fixed; inset: 0;
+            background: #010103; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: #00ffcc; z-index: 1000; transition: opacity 0.6s ease; padding: 20px; text-align: center;
         }
-        canvas {
-            display: block;
-            width: 100vw;
-            height: 100vh;
-        }
-        #hud {
+        #loader h2 { letter-spacing: 5px; margin-bottom: 8px; font-weight: 300; font-size: 22px; text-shadow: 0 0 20px rgba(0,255,204,0.5); }
+        #loader p { color: #557777; font-size: 11px; letter-spacing: 2px; }
+
+        #sidebar {
             position: absolute;
             top: 20px;
             left: 20px;
-            background: rgba(4, 4, 12, 0.85);
-            padding: 18px 22px;
-            border: 1px solid #00ffcc;
-            border-radius: 6px;
-            box-shadow: 0 0 25px rgba(0, 255, 204, 0.15);
-            z-index: 10;
-            min-width: 300px;
-            pointer-events: none;
+            width: 300px;
+            background: rgba(8, 12, 18, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 255, 204, 0.25);
+            border-radius: 10px;
+            padding: 16px;
+            z-index: 20;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,255,204,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-        h2 { margin: 0 0 12px 0; font-size: 15px; letter-spacing: 2px; color: #ff007f; }
-        p { margin: 6px 0; font-size: 13px; display: flex; justify-content: space-between; }
-        span.val { color: #ffffff; font-weight: bold; }
-        .hud-divider { border-bottom: 1px dashed #333; margin: 10px 0; }
+
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,255,204,0.2); padding-bottom: 8px; }
+        .sidebar-header h1 { margin: 0; font-size: 14px; letter-spacing: 3px; color: #fff; text-shadow: 0 0 10px rgba(0,255,204,0.5); }
+        .badge { font-size: 8px; color: #ff00ff; background: rgba(255,0,255,0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255,0,255,0.3); letter-spacing: 1px; }
+
+        .live-telemetry { display: flex; flex-direction: column; gap: 6px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 6px; border: 1px solid rgba(0,255,204,0.1); border-left: 2px solid #00ffcc; margin-bottom: 4px; }
+        .tele-row { display: flex; justify-content: space-between; font-size: 10px; color: #88a0a0; font-family: 'Courier New', monospace; letter-spacing: 0.5px; }
+        .tele-row strong { color: #fff; font-weight: bold; }
+
+        .section-title { font-size: 10px; color: #ff00ff; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
+
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        button { background: rgba(0,34,34,0.8); color: #00ffcc; border: 1px solid rgba(0,255,204,0.3); padding: 7px; font-size: 10px; font-family: 'Courier New', monospace; cursor: pointer; border-radius: 4px; transition: all 0.2s; letter-spacing: 1px; }
+        button:hover { background: #00ffcc; color: #000; box-shadow: 0 0 12px rgba(0,255,204,0.5); }
+        button.active { background: #00ffcc; color: #000; font-weight: bold; }
+
+        .control-group { display: flex; flex-direction: column; gap: 4px; }
+        .control-group label { display: flex; justify-content: space-between; font-size: 10px; color: #a0c0c0; }
+        .control-group label span { color: #00ffcc; }
+        .control-group input[type="range"] { width: 100%; accent-color: #00ffcc; cursor: pointer; background: #112222; height: 4px; border-radius: 2px; outline: none; }
+        .control-group input[type="range"]:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .action-btn { width: 100%; background: rgba(40,0,40,0.6); border-color: rgba(255,0,255,0.4); color: #ff88ff; }
+        .action-btn:hover { background: #ff00ff; color: #000; box-shadow: 0 0 12px rgba(255,0,255,0.6); }
+
+        .hint { font-size: 9px; color: #557777; text-align: center; letter-spacing: 0.5px; margin-top: -4px; }
     </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
 </head>
 <body>
-
-    <div id="hud">
-        <h2>SEBRA82 PREDICTIVE STUDIO</h2>
-        <p>Engine State: <span class="val">Continuous Forecasting</span></p>
-        <p>Quantum Noise Nodes: <span class="val">250,000</span></p>
-        <div class="hud-divider"></div>
-        <p>Prediction Horizon: <span class="val" style="color: #ff007f;">+48 Cycles</span></p>
-        <p>Frame Latency: <span class="val" id="latency-display">0.00 ms</span></p>
-        <p>Frame Rate: <span class="val" id="fps-display">60 FPS</span></p>
+    <div id="loader">
+        <h2>SEBRA82 // NOISE ENGINE</h2>
+        <p id="loader-sub">INITIALIZING GPU COMPUTE & LATTICE KERNEL...</p>
     </div>
 
-    <canvas id="sebraCanvas"></canvas>
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <h1>SEBRA82</h1>
+            <span class="badge" id="api-badge">PRO v3.4</span>
+        </div>
 
-    <script>
-        const canvas = document.getElementById('sebraCanvas');
-        const ctx = canvas.getContext('2d');
+        <div class="live-telemetry">
+            <div class="tele-row"><span>System Uptime (Ticks)</span> <strong id="tele-tick" style="color:#00ffcc">0</strong></div>
+            <div class="tele-row"><span>Engine Framework FPS</span> <strong id="tele-fps" style="color:#7ee787">60.0</strong></div>
+            <div class="tele-row"><span>Compute Latency</span> <strong id="tele-lat" style="color:#facc15">0.00 ms</strong></div>
+            <div class="tele-row"><span>Active Renderer Mode</span> <strong id="tele-api" style="color:#c084fc">INIT...</strong></div>
+            <div class="tele-row"><span>Active Compute Nodes</span> <strong id="tele-nodes" style="color:#fff">524K</strong></div>
+            <div class="tele-row"><span>Audio FFT Link</span> <strong id="tele-audio" style="color:#ff3344">OFFLINE</strong></div>
+        </div>
 
-        let RENDER_WIDTH = window.innerWidth;
-        let RENDER_HEIGHT = window.innerHeight;
-        canvas.width = RENDER_WIDTH;
-        canvas.height = RENDER_HEIGHT;
+        <div>
+            <div class="section-title" style="color: #facc15;">Noise Scale & Stress Test</div>
+            <div class="control-group">
+                <label>Active GPU Nodes: <span id="val-nodes" style="color: #facc15;">524K</span></label>
+                <input type="range" id="param-nodes" min="65536" max="524288" step="65536" value="524288" disabled>
+            </div>
+            <div class="hint" id="stress-warning" style="color:#ff3344">⚠️ High nodes may cause driver resets</div>
+        </div>
 
-        window.addEventListener('resize', () => {
-            RENDER_WIDTH = window.innerWidth;
-            RENDER_HEIGHT = window.innerHeight;
-            canvas.width = RENDER_WIDTH;
-            canvas.height = RENDER_HEIGHT;
+        <div>
+            <div class="section-title">Attractor Models</div>
+            <div class="btn-grid">
+                <button class="active" onclick="setPreset(0, -1.4, 1.6)" id="preset-0">Clifford</button>
+                <button onclick="setPreset(1, 0, 0)" id="preset-1">Lorenz</button>
+                <button onclick="setPreset(2, -1.2, -1.8)" id="preset-2">De Jong</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>Constant A: <span id="val-a">-1.4</span></label>
+            <input type="range" id="param-a" min="-3.0" max="3.0" step="0.05" value="-1.4">
+        </div>
+
+        <div class="control-group">
+            <label>Constant B: <span id="val-b">1.6</span></label>
+            <input type="range" id="param-b" min="-3.0" max="3.0" step="0.05" value="1.6">
+        </div>
+
+        <div class="control-group">
+            <label>Bloom Intensity: <span id="val-bloom">1.0</span></label>
+            <input type="range" id="param-bloom" min="0.1" max="2.5" step="0.05" value="1.0">
+        </div>
+
+        <div>
+            <div class="section-title">Performance & Audio</div>
+            <div class="btn-grid">
+                <button onclick="toggleAudio()" id="audio-btn">Mic Audio</button>
+                <button onclick="toggleRotation()" id="spin-btn">Auto Spin</button>
+            </div>
+        </div>
+
+        <div>
+            <div class="section-title">Master Output</div>
+            <div class="btn-grid">
+                <button onclick="toggleRecord()" id="rec-btn" style="border-color:#ff0055; color:#ff88aa;">Record WebM</button>
+                <button onclick="export4K()" class="action-btn">4K Print PNG</button>
+            </div>
+        </div>
+
+        <div class="hint">Click & drag on canvas to warp space</div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+        window.currentAttractor = 0;
+        window.paramA = -1.4;
+        window.paramB = 1.6;
+        window.autoRotate = false;
+        window.activeNodeCount = 524288;
+
+        let audioAnalyser, audioDataArray, audioFactor = 0.0;
+        let globalComposer, globalScene, globalCamera, globalRenderer, bloomPassRef;
+        let particleSystem, isRecording = false, mediaRecorder, chunks = [];
+        let mouseX = 0, mouseY = 0, globalTick = 0;
+
+        window.setPreset = (type, a, b) => {
+            window.currentAttractor = type;
+            window.paramA = a;
+            window.paramB = b;
+            document.getElementById('param-a').value = a;
+            document.getElementById('val-a').innerText = a;
+            document.getElementById('param-b').value = b;
+            document.getElementById('val-b').innerText = b;
+            for(let i=0; i<3; i++) {
+                document.getElementById('preset-' + i).classList.toggle('active', i === type);
+            }
+        };
+
+        document.getElementById('param-a').addEventListener('input', (e) => {
+            window.paramA = parseFloat(e.target.value);
+            document.getElementById('val-a').innerText = window.paramA;
+        });
+        document.getElementById('param-b').addEventListener('input', (e) => {
+            window.paramB = parseFloat(e.target.value);
+            document.getElementById('val-b').innerText = window.paramB;
+        });
+        document.getElementById('param-bloom').addEventListener('input', (e) => {
+            if(bloomPassRef) bloomPassRef.strength = parseFloat(e.target.value);
+            document.getElementById('val-bloom').innerText = e.target.value;
         });
 
-        const LUT_SIZE = 7200;
-        const SIN_LUT = new Float32Array(LUT_SIZE);
-        for (let i = 0; i < LUT_SIZE; i++) {
-            SIN_LUT[i] = Math.sin((i * Math.PI * 2) / LUT_SIZE);
-        }
-
-        const SIGNAL_LENGTH = 1200; 
-        const signalBuffer = new Float32Array(SIGNAL_LENGTH);
-        const PROB_NODES = 250000;
-
-        let globalTick = 0;
-        let lastTime = performance.now();
-
-        function generateHistoricalData(offset) {
-            let val = 0;
-            val += SIN_LUT[Math.floor((offset * 12) % LUT_SIZE)] * 1.0; 
-            val += SIN_LUT[Math.floor((offset * 25) % LUT_SIZE)] * 0.5;
-            val += SIN_LUT[Math.floor((offset * 7) % LUT_SIZE)] * 1.5;
-            return val;
-        }
-
-        function masterLoop() {
-            let frameStart = performance.now();
-            globalTick += 2;
-
-            ctx.fillStyle = '#010103';
-            ctx.fillRect(0, 0, RENDER_WIDTH, RENDER_HEIGHT);
-
-            let centerY = RENDER_HEIGHT / 2;
-            let currentNowX = RENDER_WIDTH * 0.65;
-
-            ctx.beginPath();
-            ctx.lineWidth = 2.5;
+        document.getElementById('param-nodes').addEventListener('input', (e) => {
+            window.activeNodeCount = parseInt(e.target.value);
+            const label = window.activeNodeCount >= 1000000 ? (window.activeNodeCount/1000000).toFixed(2) + 'M' : Math.round(window.activeNodeCount/1000) + 'K';
+            document.getElementById('val-nodes').innerText = label;
+            document.getElementById('tele-nodes').innerText = label;
             
-            for (let i = 0; i < SIGNAL_LENGTH; i++) {
-                let x = (i / SIGNAL_LENGTH) * RENDER_WIDTH;
-                let dataOffset = globalTick + i;
-                let priceY = generateHistoricalData(dataOffset);
-                let finalY = centerY - (priceY * 80);
-
-                if (i === 0) {
-                    ctx.moveTo(x, finalY);
-                } else {
-                    ctx.lineTo(x, finalY);
-                }
-                signalBuffer[i] = finalY;
+            if(particleSystem) {
+                particleSystem.geometry.setDrawRange(0, window.activeNodeCount);
             }
+        });
 
-            let gradient = ctx.createLinearGradient(0, 0, RENDER_WIDTH, 0);
-            gradient.addColorStop(0.0, "rgba(0, 255, 204, 0.1)");
-            gradient.addColorStop(0.64, "rgba(0, 255, 204, 1.0)");
-            gradient.addColorStop(0.66, "rgba(255, 0, 127, 1.0)");
-            gradient.addColorStop(1.0, "rgba(255, 0, 127, 0.2)");
-            
-            ctx.strokeStyle = gradient;
-            ctx.stroke();
+        window.toggleRotation = () => {
+            window.autoRotate = !window.autoRotate;
+            document.getElementById('spin-btn').classList.toggle('active', window.autoRotate);
+        };
 
-            ctx.fillStyle = 'rgba(255, 0, 127, 0.15)';
-            for (let i = 0; i < PROB_NODES; i++) {
-                let futureNorm = Math.pow(Math.random(), 1.5); 
-                let x = currentNowX + (futureNorm * (RENDER_WIDTH - currentNowX));
+        window.toggleAudio = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const src = ctx.createMediaStreamSource(stream);
+                audioAnalyser = ctx.createAnalyser();
+                audioAnalyser.fftSize = 64;
+                src.connect(audioAnalyser);
+                audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
                 
-                let signalIdx = Math.floor((x / RENDER_WIDTH) * SIGNAL_LENGTH);
-                signalIdx = Math.min(Math.max(signalIdx, 0), SIGNAL_LENGTH - 1);
-                let anchorY = signalBuffer[signalIdx];
+                document.getElementById('tele-audio').innerText = "ACTIVE";
+                document.getElementById('tele-audio').style.color = "#00ffcc";
+                document.getElementById('audio-btn').classList.add('active');
+                document.getElementById('audio-btn').innerText = "Mic Active";
+            } catch(e) {
+                alert("Microphone permission needed for audio reactivity.");
+            }
+        };
 
-                let uncertainty = futureNorm * 180; 
-                let phase = SIN_LUT[Math.floor((globalTick * 5 + i) % LUT_SIZE)] * Math.PI;
-                let spread = Math.sin(phase) * uncertainty * Math.random();
-                let y = anchorY + spread;
+        window.toggleRecord = () => {
+            const btn = document.getElementById('rec-btn');
+            if(!isRecording) {
+                const stream = document.querySelector('canvas').captureStream(60);
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+                chunks = [];
+                mediaRecorder.ondataavailable = e => chunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = 'sebra82-studio-loop.webm'; a.click();
+                };
+                mediaRecorder.start();
+                isRecording = true;
+                btn.classList.add('active');
+                btn.innerText = "Stop & Save";
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                btn.classList.remove('active');
+                btn.innerText = "Record WebM";
+            }
+        };
 
-                ctx.fillRect(x, y, 1.2, 1.2);
+        window.export4K = () => {
+            globalRenderer.setSize(3840, 2160, false);
+            globalCamera.aspect = 3840 / 2160;
+            globalCamera.updateProjectionMatrix();
+            globalComposer.setSize(3840, 2160);
+            globalComposer.render();
+            
+            const a = document.createElement('a');
+            a.href = globalRenderer.domElement.toDataURL('image/png');
+            a.download = 'sebra82-4k-print.png';
+            a.click();
+
+            globalRenderer.setSize(window.innerWidth, window.innerHeight, false);
+            globalCamera.aspect = window.innerWidth / window.innerHeight;
+            globalCamera.updateProjectionMatrix();
+            globalComposer.setSize(window.innerWidth * 0.5, window.innerHeight * 0.5);
+        };
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        async function init() {
+            let useWebGPU = false;
+            let device, gpuBuffer, readBuffer, bufferSize, computePipeline, bindGroup;
+            let maxHardwareNodes = 524288;
+            const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
+            if (navigator.gpu) {
+                try {
+                    const adapter = await navigator.gpu.requestAdapter();
+                    if (adapter) {
+                        const hardwareLimit = adapter.limits.maxStorageBufferBindingSize || 134217728; 
+                        device = await adapter.requestDevice({
+                            requiredLimits: { 
+                                maxStorageBufferBindingSize: hardwareLimit, 
+                                maxBufferSize: hardwareLimit 
+                            }
+                        });
+                        useWebGPU = true;
+                        maxHardwareNodes = Math.min(Math.floor(hardwareLimit / 48), 6000000);
+                        window.activeNodeCount = isMobile ? 262144 : 524288; 
+                    }
+                } catch (e) {
+                    console.warn("WebGPU initialization failed:", e);
+                }
             }
 
-            ctx.beginPath();
-            ctx.setLineDash([4, 4]);
-            ctx.moveTo(currentNowX, 0);
-            ctx.lineTo(currentNowX, RENDER_HEIGHT);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            ctx.setLineDash([]);
+            if (!useWebGPU) {
+                maxHardwareNodes = isMobile ? 131072 : 262144;
+                window.activeNodeCount = isMobile ? 65536 : 131072;
+                
+                document.getElementById('api-badge').innerText = "WEBGL 2";
+                document.getElementById('loader-sub').innerText = "INITIALIZING HIGH-SPEED WEBGL 2 FALLBACK...";
+                
+                const nodeSlider = document.getElementById('param-nodes');
+                nodeSlider.disabled = false;
+                nodeSlider.min = 32768;
+                nodeSlider.max = maxHardwareNodes;
+                nodeSlider.step = 16384;
+                nodeSlider.value = window.activeNodeCount;
+                document.getElementById('stress-warning').innerText = `Mobile Fallback Active: Array locked to max ${Math.round(maxHardwareNodes/1000)}K for 60FPS`;
+            } else {
+                const nodeSlider = document.getElementById('param-nodes');
+                nodeSlider.disabled = false;
+                nodeSlider.min = 65536;
+                nodeSlider.max = maxHardwareNodes;
+                nodeSlider.step = 65536;
+                nodeSlider.value = window.activeNodeCount;
+                document.getElementById('stress-warning').innerText = `WebGPU Active. VRAM Capacity: ${(maxHardwareNodes * 48 / 1048576).toFixed(0)} MB`;
+            }
+            
+            document.getElementById('tele-nodes').innerText = window.activeNodeCount >= 1000 ? Math.round(window.activeNodeCount/1000) + 'K' : window.activeNodeCount;
+            document.getElementById('tele-api').innerText = useWebGPU ? "WEBGPU COMPUTE" : "WEBGL 2 FALLBACK";
+            document.getElementById('tele-api').style.color = useWebGPU ? "#00ffcc" : "#facc15";
 
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '12px Courier New';
-            ctx.fillText('CURRENT STATE ->', currentNowX - 120, 30);
-            ctx.fillStyle = '#ff007f';
-            ctx.fillText('<- PREDICTIVE ANOMALY ZONE', currentNowX + 15, 30);
+            bufferSize = maxHardwareNodes * 48;
 
-            let frameEnd = performance.now();
-            let duration = frameEnd - frameStart;
-
-            if (frameEnd - lastTime >= 250) {
-                document.getElementById('latency-display').textContent = duration.toFixed(2) + ' ms';
-                document.getElementById('fps-display').textContent = Math.round(1000 / (duration || 1)) + ' FPS';
-                lastTime = frameEnd;
+            const initData = new Float32Array(maxHardwareNodes * 12);
+            for (let i = 0; i < maxHardwareNodes; i++) {
+                initData[i * 12 + 0] = (Math.random() - 0.5) * 40;
+                initData[i * 12 + 1] = (Math.random() - 0.5) * 40;
+                initData[i * 12 + 2] = (Math.random() - 0.5) * 40;
+                initData[i * 12 + 4] = 0.1; initData[i * 12 + 5] = 0.9; initData[i * 12 + 6] = 1.0;
             }
 
-            requestAnimationFrame(masterLoop);
+            if (useWebGPU) {
+                gpuBuffer = device.createBuffer({
+                    size: bufferSize,
+                    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.VERTEX,
+                    mappedAtCreation: true
+                });
+                new Float32Array(gpuBuffer.getMappedRange()).set(initData);
+                gpuBuffer.unmap();
+
+                const uniformBuffer = device.createBuffer({ size: 32, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+                readBuffer = device.createBuffer({ size: bufferSize, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+
+                const computeCode = `
+                    struct Particle { pos: vec4<f32>, col: vec4<f32>, extra: vec4<f32> };
+                    @group(0) @binding(0) var<storage, read_write> particles: array<Particle>;
+                    @group(0) @binding(1) var<uniform> params: array<f32, 8>;
+
+                    fn hash(p: vec3<f32>) -> f32 {
+                        let h = dot(p, vec3<f32>(127.1, 311.7, 74.7));
+                        return fract(sin(h) * 43758.5453123);
+                    }
+
+                    fn noise3D(p: vec3<f32>) -> f32 {
+                        let i = floor(p);
+                        let f = fract(p);
+                        let u = f * f * (3.0 - 2.0 * f);
+
+                        let n000 = hash(i + vec3<f32>(0.0, 0.0, 0.0));
+                        let n100 = hash(i + vec3<f32>(1.0, 0.0, 0.0));
+                        let n010 = hash(i + vec3<f32>(0.0, 1.0, 0.0));
+                        let n110 = hash(i + vec3<f32>(1.0, 1.0, 0.0));
+                        let n001 = hash(i + vec3<f32>(0.0, 0.0, 1.0));
+                        let n101 = hash(i + vec3<f32>(1.0, 0.0, 1.0));
+                        let n011 = hash(i + vec3<f32>(0.0, 1.0, 1.0));
+                        let n111 = hash(i + vec3<f32>(1.0, 1.0, 1.0));
+
+                        let nx0 = mix(mix(n000, n100, u.x), mix(n010, n110, u.x), u.y);
+                        let nx1 = mix(mix(n001, n101, u.x), mix(n011, n111, u.x), u.y);
+                        return mix(nx0, nx1, u.z);
+                    }
+
+                    @compute @workgroup_size(64)
+                    fn main(@builtin(global_invocation_id) id: vec3<u32>) {
+                        let idx = id.x;
+                        let active_limit = u32(params[5]);
+                        if (idx >= active_limit || idx >= arrayLength(&particles)) { return; }
+                        
+                        var p = particles[idx];
+                        let t = params[0];
+                        let mx = params[1] * 35.0;
+                        let my = params[2] * 35.0;
+                        let audio = params[3];
+                        let type = i32(params[4]);
+                        let a = params[6] + audio * 0.2;
+                        let b = params[7];
+
+                        let x = p.pos.x * 0.04; let y = p.pos.y * 0.04; let z = p.pos.z * 0.04;
+
+                        if (type == 0) {
+                            p.pos.x = (sin(a * y) + cos(a * x)) * 25.0 + sin(t * 0.4 + z * 2.0);
+                            p.pos.y = (sin(b * x) + cos(b * y)) * 25.0 + cos(t * 0.4 + x * 2.0);
+                            p.pos.z = (cos(x) * sin(y) - sin(z * 0.5)) * 25.0;
+                        } else if (type == 1) {
+                            let dt = 0.008;
+                            let dx = 10.0 * (y * 20.0 - x * 20.0);
+                            let dy = x * 20.0 * (28.0 - z * 20.0) - y * 20.0;
+                            let dz = x * 20.0 * y * 20.0 - (8.0/3.0) * z * 20.0;
+                            p.pos.x += dx * dt; p.pos.y += dy * dt; p.pos.z += dz * dt;
+                        } else {
+                            p.pos.x = (sin(a * y) - cos(b * x)) * 30.0;
+                            p.pos.y = (sin(b * x) - cos(a * y)) * 30.0;
+                            p.pos.z = sin(x * y) * 30.0;
+                        }
+
+                        let n_val = noise3D(p.pos.xyz * 0.05 + vec3<f32>(0.0, 0.0, t * 0.2));
+                        p.pos.x += (n_val - 0.5) * 2.0;
+                        p.pos.y += (n_val - 0.5) * 2.0;
+
+                        let dx_m = p.pos.x - mx;
+                        let dy_m = p.pos.y - my;
+                        let dist = sqrt(dx_m * dx_m + dy_m * dy_m + 0.1);
+                        if (dist < 30.0) {
+                            let force = (30.0 - dist) * 0.2;
+                            p.pos.x += (dx_m / dist) * force;
+                            p.pos.y += (dy_m / dist) * force;
+                        }
+
+                        p.col.r = clamp(abs(p.pos.y) * 0.03 + audio * 0.5, 0.1, 0.9);
+                        p.col.g = clamp(1.0 - abs(p.pos.x) * 0.02, 0.0, 0.9);
+                        p.col.b = clamp(1.2 + audio * 0.3, 0.4, 1.0);
+                        particles[idx] = p;
+                    }
+                `;
+
+                computePipeline = device.createComputePipeline({
+                    layout: 'auto',
+                    compute: { module: device.createShaderModule({ code: computeCode }), entryPoint: 'main' }
+                });
+
+                bindGroup = device.createBindGroup({
+                    layout: computePipeline.getBindGroupLayout(0),
+                    entries: [{ binding: 0, resource: { buffer: gpuBuffer } }, { binding: 1, resource: { buffer: uniformBuffer } }]
+                });
+            }
+
+            const scene = new THREE.Scene(); globalScene = scene;
+            scene.fog = new THREE.FogExp2(0x010103, 0.007);
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            globalCamera = camera; camera.position.set(0, 30, 80);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance", preserveDrawingBuffer: true });
+            globalRenderer = renderer; renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+            document.body.appendChild(renderer.domElement);
+
+            const composer = new EffectComposer(renderer); globalComposer = composer;
+            composer.addPass(new RenderPass(scene, camera));
+            
+            bloomPassRef = new UnrealBloomPass(new THREE.Vector2(window.innerWidth * 0.5, window.innerHeight * 0.5), 1.0, 0.4, 0.85);
+            composer.addPass(bloomPassRef);
+
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; controls.dampingFactor = 0.05;
+
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(maxHardwareNodes * 3);
+            const colors = new Float32Array(maxHardwareNodes * 3);
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setDrawRange(0, window.activeNodeCount);
+            
+            const material = new THREE.PointsMaterial({ size: 0.3, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
+            particleSystem = new THREE.Points(geometry, material);
+            scene.add(particleSystem);
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                composer.setSize(window.innerWidth * 0.5, window.innerHeight * 0.5);
+            });
+
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').remove(), 500);
+
+            let time = 0, last = performance.now(), frames = 0, timer = 0;
+            
+            async function animate() {
+                requestAnimationFrame(animate);
+                let renderStart = performance.now();
+                const delta = renderStart - last; last = renderStart;
+                frames++; timer += delta;
+                globalTick++;
+
+                time += 0.015; controls.update();
+                if(window.autoRotate) particleSystem.rotation.y += 0.003;
+
+                if(audioAnalyser) {
+                    audioAnalyser.getByteFrequencyData(audioDataArray);
+                    let sum = 0; for(let i=0; i<audioDataArray.length; i++) sum += audioDataArray[i];
+                    audioFactor = (sum / audioDataArray.length) / 128.0;
+                }
+
+                const pos = geometry.attributes.position.array;
+                const col = geometry.attributes.color.array;
+
+                if (useWebGPU) {
+                    device.queue.writeBuffer(uniformBuffer, 0, new Float32Array([time, mouseX, mouseY, audioFactor, window.currentAttractor, window.activeNodeCount, window.paramA, window.paramB]));
+
+                    const encoder = device.createCommandEncoder();
+                    const pass = encoder.beginComputePass();
+                    pass.setPipeline(computePipeline); pass.setBindGroup(0, bindGroup);
+                    pass.dispatchWorkgroups(Math.ceil(window.activeNodeCount / 64)); pass.end();
+
+                    const byteSize = window.activeNodeCount * 48;
+                    encoder.copyBufferToBuffer(gpuBuffer, 0, readBuffer, 0, byteSize);
+                    device.queue.submit([encoder.finish()]);
+
+                    await readBuffer.mapAsync(GPUMapMode.READ, 0, byteSize);
+                    const gpuData = new Float32Array(readBuffer.getMappedRange(0, byteSize));
+
+                    for(let i=0; i<window.activeNodeCount; i++) {
+                        pos[i*3] = gpuData[i*12]; pos[i*3+1] = gpuData[i*12+1]; pos[i*3+2] = gpuData[i*12+2];
+                        col[i*3] = gpuData[i*12+4]; col[i*3+1] = gpuData[i*12+5]; col[i*3+2] = gpuData[i*12+6];
+                    }
+                    readBuffer.unmap();
+                } else {
+                    const mx = mouseX * 35.0;
+                    const my = mouseY * 35.0;
+                    for(let i=0; i<window.activeNodeCount; i++) {
+                        let px = pos[i*3], py = pos[i*3+1], pz = pos[i*3+2];
+                        let x = px * 0.04, y = py * 0.04, z = pz * 0.04;
+                        let a = window.paramA + audioFactor * 0.2;
+                        let b = window.paramB;
+
+                        if (window.currentAttractor === 0) {
+                            px = (Math.sin(a * y) + Math.cos(a * x)) * 25.0 + Math.sin(time * 0.4 + z * 2.0);
+                            py = (Math.sin(b * x) + Math.cos(b * y)) * 25.0 + Math.cos(time * 0.4 + x * 2.0);
+                            pz = (Math.cos(x) * Math.sin(y) - Math.sin(z * 0.5)) * 25.0;
+                        } else if (window.currentAttractor === 1) {
+                            let dt = 0.008;
+                            let dx = 10.0 * (y * 20.0 - x * 20.0);
+                            let dy = x * 20.0 * (28.0 - z * 20.0) - y * 20.0;
+                            let dz = x * 20.0 * y * 20.0 - (8.0/3.0) * z * 20.0;
+                            px += dx * dt; py += dy * dt; pz += dz * dt;
+                        } else {
+                            px = (Math.sin(a * y) - Math.cos(b * x)) * 30.0;
+                            py = (Math.sin(b * x) - Math.cos(a * y)) * 30.0;
+                            pz = Math.sin(x * y) * 30.0;
+                        }
+
+                        let dx_m = px - mx;
+                        let dy_m = py - my;
+                        let dist = Math.sqrt(dx_m * dx_m + dy_m * dy_m + 0.1);
+                        if (dist < 30.0) {
+                            let force = (30.0 - dist) * 0.2;
+                            px += (dx_m / dist) * force;
+                            py += (dy_m / dist) * force;
+                        }
+
+                        pos[i*3] = px; pos[i*3+1] = py; pos[i*3+2] = pz;
+                        col[i*3] = Math.min(Math.max(Math.abs(py) * 0.03 + audioFactor * 0.5, 0.1), 0.9);
+                        col[i*3+1] = Math.min(Math.max(1.0 - Math.abs(px) * 0.02, 0.0), 0.9);
+                        col[i*3+2] = Math.min(Math.max(1.2 + audioFactor * 0.3, 0.4), 1.0);
+                    }
+                }
+
+                geometry.attributes.position.updateRange = { offset: 0, count: window.activeNodeCount * 3 };
+                geometry.attributes.color.updateRange = { offset: 0, count: window.activeNodeCount * 3 };
+                geometry.attributes.position.needsUpdate = true;
+                geometry.attributes.color.needsUpdate = true;
+                
+                composer.render();
+
+                let renderEnd = performance.now();
+                let computeLatency = renderEnd - renderStart;
+
+                if(timer >= 500) {
+                    let currentFPS = (frames * 1000 / timer);
+                    document.getElementById('tele-tick').innerText = globalTick;
+                    document.getElementById('tele-fps').innerText = currentFPS.toFixed(1);
+                    document.getElementById('tele-lat').innerText = computeLatency.toFixed(2) + " ms";
+                    
+                    if (currentFPS < 30 || computeLatency > 33) {
+                        document.getElementById('tele-lat').style.color = "#ff3344";
+                        document.getElementById('tele-fps').style.color = "#ff3344";
+                    } else if (currentFPS < 55 || computeLatency > 16.6) {
+                        document.getElementById('tele-lat').style.color = "#facc15";
+                        document.getElementById('tele-fps').style.color = "#facc15";
+                    } else {
+                        document.getElementById('tele-lat').style.color = "#7ee787";
+                        document.getElementById('tele-fps').style.color = "#7ee787";
+                    }
+                    
+                    frames = 0; timer = 0;
+                }
+            }
+            animate();
         }
-
-        requestAnimationFrame(masterLoop);
+        init().catch(console.error);
     </script>
 </body>
 </html>
