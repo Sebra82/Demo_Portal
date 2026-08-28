@@ -1,1 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEBRA82 True 16D Spatial Hyper-Matrix</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #030305; color: #fff; font-family: monospace; }
+        #canvas-container { width: 100vw; height: 100vh; }
+        #hud {
+            position: absolute; bottom: 20px; left: 20px;
+            background: rgba(8, 8, 12, 0.85); backdrop-filter: blur(8px);
+            padding: 15px; border-radius: 8px; border: 1px solid rgba(0, 255, 204, 0.2);
+            z-index: 10; pointer-events: none; font-size: 13px;
+        }
+        .line { margin: 4px 0; }
+        .hl { color: #00ffcc; font-weight: bold; }
+        .accent { color: #ff007f; font-weight: bold; }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="hud">
+        <div class="line">ENGINE: <span class="hl">SEBRA82 TRUE 16D SPATIAL MATRIX</span></div>
+        <div class="line">TOPOLOGY: <span class="accent">16-DIMENSIONAL HYPER-MANIFOLD</span></div>
+        <div class="line">STATUS: <span class="hl">VIEWPORT READY</span></div>
+    </div>
+    <div id="canvas-container"></div>
 
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 15, 40);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        const vertexShader = `
+            uniform float uTime;
+            attribute vec4 aHyper1; 
+            attribute vec4 aHyper2; 
+            attribute vec4 aHyper3; 
+            attribute vec4 aHyper4; 
+            attribute float aPhase;
+            varying vec3 vColor;
+
+            void main() {
+                float t = uTime * 0.15;
+
+                mat2 rot1 = mat2(cos(t), -sin(t), sin(t), cos(t));
+                mat2 rot2 = mat2(cos(t * 0.8), -sin(t * 0.8), sin(t * 0.8), cos(t * 0.8));
+                mat2 rot3 = mat2(cos(t * 0.5), -sin(t * 0.5), sin(t * 0.5), cos(t * 0.5));
+                mat2 rot4 = mat2(cos(t * 0.3), -sin(t * 0.3), sin(t * 0.3), cos(t * 0.3));
+
+                vec4 h1 = aHyper1; h1.xy = rot1 * h1.xy;
+                vec4 h2 = aHyper2; h2.xy = rot2 * h2.xy;
+                vec4 h3 = aHyper3; h3.xy = rot3 * h3.xy;
+                vec4 h4 = aHyper4; h4.xy = rot4 * h4.xy;
+
+                float hyperScalar = 1.0 + (h1.w * 0.05) + (h2.w * 0.04) + (h3.w * 0.03) + (h4.w * 0.02);
+                vec3 pos3 = vec3(h1.x + h2.x + h3.x + h4.x, h1.y + h2.y + h3.y + h4.y, h1.z + h2.z + h3.z + h4.z) / (4.0 * hyperScalar);
+
+                float boundaryLimit = 16.0;
+                if (abs(pos3.x) > boundaryLimit) { pos3.x = sign(pos3.x) * (2.0 * boundaryLimit - abs(pos3.x)); }
+                if (abs(pos3.y) > boundaryLimit) { pos3.y = sign(pos3.y) * (2.0 * boundaryLimit - abs(pos3.y)); }
+                if (abs(pos3.z) > boundaryLimit) { pos3.z = sign(pos3.z) * (2.0 * boundaryLimit - abs(pos3.z)); }
+
+                float dist = length(pos3);
+                pos3 += normalize(pos3) * sin(dist * 3.5 - uTime * 2.0) * 0.35;
+
+                vec4 mvPosition = modelViewMatrix * vec4(pos3, 1.0);
+                gl_Position = projectionMatrix * mvPosition;
+
+                float colorPhase = aPhase + uTime * 0.5;
+                vColor = vec3(
+                    0.5 + 0.5 * sin(colorPhase + h4.x * 0.1),
+                    0.5 + 0.5 * sin(colorPhase + 2.09 + h4.y * 0.1),
+                    0.5 + 0.5 * sin(colorPhase + 4.18 + h4.z * 0.1)
+                );
+
+                gl_PointSize = (16.0 / -mvPosition.z);
+            }
+        `;
+
+        const fragmentShader = `
+            precision highp float;
+            varying vec3 vColor;
+            void main() {
+                vec2 coord = gl_PointCoord - vec2(0.5);
+                float dist = length(coord);
+                if(dist > 0.5) discard;
+                float alpha = smoothstep(0.5, 0.0, dist);
+                gl_FragColor = vec4(vColor * 1.7, alpha * 0.85);
+            }
+        `;
+
+        const NODE_COUNT = 150000;
+        const geometry = new THREE.BufferGeometry();
+        
+        const h1 = new Float32Array(NODE_COUNT * 4);
+        const h2 = new Float32Array(NODE_COUNT * 4);
+        const h3 = new Float32Array(NODE_COUNT * 4);
+        const h4 = new Float32Array(NODE_COUNT * 4);
+        const phases = new Float32Array(NODE_COUNT);
+
+        for (let i = 0; i < NODE_COUNT; i++) {
+            const r = 18 * Math.cbrt(Math.random());
+            const theta = Math.random() * 2 * Math.PI;
+            const phi = Math.acos(2 * Math.random() - 1);
+
+            h1[i * 4 + 0] = r * Math.sin(phi) * Math.cos(theta);
+            h1[i * 4 + 1] = r * Math.sin(phi) * Math.sin(theta);
+            h1[i * 4 + 2] = r * Math.cos(phi);
+            h1[i * 4 + 3] = (Math.random() - 0.5) * 8.0;
+
+            h2[i * 4 + 0] = (Math.random() - 0.5) * 10.0;
+            h2[i * 4 + 1] = (Math.random() - 0.5) * 10.0;
+            h2[i * 4 + 2] = (Math.random() - 0.5) * 10.0;
+            h2[i * 4 + 3] = (Math.random() - 0.5) * 10.0;
+
+            h3[i * 4 + 0] = (Math.random() - 0.5) * 10.0;
+            h3[i * 4 + 1] = (Math.random() - 0.5) * 10.0;
+            h3[i * 4 + 2] = (Math.random() - 0.5) * 10.0;
+            h3[i * 4 + 3] = (Math.random() - 0.5) * 10.0;
+
+            h4[i * 4 + 0] = (Math.random() - 0.5) * 10.0;
+            h4[i * 4 + 1] = (Math.random() - 0.5) * 10.0;
+            h4[i * 4 + 2] = (Math.random() - 0.5) * 10.0;
+            h4[i * 4 + 3] = (Math.random() - 0.5) * 10.0;
+
+            phases[i] = Math.random() * Math.PI * 2;
+        }
+
+        geometry.setAttribute('aHyper1', new THREE.BufferAttribute(h1, 4));
+        geometry.setAttribute('aHyper2', new THREE.BufferAttribute(h2, 4));
+        geometry.setAttribute('aHyper3', new THREE.BufferAttribute(h3, 4));
+        geometry.setAttribute('aHyper4', new THREE.BufferAttribute(h4, 4));
+        geometry.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
+
+        const material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms: { uTime: { value: 0 } },
+            transparent: true,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending
+        });
+
+        const pointCloud = new THREE.Points(geometry, material);
+        scene.add(pointCloud);
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            material.uniforms.uTime.value = clock.getElapsedTime();
+            controls.update();
+            pointCloud.rotation.y = clock.getElapsedTime() * 0.02;
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
