@@ -1,6 +1,4 @@
-The black screen on mobile GitHub Pages is caused by ES module import maps and CDN MIME-type restrictions failing to resolve asynchronously in mobile Safari or Chrome, which halts the script before rendering.
-Switching from ES modules to standard global UMD script tags bypasses module loading blocks entirely and guarantees the WebGL context renders instantly.
-Replace your code with this fully self-contained, UMD-bundled version:
+
 <!DOCTYPE html>
 <html lang="en" class="dark h-full w-full">
 <head>
