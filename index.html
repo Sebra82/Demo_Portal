@@ -1,8 +1,4 @@
-Console Error Diagnosis
-If the viewport remains blank, the browser's JavaScript execution is halting due to a script path or loading failure. Specifically, in version 0.160.0 of Three.js, the global UMD path for OrbitControls.js does not exist in the public examples/js/ CDN directory, causing a ReferenceError that kills the animation loop before the canvas can paint.
-To eliminate external dependency loading failures entirely, this version strips out external control scripts and uses native touch-drag event listeners directly on the canvas.
-Self-Contained Fix (Zero External Addons)
-Replace your index.html content with this fully self-contained script:
+
 <!DOCTYPE html>
 <html lang="en" class="dark h-full w-full">
 <head>
