@@ -1,4 +1,8 @@
-
+Console Error Diagnosis
+If the viewport remains blank, the browser's JavaScript execution is halting due to a script path or loading failure. Specifically, in version 0.160.0 of Three.js, the global UMD path for OrbitControls.js does not exist in the public examples/js/ CDN directory, causing a ReferenceError that kills the animation loop before the canvas can paint.
+To eliminate external dependency loading failures entirely, this version strips out external control scripts and uses native touch-drag event listeners directly on the canvas.
+Self-Contained Fix (Zero External Addons)
+Replace your index.html content with this fully self-contained script:
 <!DOCTYPE html>
 <html lang="en" class="dark h-full w-full">
 <head>
@@ -15,22 +19,18 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
     </style>
-
-    <!-- Standard UMD Scripts (Guarantees mobile browser compatibility without import map blocks) -->
+    <!-- Core Three.js UMD Library Only -->
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body class="text-gray-100 font-mono flex flex-col h-full w-full">
 
-    <!-- Top Viewport: High-Performance Lattice Simulation -->
     <div class="relative w-full h-[50vh] bg-black border-b border-gray-800">
         <canvas id="latticeCanvas" class="absolute inset-0 w-full h-full"></canvas>
         <div class="absolute top-3 left-3 px-2 py-1 bg-black/70 border border-cyan-800 rounded text-[10px] text-cyan-400">
-            MOBILE EDGE STACK: ACTIVE (15K NODES)
+            NATIVE EDGE STACK: ACTIVE (15K NODES)
         </div>
     </div>
 
-    <!-- Bottom Viewport: Telemetry & Controls -->
     <div class="flex-1 w-full bg-gray-950 flex flex-col p-4 overflow-hidden">
         <div class="w-full bg-gray-900 border border-gray-700 rounded-lg overflow-hidden mb-3 shadow-xl">
             <div class="grid grid-cols-3 bg-gray-800 text-[10px] text-gray-400 uppercase tracking-widest px-3 py-2 border-b border-gray-700">
@@ -51,7 +51,7 @@
         </div>
 
         <div id="chatLog" class="flex-1 w-full bg-black/60 border border-gray-800 rounded-lg p-3 overflow-y-auto text-[10px] text-gray-400 font-mono space-y-1 mb-3 shadow-inner">
-            <div class="text-cyan-400">[SYS] SEBRA82 UMD mobile pipeline initialized. 15,000 instanced nodes online.</div>
+            <div class="text-cyan-400">[SYS] SEBRA82 native pipeline online. 15,000 nodes rendering.</div>
         </div>
 
         <div class="grid grid-cols-3 gap-2 pb-1">
@@ -83,26 +83,32 @@
             chatLog.scrollTop = chatLog.scrollHeight;
         }
 
-        // Direct Viewport Sizing
-        const initWidth = window.innerWidth;
-        const initHeight = window.innerHeight * 0.5;
+        const width = window.innerWidth;
+        const height = window.innerHeight * 0.5;
 
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-        renderer.setSize(initWidth, initHeight, false);
+        renderer.setSize(width, height, false);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(50, initWidth / initHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
         camera.position.set(0, 0, 350);
 
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.enablePan = false;
-        controls.enableZoom = false;
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.4;
+        // Native Touch/Mouse Rotation Tracking
+        let isDragging = false;
+        let prevMouseX = 0, prevMouseY = 0;
+        let rotationX = 0, rotationY = 0;
 
-        // 15,000 Node Instanced Mesh Matrix
+        canvas.addEventListener('pointerdown', (e) => { isDragging = true; prevMouseX = e.clientX; prevMouseY = e.clientY; });
+        window.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
+            rotationY += (e.clientX - prevMouseX) * 0.005;
+            rotationX += (e.clientY - prevMouseY) * 0.005;
+            prevMouseX = e.clientX;
+            prevMouseY = e.clientY;
+        });
+        window.addEventListener('pointerup', () => { isDragging = false; });
+
         const NODE_COUNT = 15000;
         const geometry = new THREE.IcosahedronGeometry(1.2, 0);
         const material = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9 });
@@ -150,6 +156,10 @@
             requestAnimationFrame(animate);
             time += 0.04 * lfpSpeed;
 
+            if (!isDragging) rotationY += 0.003;
+            instancedMesh.rotation.y = rotationY;
+            instancedMesh.rotation.x = rotationX;
+
             for (let i = 0; i < NODE_COUNT; i++) {
                 const data = nodeData[i];
                 const jitter = Math.sin(time + data.phase) * chaosFactor;
@@ -164,22 +174,17 @@
             }
 
             instancedMesh.instanceMatrix.needsUpdate = true;
-            controls.update();
             renderer.render(scene, camera);
         }
         animate();
 
-        function resize() {
-            const width = window.innerWidth;
-            const height = window.innerHeight * 0.5;
-            renderer.setSize(width, height, false);
-            camera.aspect = width / height;
+        window.addEventListener('resize', () => {
+            const w = window.innerWidth;
+            const h = window.innerHeight * 0.5;
+            renderer.setSize(w, h, false);
+            camera.aspect = w / h;
             camera.updateProjectionMatrix();
-        }
-
-        window.addEventListener('resize', resize);
-        window.addEventListener('orientationchange', resize);
-        resize();
+        });
 
         function updateColors(color) {
             const colors = instancedMesh.geometry.attributes.instanceColor;
@@ -197,41 +202,32 @@
             tempReadout.textContent = "37.0 °C";
             tempStatus.textContent = "NOMINAL";
             tempStatus.className = "text-indigo-400 font-bold";
-
-            lfpSpeed = 0.4;
-            chaosFactor = 0.1;
+            lfpSpeed = 0.4; chaosFactor = 0.1;
             updateColors(colIndigo);
-            controls.autoRotateSpeed = 0.2;
         });
 
         document.getElementById('btnParadox').addEventListener('click', () => {
-            logMsg("[ERR] Semantic paradox injected! Thermodynamic bleed and heat shock initiated.", true);
+            logMsg("[ERR] Semantic paradox injected! Thermodynamic bleed initiated.", true);
             lfpReadout.textContent = "114.2 Hz";
             lfpStatus.textContent = "CHAOS";
             lfpStatus.className = "text-red-500 font-bold animate-pulse";
             tempReadout.textContent = "39.5 °C";
             tempStatus.textContent = "CRITICAL";
             tempStatus.className = "text-red-500 font-bold animate-pulse";
-
-            lfpSpeed = 3.5;
-            chaosFactor = 4.5;
+            lfpSpeed = 3.5; chaosFactor = 4.5;
             updateColors(colRed);
-            controls.autoRotateSpeed = 3.5;
         });
 
         document.getElementById('btnEndocrine').addEventListener('click', () => {
-            logMsg("[SYNTH] Endocrine wash engaged. Dopamine/serotonin override restoring harmonic flow.");
+            logMsg("[SYNTH] Endocrine wash engaged. Harmonic flow restored.");
             lfpReadout.textContent = "11.2 Hz";
             lfpStatus.textContent = "PLASTIC";
             lfpStatus.className = "text-amber-400 font-bold";
             tempReadout.textContent = "37.1 °C";
             tempStatus.textContent = "RECOVERED";
             tempStatus.className = "text-amber-400 font-bold";
-
-            lfpSpeed = 1.2;
-            chaosFactor = 0.3;
+            lfpSpeed = 1.2; chaosFactor = 0.3;
             updateColors(colGold);
-            controls.autoRotateSpeed = 0.5;
         });
     </script>
 </body>
