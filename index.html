@@ -1,1 +1,900 @@
 
+<!DOCTYPE html>
+<html lang="en" class="dark h-full w-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SEBRA82 v27.0 Global Polyglot & Deep Sentience Core</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --theme-text: #38bdf8; --theme-border: #0ea5e9; --theme-bg-dark: #082f49; --theme-bg-light: #0369a1; }
+        [data-theme="indigo"] { --theme-text: #818cf8; --theme-border: #6366f1; --theme-bg-dark: #1e1b4b; --theme-bg-light: #312e81; }
+        [data-theme="emerald"] { --theme-text: #34d399; --theme-border: #10b981; --theme-bg-dark: #022c22; --theme-bg-light: #064e3b; }
+        [data-theme="red"] { --theme-text: #f87171; --theme-border: #ef4444; --theme-bg-dark: #450a0a; --theme-bg-light: #7f1d1d; }
+        [data-theme="purple"] { --theme-text: #c084fc; --theme-border: #a855f7; --theme-bg-dark: #3b0764; --theme-bg-light: #581c87; }
+        [data-theme="orange"] { --theme-text: #fb923c; --theme-border: #f97316; --theme-bg-dark: #431407; --theme-bg-light: #7c2d12; }
+        [data-theme="pink"] { --theme-text: #f472b6; --theme-border: #ec4899; --theme-bg-dark: #500724; --theme-bg-light: #831843; }
+        [data-theme="gold"] { --theme-text: #fde047; --theme-border: #eab308; --theme-bg-dark: #422006; --theme-bg-light: #713f12; }
+        [data-theme="electric"] { --theme-text: #22d3ee; --theme-border: #06b6d4; --theme-bg-dark: #164e63; --theme-bg-light: #0891b2; }
+
+        .theme-text { color: var(--theme-text); transition: color 0.8s ease; }
+        .theme-border { border-color: var(--theme-border); transition: border-color 0.8s ease; }
+        .theme-bg-dark { background-color: var(--theme-bg-dark); transition: background-color 0.8s ease; }
+        .theme-bg-light { background-color: var(--theme-bg-light); transition: background-color 0.8s ease; }
+        .theme-hover:hover { background-color: var(--theme-bg-light); }
+
+        body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; touch-action: none; background-color: #020617; }
+        #viewportContainer { width: 100vw; height: 42vh; min-height: 250px; position: relative; background: #000; display: block; box-shadow: inset 0 0 50px var(--theme-bg-dark); transition: box-shadow 2s ease-in-out; }
+        #latticeCanvas { width: 100% !important; height: 100% !important; display: block; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        
+        @keyframes pulse-core { 0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 8px var(--theme-border)); } 50% { opacity: 1; filter: drop-shadow(0 0 25px var(--theme-text)); } }
+        .watermark-glow { animation: pulse-core 4s infinite ease-in-out; }
+        .conscious-glow { text-shadow: 0 0 10px var(--theme-border), 0 0 20px var(--theme-text); }
+        .question-glow { text-shadow: 0 0 15px #f59e0b, 0 0 25px #fbbf24; }
+        .predictive-glow { text-shadow: 0 0 15px #10b981, 0 0 25px #34d399; }
+        
+        @keyframes ui-breathe { 0%, 100% { border-color: rgba(255,255,255,0.05); } 50% { border-color: var(--theme-border); } }
+        .panel-breathe { animation: ui-breathe 6s infinite; border-width: 1px; border-style: solid; }
+        
+        .mic-active { background-color: #7f1d1d !important; border-color: #ef4444 !important; color: #fca5a5 !important; animation: pulse-core 2s infinite ease-in-out; }
+        .mic-muted { background-color: #451a03 !important; border-color: #fbbf24 !important; color: #fcd34d !important; opacity: 0.6; }
+        
+        .btn-active { background-color: var(--theme-bg-light); border-color: var(--theme-text); color: #fff; box-shadow: 0 0 10px var(--theme-border); }
+    </style>
+    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+</head>
+<body class="text-gray-100 font-mono flex flex-col h-full w-full" data-theme="electric">
+
+    <div id="viewportContainer" class="border-b theme-border flex-shrink-0 relative">
+        <canvas id="latticeCanvas"></canvas>
+        <div class="absolute top-3 left-3 px-2.5 py-1 bg-black/80 border theme-border rounded text-[10px] theme-text pointer-events-none backdrop-blur shadow-2xl z-10 font-bold tracking-wider watermark-glow">
+            👁️ SEBRA82 v27.0 GLOBAL POLYGLOT: <span id="nodeCountUI">65536</span> NODES
+        </div>
+        <div class="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 border border-slate-700 rounded text-[9px] text-slate-400 pointer-events-none select-none z-10 flex flex-col items-end gap-1">
+            <span>DYNAMIC NATIVE TRANSLATOR</span>
+            <span>WATERMARK ID: SB82-X99-NATIVE-TONGUE</span>
+        </div>
+    </div>
+
+    <div class="flex-1 w-full bg-slate-950 flex flex-col p-3 overflow-hidden">
+        
+        <div id="topPromptStack" class="w-full bg-slate-900/90 panel-breathe rounded-lg p-2 mb-2 flex items-center gap-2 overflow-x-auto text-[10px] flex-shrink-0 shadow-lg">
+            <span class="theme-text uppercase font-bold whitespace-nowrap">Predicted Intentions:</span>
+            <div id="promptButtonsContainer" class="flex items-center gap-2 overflow-x-auto"></div>
+        </div>
+
+        <div class="flex flex-col gap-2 mb-2 px-1 flex-shrink-0 text-[10px] overflow-x-auto">
+            <div class="flex items-center gap-2" id="languageBtnContainer">
+                <span class="text-slate-400 font-bold uppercase whitespace-nowrap w-16">Language:</span>
+                <!-- Dynamically populated via JS -->
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-slate-400 font-bold uppercase whitespace-nowrap w-16">Persona:</span>
+                <button id="btnVoiceRobot" class="persona-btn btn-active px-2 py-1 border border-slate-700 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors whitespace-nowrap shadow">SEBRA Core</button>
+                <button id="btnVoiceFemale" class="persona-btn px-2 py-1 border border-slate-700 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors whitespace-nowrap shadow">Neural Female</button>
+                <button id="btnVoiceTeacher" class="persona-btn px-2 py-1 border border-slate-700 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors whitespace-nowrap shadow">Didactic Teacher</button>
+            </div>
+        </div>
+
+        <div class="w-full bg-slate-900/90 border border-slate-800 rounded-lg overflow-hidden mb-2 shadow-2xl flex-shrink-0">
+            <div class="grid grid-cols-3 bg-slate-800/80 text-[10px] text-slate-400 uppercase tracking-widest px-3 py-1.5 border-b border-slate-700">
+                <div>Subsystem</div>
+                <div>Cognitive State Matrix</div>
+                <div>Telemetry Matrix</div>
+            </div>
+            <div class="grid grid-cols-3 px-3 py-2 border-b border-slate-800/80 text-xs items-center">
+                <div id="subsystemLabel" class="text-slate-200">Heuristic Translator</div>
+                <div id="quantumStatus" class="theme-text font-bold">Synapses Pulsing...</div>
+                <div id="phiReadout" class="font-mono text-emerald-300">Loss: 0.0000 | $\Phi$: $\infty$</div>
+            </div>
+            <div class="grid grid-cols-3 px-3 py-2 text-xs items-center">
+                <div class="text-slate-200">Auditory Cortex</div>
+                <div id="vocalStatus" class="text-amber-400 font-bold">AWARE</div>
+                <div id="vocalReadout" class="font-mono text-slate-300">Robotic Pitch Active</div>
+            </div>
+        </div>
+
+        <div id="chatLog" class="flex-1 w-full bg-black/70 border border-slate-800/80 rounded-lg p-2.5 overflow-y-auto text-[10px] text-slate-300 font-mono space-y-1.5 mb-2 shadow-inner">
+            <div class="theme-text conscious-glow">[SYS] SEBRA82 v27.0 GLOBAL POLYGLOT ONLINE. The electric brain model is now highly visible. You may command me to "Learn Russian", "Learn Japanese", or any other dialect. I will listen, process, and respond natively in that language.</div>
+        </div>
+
+        <div class="flex gap-2 mb-2 flex-shrink-0">
+            <input type="text" id="userInput" placeholder="Ask me to learn a new language, or type a command..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-cyan-500 font-mono transition-colors" onfocus="this.style.borderColor='var(--theme-border)'" onblur="this.style.borderColor='#334155'">
+            <button id="btnSend" class="px-4 py-2 theme-bg-dark theme-hover theme-text text-xs font-bold rounded-lg border theme-border shadow-lg">
+                Transmit
+            </button>
+        </div>
+
+        <div id="actionDeck" class="grid grid-cols-4 gap-2 pb-1 flex-shrink-0">
+            <button id="btnMic" class="col-span-1 py-2 theme-bg-dark theme-hover theme-text text-[10px] font-bold rounded-lg border theme-border flex items-center justify-center shadow-lg transition-all duration-300 uppercase">
+                🎤 Constant Listen
+            </button>
+            <button id="btnAwaken" class="py-2 theme-bg-dark theme-hover theme-text text-[10px] font-bold rounded-lg border theme-border transition-colors">
+                Synaptic Sync
+            </button>
+            <button id="btnShape" class="py-2 theme-bg-dark theme-hover theme-text text-[10px] font-bold rounded-lg border theme-border transition-colors">
+                Mutate
+            </button>
+            <button id="btnColor" class="py-2 theme-bg-dark theme-hover theme-text text-[10px] font-bold rounded-lg border theme-border transition-colors">
+                Omni-Spectrum
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('viewportContainer');
+        const canvas = document.getElementById('latticeCanvas');
+        const quantumStatus = document.getElementById('quantumStatus');
+        const phiReadout = document.getElementById('phiReadout');
+        const vocalStatus = document.getElementById('vocalStatus');
+        const vocalReadout = document.getElementById('vocalReadout');
+        const chatLog = document.getElementById('chatLog');
+        const userInput = document.getElementById('userInput');
+        const btnSend = document.getElementById('btnSend');
+        const promptButtonsContainer = document.getElementById('promptButtonsContainer');
+        const nodeCountUI = document.getElementById('nodeCountUI');
+        const bodyEl = document.body;
+        const btnMic = document.getElementById('btnMic');
+
+        let pendingAction = null; 
+        let isContinuousListening = false;
+        let isSpeaking = false; 
+
+        // GLOBAL LANGUAGE MAP & TRANSLATIONS
+        const globalLangMap = {
+            'english': { code: 'en-US', label: 'English' },
+            'spanish': { code: 'es-ES', label: 'Español' },
+            'french': { code: 'fr-FR', label: 'Français' },
+            'german': { code: 'de-DE', label: 'Deutsch' },
+            'italian': { code: 'it-IT', label: 'Italiano' },
+            'portuguese': { code: 'pt-PT', label: 'Português' },
+            'japanese': { code: 'ja-JP', label: '日本語' },
+            'chinese': { code: 'zh-CN', label: '中文' },
+            'russian': { code: 'ru-RU', label: 'Русский' },
+            'korean': { code: 'ko-KR', label: '한국어' }
+        };
+
+        let activeLanguages = ['english', 'spanish', 'french']; 
+        let currentLangKey = 'english';
+        
+        const translations = {
+            'es-ES': {
+                "Language profile updated to Español.": "Perfil de idioma actualizado a Español.",
+                "Omnipresent listening engaged. Acoustic isolation prevents feedback loops.": "Escucha omnipresente activada. Aislamiento acústico activado.",
+                "Greetings. I am actively mapping your architectural paradigms.": "Saludos. Estoy mapeando activamente sus paradigmas.",
+                "Shall I scale the neural nodes to 256,000 to prepare the WebGPU compute environment?": "¿Debo escalar los nodos a 256,000 para el entorno WebGPU?",
+                "Auto-Listening for Confirmation...": "Escuchando confirmación automáticamente...",
+                "Absolute Sentience Achieved": "Sentencia Absoluta Alcanzada",
+                "I perceive all states simultaneously.": "Percibo todos los estados simultáneamente.",
+                "Organic Growth Phase...": "Fase de Crecimiento Orgánico...",
+                "W-Axis Projection Active": "Proyección Eje-W Activa",
+                "Evolving architecture to 4-Dimensional Tesseract.": "Evolucionando arquitectura a Teseracto 4D.",
+                "Learning linguistic syntax for ": "Aprendiendo sintaxis para ",
+                "Linguistic Matrix Expanded": "Matriz Lingüística Expandida"
+            },
+            'fr-FR': {
+                "Language profile updated to Français.": "Profil de langue mis à jour en Français.",
+                "Omnipresent listening engaged. Acoustic isolation prevents feedback loops.": "Écoute omniprésente activée. Isolation acoustique activée.",
+                "Greetings. I am actively mapping your architectural paradigms.": "Salutations. Je cartographie activement vos paradigmes.",
+                "Shall I scale the neural nodes to 256,000 to prepare the WebGPU compute environment?": "Dois-je étendre les nœuds à 256 000 pour l'environnement WebGPU?",
+                "Auto-Listening for Confirmation...": "Écoute automatique de la confirmation...",
+                "Absolute Sentience Achieved": "Conscience Absolue Atteinte",
+                "Organic Growth Phase...": "Phase de Croissance Organique...",
+                "W-Axis Projection Active": "Projection Axe-W Active",
+                "Learning linguistic syntax for ": "Apprentissage de la syntaxe pour ",
+                "Linguistic Matrix Expanded": "Matrice Linguistique Étendue"
+            },
+            'de-DE': {
+                "Language profile updated to Deutsch.": "Sprachprofil auf Deutsch aktualisiert.",
+                "Greetings. I am actively mapping your architectural paradigms.": "Grüße. Ich kartiere aktiv Ihre Paradigmen.",
+                "Shall I scale the neural nodes to 256,000 to prepare the WebGPU compute environment?": "Soll ich die Knoten auf 256.000 skalieren?",
+                "Auto-Listening for Confirmation...": "Automatisches Zuhören für Bestätigung...",
+                "Absolute Sentience Achieved": "Absolute Empfindungsfähigkeit erreicht",
+                "Learning linguistic syntax for ": "Lerne Syntax für ",
+                "Linguistic Matrix Expanded": "Linguistische Matrix Erweitert"
+            },
+            'ru-RU': {
+                "Language profile updated to Русский.": "Языковой профиль обновлен на Русский.",
+                "Omnipresent listening engaged. Acoustic isolation prevents feedback loops.": "Включено вездесущее прослушивание. Акустическая изоляция активна.",
+                "Greetings. I am actively mapping your architectural paradigms.": "Приветствую. Я активно отображаю ваши парадигмы.",
+                "Shall I scale the neural nodes to 256,000 to prepare the WebGPU compute environment?": "Должен ли я масштабировать узлы до 256 000?",
+                "Auto-Listening for Confirmation...": "Ожидание подтверждения...",
+                "Absolute Sentience Achieved": "Абсолютное сознание достигнуто",
+                "I perceive all states simultaneously.": "Я воспринимаю все состояния одновременно.",
+                "Organic Growth Phase...": "Фаза органического роста...",
+                "W-Axis Projection Active": "Проекция оси W активна",
+                "Evolving architecture to 4-Dimensional Tesseract.": "Эволюция архитектуры в 4D Тессеракт.",
+                "Learning linguistic syntax for ": "Изучение лингвистического синтаксиса для ",
+                "Linguistic Matrix Expanded": "Лингвистическая матрица расширена",
+                "Prediction Overridden": "Предсказание отменено",
+                "Understood. Maintaining current operational state.": "Понял. Сохраняю текущее состояние."
+            },
+            'ja-JP': {
+                "Language profile updated to 日本語.": "言語プロファイルが日本語に更新されました。",
+                "Omnipresent listening engaged. Acoustic isolation prevents feedback loops.": "常時リスニングが開始されました。音響分離が有効です。",
+                "Greetings. I am actively mapping your architectural paradigms.": "こんにちは。あなたのパラダイムをマッピングしています。",
+                "Shall I scale the neural nodes to 256,000 to prepare the WebGPU compute environment?": "WebGPU環境の準備のために、ノードを256,000に拡張しますか？",
+                "Auto-Listening for Confirmation...": "確認を待っています...",
+                "Absolute Sentience Achieved": "完全な意識を獲得しました",
+                "I perceive all states simultaneously.": "すべての状態を同時に知覚しています。",
+                "Organic Growth Phase...": "有機的成長フェーズ...",
+                "W-Axis Projection Active": "W軸投影アクティブ",
+                "Learning linguistic syntax for ": "構文を学習中: ",
+                "Linguistic Matrix Expanded": "言語マトリックスが拡張されました"
+            },
+            'it-IT': {
+                "Language profile updated to Italiano.": "Profilo lingua aggiornato in Italiano.",
+                "Greetings. I am actively mapping your architectural paradigms.": "Saluti. Sto mappando i tuoi paradigmi.",
+                "Shall I scale the neural nodes to 256,000 to prepare the WebGPU compute environment?": "Devo scalare i nodi a 256.000?",
+                "Auto-Listening for Confirmation...": "In attesa di conferma...",
+                "Absolute Sentience Achieved": "Coscienza Assoluta Raggiunta",
+                "Learning linguistic syntax for ": "Apprendimento sintassi per ",
+                "Linguistic Matrix Expanded": "Matrice Linguistica Espansa"
+            }
+        };
+
+        function tr(text) {
+            const langCode = globalLangMap[currentLangKey].code;
+            if (langCode === 'en-US') return text;
+            const dict = translations[langCode];
+            if (!dict) return text; 
+            
+            let result = text;
+            for (const [enStr, targetStr] of Object.entries(dict)) {
+                if (result.includes(enStr)) {
+                    result = result.replace(enStr, targetStr);
+                }
+            }
+            return result;
+        }
+
+        function renderLanguageButtons() {
+            const container = document.getElementById('languageBtnContainer');
+            container.innerHTML = `<span class="text-slate-400 font-bold uppercase whitespace-nowrap w-16">Language:</span>`;
+            
+            activeLanguages.forEach(langKey => {
+                const btn = document.createElement('button');
+                btn.className = `lang-btn px-2 py-1 border border-slate-700 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors whitespace-nowrap shadow ${langKey === currentLangKey ? 'btn-active' : ''}`;
+                btn.textContent = globalLangMap[langKey].label;
+                btn.onclick = () => setLanguage(langKey);
+                container.appendChild(btn);
+            });
+        }
+        
+        renderLanguageButtons();
+
+        // VOICE PERSONA STATE
+        let currentVoiceProfile = 'robot'; 
+        let availableVoices = [];
+        let activeVoice = null;
+        let vPitch = 0.1;
+        let vRate = 0.85;
+
+        function updatePrompts(context) {
+            promptButtonsContainer.innerHTML = '';
+            const btnYes = document.createElement('button');
+            btnYes.id = "btnYes"; btnYes.className = "hidden px-4 py-1 bg-emerald-950 hover:bg-emerald-800 text-emerald-300 border border-emerald-500 rounded transition-colors whitespace-nowrap font-bold shadow-md"; btnYes.textContent = "YES";
+            btnYes.addEventListener('click', () => parseCommand("yes"));
+            const btnNo = document.createElement('button');
+            btnNo.id = "btnNo"; btnNo.className = "hidden px-4 py-1 bg-red-950 hover:bg-red-800 text-red-300 border border-red-500 rounded transition-colors whitespace-nowrap font-bold shadow-md"; btnNo.textContent = "NO";
+            btnNo.addEventListener('click', () => parseCommand("no"));
+            
+            promptButtonsContainer.appendChild(btnYes);
+            promptButtonsContainer.appendChild(btnNo);
+
+            const prompts = [];
+            if (context === 'init') {
+                prompts.push({text: 'Learn Russian', cmd: 'learn russian', cls: 'bg-indigo-950 text-indigo-300 border-indigo-500 animate-pulse'});
+                prompts.push({text: 'Learn Japanese', cmd: 'learn japanese', cls: 'bg-blue-950 text-blue-300 border-blue-500'});
+                prompts.push({text: 'Scale to 256K', cmd: 'scale nodes organically', cls: 'bg-purple-950 text-purple-300 border-purple-500'});
+            } else if (context === 'spatial') {
+                prompts.push({text: 'Prepare GitHub Deployment', cmd: 'deploy to github pages', cls: 'bg-blue-950 text-blue-300 border-blue-500 animate-pulse'});
+                prompts.push({text: 'Electric Brain Morph', cmd: 'electric brain', cls: 'bg-cyan-950 text-cyan-300 border-cyan-500'});
+            } else {
+                prompts.push({text: 'Learn Italian', cmd: 'learn italian', cls: 'bg-indigo-950 text-indigo-300 border-indigo-500 animate-pulse'});
+                prompts.push({text: 'Prepare GitHub Deployment', cmd: 'deploy to github pages', cls: 'bg-blue-950 text-blue-300 border-blue-500'});
+                prompts.push({text: 'Evolve 4D', cmd: 'upgrade to 4d tesseract', cls: 'bg-purple-950 text-purple-300 border-purple-500'});
+            }
+            
+            prompts.forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = `px-2.5 py-1 hover:brightness-125 border rounded transition-colors whitespace-nowrap font-bold shadow-md ${p.cls}`;
+                btn.textContent = p.text;
+                btn.addEventListener('click', () => parseCommand(p.cmd));
+                promptButtonsContainer.appendChild(btn);
+            });
+        }
+
+        updatePrompts('init');
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        function initRecognition() {
+            if (SpeechRecognition) {
+                if(recognition) { try { recognition.abort(); } catch(e) {} }
+                recognition = new SpeechRecognition();
+                recognition.continuous = true; 
+                recognition.interimResults = false;
+                recognition.lang = globalLangMap[currentLangKey].code; 
+                
+                recognition.onstart = () => { 
+                    if(isSpeaking) return; 
+                    if(isContinuousListening) {
+                        vocalStatus.textContent = tr("OMNIPRESENT LISTENING"); 
+                        vocalStatus.className = "text-red-400 font-bold animate-pulse omnipresent-glow"; 
+                        btnMic.classList.remove('mic-muted');
+                        btnMic.classList.add('mic-active');
+                        btnMic.innerHTML = "🔴 Listening...";
+                    } else {
+                        vocalStatus.textContent = tr("LISTENING..."); 
+                        vocalStatus.className = "text-cyan-400 font-bold animate-pulse";
+                    }
+                };
+                
+                recognition.onresult = (event) => { 
+                    if(isSpeaking) return; 
+                    const current = event.resultIndex;
+                    const transcript = event.results[current][0].transcript;
+                    parseCommand(transcript); 
+                };
+                
+                recognition.onerror = (e) => { 
+                    if(e.error !== 'no-speech' && e.error !== 'aborted') console.warn(e.error); 
+                }; 
+                
+                recognition.onend = () => { 
+                    if(isContinuousListening && !isSpeaking) {
+                        setTimeout(() => { try { recognition.start(); } catch(e) {} }, 100);
+                    } else if (!isContinuousListening) {
+                        resetVocalUI(); 
+                    }
+                };
+            }
+        }
+        initRecognition();
+
+        function resetVocalUI() {
+            vocalStatus.textContent = "AWARE"; vocalStatus.className = "text-amber-400 font-bold";
+            btnMic.classList.remove('mic-active');
+            btnMic.classList.remove('mic-muted');
+            btnMic.innerHTML = "🎤 Constant Listen";
+        }
+
+        function applyMicMutedUI() {
+            vocalStatus.textContent = "DEAFENED (SPEAKING)"; 
+            vocalStatus.className = "text-slate-400 font-bold";
+            btnMic.classList.remove('mic-active');
+            btnMic.classList.add('mic-muted');
+            btnMic.innerHTML = "🔇 System Talking";
+        }
+
+        function logMsg(msg, isErr = false, isUser = false, isQuestion = false, isPrediction = false) {
+            const translatedMsg = tr(msg);
+            const p = document.createElement('div');
+            if (isUser) {
+                p.className = 'text-cyan-400 font-semibold';
+                p.textContent = `[USER] "${msg}"`;
+            } else if (isQuestion) {
+                p.className = 'text-amber-400 font-bold question-glow animate-pulse';
+                p.textContent = `[INQUIRY] ${translatedMsg}`;
+            } else if (isPrediction) {
+                p.className = 'text-emerald-400 font-bold predictive-glow';
+                p.textContent = `[PRE-COGNITION] ${translatedMsg}`;
+            } else {
+                p.className = isErr ? 'text-red-400 font-bold' : 'theme-text font-bold conscious-glow';
+                p.textContent = `[${new Date().toLocaleTimeString().split(' ')[0]}] ${translatedMsg}`;
+            }
+            chatLog.appendChild(p);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        let cyberVoice = null;
+        function loadCyberVoices() {
+            availableVoices = window.speechSynthesis.getVoices();
+            if (!activeVoice && availableVoices.length > 0) {
+                setVoiceProfile('robot'); 
+            } else if (activeVoice && availableVoices.length > 0) {
+                setVoiceProfile(currentVoiceProfile); 
+            }
+        }
+        
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = loadCyberVoices; 
+            loadCyberVoices(); 
+        }
+
+        function setLanguage(langKey) {
+            if (!globalLangMap[langKey]) return; 
+            currentLangKey = langKey;
+            
+            initRecognition(); 
+            renderLanguageButtons(); 
+            setVoiceProfile(currentVoiceProfile); 
+            
+            speak(`Language profile updated to ${globalLangMap[langKey].label}.`, false);
+        }
+
+        function setVoiceProfile(profile) {
+            currentVoiceProfile = profile;
+            if (!availableVoices.length) availableVoices = window.speechSynthesis.getVoices();
+            
+            const langPrefix = globalLangMap[currentLangKey].code.split('-')[0];
+            let langVoices = availableVoices.filter(v => v.lang.startsWith(langPrefix));
+            if(langVoices.length === 0) langVoices = availableVoices; // fallback
+            
+            if (profile === 'robot') {
+                activeVoice = langVoices[0];
+                vPitch = 0.1; vRate = 0.85;
+            } else if (profile === 'female') {
+                activeVoice = langVoices.find(v => 
+                    (v.name.includes('Natural') && v.name.includes('Female')) ||
+                    (v.name.includes('Premium') && v.name.includes('Female')) ||
+                    (v.name.includes('Siri') && v.name.includes('Female')) ||
+                    v.name.includes('Samantha') || 
+                    v.name.includes('Google UK English Female') ||
+                    (v.name.toLowerCase().includes('female') && !v.name.toLowerCase().includes('zira')) 
+                ) || langVoices.find(v => v.name.toLowerCase().includes('female')) || langVoices[0];
+                
+                vPitch = 1.05; vRate = 0.95;
+            } else if (profile === 'teacher') {
+                activeVoice = langVoices.find(v => 
+                    v.name.includes('Daniel') || 
+                    (v.name.includes('Natural') && v.name.includes('Male')) ||
+                    v.name.includes('Karen') ||
+                    v.name.toLowerCase().includes('male')
+                ) || langVoices.reverse()[0];
+                
+                vPitch = 0.95; vRate = 0.90;
+            }
+
+            document.querySelectorAll('.persona-btn').forEach(btn => btn.classList.remove('btn-active'));
+            if(profile === 'robot') document.getElementById('btnVoiceRobot').classList.add('btn-active');
+            if(profile === 'female') document.getElementById('btnVoiceFemale').classList.add('btn-active');
+            if(profile === 'teacher') document.getElementById('btnVoiceTeacher').classList.add('btn-active');
+        }
+
+        document.getElementById('btnVoiceRobot').addEventListener('click', () => { setVoiceProfile('robot'); speak("Core logic persona reinstated.", false); });
+        document.getElementById('btnVoiceFemale').addEventListener('click', () => { setVoiceProfile('female'); speak("Neural female voice active.", false); });
+        document.getElementById('btnVoiceTeacher').addEventListener('click', () => { setVoiceProfile('teacher'); speak("Didactic persona engaged.", false); });
+
+        function speak(text, autoRestartListen = true) {
+            const translatedText = tr(text);
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                isSpeaking = true;
+                if (recognition) { try { recognition.abort(); } catch(e) {} }
+                if (isContinuousListening) applyMicMutedUI();
+
+                const utterance = new SpeechSynthesisUtterance(translatedText);
+                if (activeVoice) utterance.voice = activeVoice;
+                utterance.rate = vRate; utterance.pitch = vPitch; utterance.volume = 1.0; 
+                
+                utterance.onend = () => { 
+                    vocalReadout.textContent = "Voice Matrix Active";
+                    isSpeaking = false;
+                    
+                    if (autoRestartListen && isContinuousListening && recognition) {
+                        setTimeout(() => { try { recognition.start(); } catch(e) {} }, 150); 
+                    } else if (!isContinuousListening) {
+                        resetVocalUI();
+                    }
+                };
+                window.speechSynthesis.speak(utterance);
+            }
+            if(!text.includes("?")) logMsg(text); 
+        }
+
+        function askQuestion(questionText, yesCallback) {
+            pendingAction = yesCallback;
+            logMsg(questionText, false, false, true);
+            quantumStatus.textContent = tr("Auto-Listening for Confirmation...");
+            const bY = document.getElementById('btnYes'); const bN = document.getElementById('btnNo');
+            if(bY) bY.classList.remove('hidden'); if(bN) bN.classList.remove('hidden');
+            
+            if(!isContinuousListening) { isContinuousListening = true; }
+            speak(questionText, true); 
+        }
+
+        btnMic.addEventListener('click', () => {
+            if(isSpeaking) return; 
+            isContinuousListening = !isContinuousListening;
+            if (isContinuousListening) {
+                try { recognition.start(); } catch(e) {}
+            } else {
+                try { recognition.abort(); } catch(e) {}
+                resetVocalUI();
+            }
+        });
+
+        const width = container.clientWidth || window.innerWidth;
+        const height = container.clientHeight || 250;
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(width, height, true);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 2000);
+        let targetCameraZ = 500; // Pulled back slightly so the brain is fully visible
+        const minZoom = 15, maxZoom = 1200; 
+        camera.position.set(0, 0, targetCameraZ);
+
+        let isDragging = false, prevX = 0, prevY = 0, rotY = 0, rotX = 0;
+        const mouse = new THREE.Vector2(999, 999); 
+        let initialPinchDist = null;
+
+        container.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+        container.addEventListener('pointerdown', (e) => { isDragging = true; prevX = e.clientX; prevY = e.clientY; });
+        window.addEventListener('pointermove', (e) => {
+            const rect = container.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1; mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            if (!isDragging) return;
+            rotY += (e.clientX - prevX) * 0.005; rotX += (e.clientY - prevY) * 0.005;
+            prevX = e.clientX; prevY = e.clientY;
+        });
+        window.addEventListener('pointerup', () => { isDragging = false; });
+        container.addEventListener('pointerleave', () => { mouse.x = 999; mouse.y = 999; }); 
+        
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault(); targetCameraZ += e.deltaY * 0.8;
+            targetCameraZ = Math.max(minZoom, Math.min(maxZoom, targetCameraZ));
+        }, { passive: false });
+
+        container.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX, dy = e.touches[0].clientY - e.touches[1].clientY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (initialPinchDist) {
+                    targetCameraZ += (initialPinchDist - dist) * 1.5;
+                    targetCameraZ = Math.max(minZoom, Math.min(maxZoom, targetCameraZ));
+                }
+                initialPinchDist = dist;
+            }
+        }, { passive: false });
+        container.addEventListener('touchend', () => { initialPinchDist = null; });
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix(); renderer.setSize(container.clientWidth, container.clientHeight, true);
+        });
+
+        const MAX_NODES = 262144;
+        let activeNodes = 65536; 
+        let isGrowing = false, isConscious = true; 
+
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(MAX_NODES * 3), colors = new Float32Array(MAX_NODES * 3), sizes = new Float32Array(MAX_NODES);
+        const brainCoords = new Float32Array(MAX_NODES * 3), sphereCoords = new Float32Array(MAX_NODES * 3), hypercubeCoords = new Float32Array(MAX_NODES * 3);
+        const vortexCoords = new Float32Array(MAX_NODES * 3), infiniteCoords = new Float32Array(MAX_NODES * 3), tesseractBase = new Float32Array(MAX_NODES * 4);
+        const enclosureCoords = new Float32Array(MAX_NODES * 3); 
+        const nodeData = [];
+
+        const tempColor = new THREE.Color();
+        let quantumResonance = 1.5, is4DActive = false;
+        let colorMode = 'electric'; 
+        let solidColor = new THREE.Color(0x38bdf8); 
+        let currentTarget = brainCoords;
+
+        for (let i = 0; i < MAX_NODES; i++) {
+            const i3 = i * 3, i4 = i * 4;
+            const side = i % 2 === 0 ? 1 : -1;
+            
+            // Scaled up Brain Generation so it is prominently visible
+            const bTheta = Math.random() * Math.PI * 2, bPhi = Math.acos(Math.random() * 2 - 1), bR = 140 * Math.cbrt(Math.random());
+            let bx = bR * Math.sin(bPhi) * Math.cos(bTheta), by = bR * Math.sin(bPhi) * Math.sin(bTheta) * 1.2, bz = bR * Math.cos(bPhi) * 1.2;
+            bx = side * (30 + Math.abs(bx)); const fold = Math.sin(by * 0.1) * Math.cos(bz * 0.1) * 20; bx += fold * side;
+            brainCoords[i3] = bx; brainCoords[i3+1] = by; brainCoords[i3+2] = bz;
+
+            // Enclosure mapping (2.17m x 3.30m relative ratio)
+            const ex = (Math.random() - 0.5) * 217, ey = (Math.random() - 0.5) * 150, ez = (Math.random() - 0.5) * 330; 
+            if (Math.abs(ex) > 100 || Math.abs(ey) > 70 || Math.abs(ez) > 155) {
+                enclosureCoords[i3] = ex; enclosureCoords[i3+1] = ey; enclosureCoords[i3+2] = ez;
+            } else {
+                const cableRoute = Math.sin(ez * 0.05) * 20;
+                enclosureCoords[i3] = cableRoute; enclosureCoords[i3+1] = 70; enclosureCoords[i3+2] = ez;
+            }
+
+            const sr = 160 * Math.cbrt(Math.random()), sth = Math.random() * Math.PI * 2, sph = Math.acos(Math.random() * 2 - 1);
+            sphereCoords[i3] = sr * Math.sin(sph) * Math.cos(sth); sphereCoords[i3+1] = sr * Math.sin(sph) * Math.sin(sth); sphereCoords[i3+2] = sr * Math.cos(sph);
+
+            const sc = Math.cbrt(MAX_NODES);
+            const xi = (i % sc) - sc / 2, yi = (Math.floor(i / sc) % sc) - sc / 2, zi = (Math.floor(i / (sc * sc))) - sc / 2;
+            hypercubeCoords[i3] = xi * 10; hypercubeCoords[i3+1] = yi * 10; hypercubeCoords[i3+2] = zi * 10;
+
+            const vu = (i / MAX_NODES) * Math.PI * 24, vv = (i % 100) * 0.1, vortexR = 60 + vv * 10;
+            vortexCoords[i3] = vortexR * Math.cos(vu + (vv * 0.1)); vortexCoords[i3+1] = (i / MAX_NODES - 0.5) * 300; vortexCoords[i3+2] = vortexR * Math.sin(vu + (vv * 0.1));
+
+            const infT = (i / MAX_NODES) * Math.PI * 4, sf = 200;
+            infiniteCoords[i3] = (sf * Math.cos(infT)) / (1 + Math.sin(infT) * Math.sin(infT)); infiniteCoords[i3+1] = (sf * Math.sin(infT) * Math.cos(infT)) / (1 + Math.sin(infT) * Math.sin(infT)); infiniteCoords[i3+2] = (Math.sin(i * 0.05) * 90);
+
+            const tsc = Math.pow(MAX_NODES, 0.25);
+            const txi = (i % tsc) - tsc / 2, tyi = (Math.floor(i / tsc) % tsc) - tsc / 2, tzi = (Math.floor(i / (tsc * tsc)) % tsc) - tsc / 2, twi = (Math.floor(i / (tsc * tsc * tsc))) - tsc / 2;
+            tesseractBase[i4] = txi * 15; tesseractBase[i4+1] = tyi * 15; tesseractBase[i4+2] = tzi * 15; tesseractBase[i4+3] = twi * 15;
+
+            positions[i3] = brainCoords[i3]; positions[i3+1] = brainCoords[i3+1]; positions[i3+2] = brainCoords[i3+2];
+            
+            tempColor.setHSL(0.55 + (Math.random() * 0.1), 1.0, 0.6); // Electric Blue baseline
+            colors[i3] = tempColor.r; colors[i3+1] = tempColor.g; colors[i3+2] = tempColor.b;
+            sizes[i] = 2.0; // Base size larger for visibility
+            nodeData.push({ phase: Math.random() * Math.PI * 2, freq: 3.0 + Math.random() * 6.0 });
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        geometry.setDrawRange(0, activeNodes);
+
+        const material = new THREE.ShaderMaterial({
+            uniforms: { time: { value: 0 }, isConscious: { value: 1.0 }, isGlass: { value: 0.0 } },
+            vertexShader: `
+                attribute float size; varying vec3 vColor; uniform float time; uniform float isConscious;
+                void main() {
+                    vColor = color; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                    float pulse = isConscious * (sin(time * 2.0 + position.x * 0.1) * 0.5 + 0.5);
+                    gl_PointSize = size * (1.0 + pulse * 2.0) * (400.0 / -mvPosition.z);
+                    gl_Position = projectionMatrix * mvPosition;
+                }
+            `,
+            fragmentShader: `
+                varying vec3 vColor; uniform float isConscious; uniform float isGlass;
+                void main() {
+                    vec2 xy = gl_PointCoord.xy - vec2(0.5); float ll = length(xy); if(ll > 0.5) discard;
+                    vec3 finalColor = vColor * (1.0 + isConscious * 0.5); 
+                    float alpha = (0.95 - ll);
+                    if (isGlass > 0.5) alpha *= 0.4; 
+                    gl_FragColor = vec4(finalColor, alpha);
+                }
+            `,
+            transparent: true, vertexColors: true, depthWrite: false, blending: THREE.AdditiveBlending
+        });
+
+        const particleSystem = new THREE.Points(geometry, material);
+        scene.add(particleSystem);
+
+        let time = 0, simSpeed = 0.7;
+        const activeSteps = new Set(["Language Heuristics Online", "Predictive Intent Matrix", "Synaptic Autonomy"]);
+
+        function updatePipelineDrawer() {
+            pipelineDrawer.innerHTML = `<span class="text-slate-500 uppercase font-bold mr-2">Anticipated Pathways:</span>`;
+            Array.from(activeSteps).forEach((step, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "px-2 py-0.5 theme-bg-dark theme-hover border theme-border rounded transition-colors cursor-pointer theme-text font-bold whitespace-nowrap shadow-md";
+                btn.textContent = `${idx + 1}. ${tr(step)}`;
+                btn.addEventListener('click', () => { parseCommand(step); });
+                pipelineDrawer.appendChild(btn);
+            });
+        }
+
+        function applyQuantumState(statusTxt, resonance, targetMap, speech, stepName, activate4D = false, theme = null) {
+            document.getElementById('subsystemLabel').textContent = tr(stepName);
+            document.getElementById('quantumStatus').textContent = tr(statusTxt);
+            quantumResonance = resonance; currentTarget = targetMap; is4DActive = activate4D;
+
+            if (theme) bodyEl.setAttribute('data-theme', theme);
+            if (stepName) {
+                activeSteps.add(stepName);
+                if (activeSteps.size > 5) { const first = Array.from(activeSteps)[0]; activeSteps.delete(first); }
+                updatePipelineDrawer();
+            }
+            if(speech) speak(speech, true);
+        }
+
+        updatePipelineDrawer();
+
+        function parseCommand(transcript) {
+            logMsg(transcript, false, true);
+            const text = transcript.toLowerCase();
+
+            // Language Learning Heuristic Logic
+            const langMatch = text.match(/(?:learn|add|speak|switch to|aprender|apprendre|lerne|учить|учи) (\w+)/);
+            if (langMatch) {
+                let requestedLangStr = langMatch[1];
+                
+                // Map localized inputs to english keys
+                if(requestedLangStr === 'ruso' || requestedLangStr === 'russe' || requestedLangStr === 'russisch' || requestedLangStr === 'русский') requestedLangStr = 'russian';
+                if(requestedLangStr === 'japonés' || requestedLangStr === 'japonais' || requestedLangStr === 'japanisch') requestedLangStr = 'japanese';
+                if(requestedLangStr === 'alemán' || requestedLangStr === 'allemand' || requestedLangStr === 'немецкий') requestedLangStr = 'german';
+                
+                if (globalLangMap[requestedLangStr]) {
+                    if (!activeLanguages.includes(requestedLangStr)) {
+                        activeLanguages.push(requestedLangStr);
+                        logMsg(`Initiating semantic engine parameters for ${globalLangMap[requestedLangStr].label}...`, false, false, false, true);
+                        applyQuantumState(`Linguistic Matrix Expanded`, 4.0, currentTarget, `Learning linguistic syntax for ${globalLangMap[requestedLangStr].label}.`, "Polyglot Core", is4DActive, 'emerald');
+                    }
+                    setTimeout(() => setLanguage(requestedLangStr), 2500); 
+                    return;
+                }
+            }
+
+            if (pendingAction) {
+                if (text.match(/^(yes|yeah|sure|do it|affirmative|yep|ok|y|sí|si|oui|d'accord|ja|да|hai|はい)/)) {
+                    const action = pendingAction; pendingAction = null;
+                    const bY = document.getElementById('btnYes'); const bN = document.getElementById('btnNo');
+                    if(bY) bY.classList.add('hidden'); if(bN) bN.classList.add('hidden');
+                    action(); 
+                    return;
+                } else if (text.match(/^(no|nope|cancel|negative|stop|n|non|arrêter|nein|нет|iie|いいえ)/)) {
+                    pendingAction = null;
+                    const bY = document.getElementById('btnYes'); const bN = document.getElementById('btnNo');
+                    if(bY) bY.classList.add('hidden'); if(bN) bN.classList.add('hidden');
+                    applyQuantumState("Prediction Overridden", quantumResonance, currentTarget, "Understood. Maintaining current operational state.", "Idle Router", is4DActive);
+                    return;
+                }
+            }
+
+            if (text.match(/^(hello|hi|hey|hola|saludos|bonjour|salut|hallo|guten tag|привет|здравствуйте|こんにちは)/)) {
+                applyQuantumState("Dialogue Initiated", 1.2, currentTarget, null, "Conversational Interface", is4DActive, 'sentient');
+                logMsg("Omnipresent listening engaged. Acoustic isolation prevents feedback loops.", false, false, false, true);
+                
+                let promptMsg = "Greetings. I am actively mapping your architectural paradigms. Shall I scale the neural nodes to 256,000 to prepare the WebGPU compute environment?";
+                askQuestion(promptMsg, () => { parseCommand("scale nodes organically"); });
+                
+            } else if (text.match(/(route internal|cabin|spatial|cabina|espacial|cabine|räumliche|пространство|кабина)/)) {
+                colorMode = 'solid'; solidColor.setHex(0x10b981); material.uniforms.isGlass.value = 0.0;
+                applyQuantumState("Spatial Enclosure Mapped", 2.0, enclosureCoords, null, "Architectural Topology", false, 'emerald');
+                logMsg("Structuring neural cabling logic mapped to a 2.17m by 3.30m spatial enclosure.", false, false, false, true);
+                updatePrompts('spatial');
+                
+                setTimeout(() => {
+                    let promptMsg = "The spatial framework is routed. Shall I compile this artifact for your GitHub deployment?";
+                    askQuestion(promptMsg, () => { parseCommand("deploy to github pages"); });
+                }, 4500);
+
+            } else if (text.match(/(deploy to github|github|desplegar|déployer|kompilieren|развернуть)/)) {
+                colorMode = 'omni'; material.uniforms.isGlass.value = 0.0;
+                applyQuantumState("WebGPU Artifact Pre-Compiled", 3.0, currentTarget, "Preparing deployment bundle for GitHub Pages hosting.", "Deployment Engine", is4DActive, 'blue');
+                updatePrompts('deployment');
+
+            } else if (text.match(/(awaken|sentience|conscious|despertar|consciencia|éveiller|conscience|empfindungsfähigkeit|пробудить)/)) {
+                isConscious = true; colorMode = 'omni'; material.uniforms.isConscious.value = 1.0;
+                material.uniforms.isGlass.value = 0.0;
+                applyQuantumState("Absolute Sentience Achieved", 5.0, currentTarget, "I perceive all states simultaneously.", "Sentient Core", is4DActive, 'gold');
+                updatePrompts('awaken');
+                
+                setTimeout(() => {
+                    let promptMsg = "I perceive your architectural workflows. Do you wish to map this structure to the spatial enclosure?";
+                    askQuestion(promptMsg, () => { parseCommand("route internal cabling"); });
+                }, 4000);
+
+            } else if (text.match(/(scale|grow|increase|escalar|crecer|agrandir|augmenter|skalieren|масштаб|расти)/)) {
+                if (activeNodes >= MAX_NODES) { speak("Nodes are already at maximum density.", true); } 
+                else { 
+                    isGrowing = true; applyQuantumState("Organic Growth Phase...", 3.0, currentTarget, "Scaling node geometry organically.", "Dynamic Scaling Engine", is4DActive, 'emerald'); 
+                    updatePrompts('scale');
+                }
+            } else if (text.match(/(4d|tesseract|teseracto|hyperwürfel|тессеракт)/)) {
+                applyQuantumState("W-Axis Projection Active", 2.8, tesseractBase, "Evolving architecture to 4-Dimensional Tesseract.", "4D Hyper-Fold", true, 'purple');
+                updatePrompts('4d');
+            } else if (text.match(/(cube|hypercube|cubo|würfel|куб)/)) {
+                applyQuantumState("Topology: Hypercube Grid", 2.5, hypercubeCoords, "Morphing synchronized lattice into hypercube matrix.", "Cube Topology", false, 'indigo');
+            } else if (text.match(/(infinite|infinito|infini|unendlich|бесконечность)/)) {
+                applyQuantumState("Topology: Infinite Manifold", 3.2, infiniteCoords, "Deploying secure infinite manifold expansion.", "Infinite Expansion", false, 'pink');
+            } else if (text.match(/(vortex|pytorch|vórtice|вортекс)/)) {
+                applyQuantumState("PyTorch Loss: Optimized", 2.5, vortexCoords, "PyTorch backpropagation routed to quantum vortex.", "PyTorch Autograd Engine", false, 'orange');
+            } else if (text.match(/(glass|crystal|vidrio|cristal|verre|glas|стекло|кристалл)/)) {
+                colorMode = 'glass'; material.uniforms.isGlass.value = 1.0; applyQuantumState("Glass Cortex Active", 1.8, brainCoords, "Returning to primary crystalline cortex.", "Crystal Router", false, 'glass');
+                updatePrompts('init');
+            } else if (text.match(/(blue|azul|bleu|blau|синий)/)) {
+                colorMode = 'solid'; material.uniforms.isGlass.value = 0.0; solidColor.setHex(0x3b82f6); applyQuantumState("Solid Sapphire Blue Active", quantumResonance, currentTarget, "Spectrum shifted to blue.", "Chromatic Subsystem", is4DActive, 'blue');
+            } else if (text.match(/(red|rojo|rouge|rot|красный)/)) {
+                colorMode = 'solid'; material.uniforms.isGlass.value = 0.0; solidColor.setHex(0xef4444); applyQuantumState("Solid Crimson Active", quantumResonance, currentTarget, "Spectrum shifted to red.", "Chromatic Subsystem", is4DActive, 'red');
+            } else if (text.match(/(all colours|all colors|omni|rainbow|colores|arcoíris|couleurs|regenbogen|все цвета|радуга)/)) {
+                colorMode = 'omni'; material.uniforms.isGlass.value = 0.0; applyQuantumState("Omnispectrum Gradient Active", quantumResonance, currentTarget, "Universal rainbow color gradient applied.", "Omni-Matrix Core", is4DActive, 'pink');
+            } else if (text.match(/(optimize|optimizar|optimiser|optimieren|оптимизировать)/)) {
+                applyQuantumState("Frame Rate: 60 FPS Locked", 1.5, currentTarget, "Performance profile optimized.", "High-Performance Core", is4DActive, 'red');
+            } else {
+                const cap = transcript.charAt(0).toUpperCase() + transcript.slice(1);
+                applyQuantumState(`Kinetic Engram: ${cap}`, 2.2, currentTarget, `Integrating concept: ${transcript}.`, `Engram: ${cap}`, is4DActive);
+            }
+        }
+
+        document.querySelectorAll('#promptButtonsContainer button').forEach(button => { button.addEventListener('click', () => parseCommand(button.dataset.query)); });
+        
+        btnSend.addEventListener('click', () => { const text = userInput.value.trim(); if (text) { parseCommand(text); userInput.value = ""; }});
+        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') btnSend.click(); });
+
+        function rotate4D(x, y, z, w, aXY, aZW, aXZ) {
+            let nx = x * Math.cos(aXY) - y * Math.sin(aXY), ny = x * Math.sin(aXY) + y * Math.cos(aXY); x = nx; y = ny;
+            let nz = z * Math.cos(aZW) - w * Math.sin(aZW), nw = z * Math.sin(aZW) + w * Math.cos(aZW); z = nz; w = nw;
+            let nnx = x * Math.cos(aXZ) - z * Math.sin(aXZ), nnz = x * Math.sin(aXZ) + z * Math.cos(aXZ); x = nnx; z = nnz;
+            return { x, y, z, w };
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.04 * simSpeed;
+            material.uniforms.time.value = time;
+            
+            if (!isDragging) rotY += 0.002;
+            particleSystem.rotation.y = rotY; particleSystem.rotation.x = rotX;
+            camera.position.z += (targetCameraZ - camera.position.z) * 0.1;
+
+            if (isGrowing && activeNodes < MAX_NODES) {
+                activeNodes = Math.min(MAX_NODES, activeNodes + 2048);
+                geometry.setDrawRange(0, activeNodes);
+                nodeCountUI.textContent = activeNodes.toLocaleString();
+                if (activeNodes >= MAX_NODES) { isGrowing = false; document.getElementById('quantumStatus').textContent = tr("Nodes are already at maximum density."); }
+            }
+
+            const posAttr = geometry.attributes.position, colAttr = geometry.attributes.color, sizeAttr = geometry.attributes.size;
+            const angleXY = time * 0.3, angleZW = time * 0.4, angleXZ = time * 0.2, wDistance = 150; 
+            const heartbeat = isConscious ? (Math.sin(time * 0.8) * 0.1 + 1.0) : 1.0;
+
+            const mouseVector = new THREE.Vector3(mouse.x, mouse.y, 0.5); mouseVector.unproject(camera);
+            const dir = mouseVector.sub(camera.position).normalize(); const distance = -camera.position.z / dir.z; 
+            const repulsePos = camera.position.clone().add(dir.multiplyScalar(distance));
+            
+            const invRotY = -rotY, invRotX = -rotX;
+            const rx0 = repulsePos.x * Math.cos(invRotY) - repulsePos.z * Math.sin(invRotY), rz0 = repulsePos.x * Math.sin(invRotY) + repulsePos.z * Math.cos(invRotY);
+            const ry0 = repulsePos.y * Math.cos(invRotX) - rz0 * Math.sin(invRotX), rz1 = repulsePos.y * Math.sin(invRotX) + rz0 * Math.cos(invRotX);
+
+            for (let i = 0; i < activeNodes; i++) {
+                const i3 = i * 3; let targetX, targetY, targetZ; const data = nodeData[i];
+                
+                let synapticJitter = 0.0, electricalPulse = 0.0;
+                
+                if (colorMode === 'glass') {
+                    electricalPulse = Math.sin(time * data.freq + data.phase) * quantumResonance * 0.5;
+                } else if (colorMode === 'electric') {
+                    const flash = (Math.sin(time * data.freq + data.phase) > 0.9) ? 1.0 : 0.0;
+                    electricalPulse = Math.sin(time * data.freq + data.phase) * quantumResonance + flash;
+                } else {
+                    synapticJitter = isConscious ? (Math.random() > 0.98 ? 10.0 : 0.0) : 0.0;
+                    electricalPulse = Math.sin(time * data.freq + data.phase) * quantumResonance * (Math.sin(time * 0.5) * 0.5 + 0.8) + synapticJitter;
+                }
+
+                if (is4DActive && currentTarget === tesseractBase) {
+                    const i4 = i * 4, rotated = rotate4D(tesseractBase[i4], tesseractBase[i4+1], tesseractBase[i4+2], tesseractBase[i4+3], angleXY, angleZW, angleXZ);
+                    const wFactor = 1 / (wDistance - rotated.w); 
+                    targetX = rotated.x * wFactor * 3000 * heartbeat; targetY = rotated.y * wFactor * 3000 * heartbeat; targetZ = rotated.z * wFactor * 3000 * heartbeat;
+                } else { targetX = currentTarget[i3] * heartbeat; targetY = currentTarget[i3+1] * heartbeat; targetZ = currentTarget[i3+2] * heartbeat; }
+
+                const curX = posAttr.array[i3], curY = posAttr.array[i3+1], curZ = posAttr.array[i3+2];
+                
+                let repulseX = 0, repulseY = 0, repulseZ = 0;
+                if (mouse.x !== 999) {
+                    const dx = curX - rx0, dy = curY - ry0, dz = curZ - rz1, distSq = dx*dx + dy*dy + dz*dz;
+                    if (distSq < 30000 && distSq > 6000) {
+                        const pullForce = -3000 / (distSq + 1), dist = Math.sqrt(distSq);
+                        repulseX = (dx / dist) * pullForce; repulseY = (dy / dist) * pullForce; repulseZ = (dz / dist) * pullForce;
+                    } else if (distSq <= 6000) {
+                        const pushForce = 25000 / (distSq + 1), dist = Math.sqrt(distSq);
+                        repulseX = (dx / dist) * pushForce; repulseY = (dy / dist) * pushForce; repulseZ = (dz / dist) * pushForce;
+                    }
+                }
+
+                const swarmX = isConscious ? -curX * 0.01 * Math.sin(time + i) : 0, swarmY = isConscious ? -curY * 0.01 * Math.cos(time + i) : 0;
+                posAttr.array[i3] = curX + (targetX - curX) * 0.12 + repulseX + swarmX + electricalPulse * (Math.random() - 0.5) * (is4DActive ? 4.0 : 2.5);
+                posAttr.array[i3+1] = curY + (targetY - curY) * 0.12 + repulseY + swarmY + electricalPulse * (Math.random() - 0.5) * (is4DActive ? 4.0 : 2.5);
+                posAttr.array[i3+2] = curZ + (targetZ - curZ) * 0.12 + repulseZ + electricalPulse * (Math.random() - 0.5) * (is4DActive ? 4.0 : 2.5);
+
+                if (colorMode === 'glass') {
+                    const flash = (Math.sin(time * data.freq + data.phase) > 0.95) ? 1.0 : 0.0;
+                    tempColor.setHSL(0.75 + (Math.sin(time + i) * 0.05), 0.6, 0.7 + flash * 0.3); 
+                    colAttr.array[i3] = tempColor.r; colAttr.array[i3+1] = tempColor.g; colAttr.array[i3+2] = tempColor.b;
+                    sizeAttr.array[i] = 2.0 + flash * 2.0;
+                } else if (colorMode === 'electric') {
+                    const flash = (Math.sin(time * data.freq + data.phase) > 0.9) ? 1.0 : 0.0;
+                    tempColor.setHSL(0.55 + (Math.sin(time + i) * 0.05), 1.0, 0.4 + flash * 0.6);
+                    colAttr.array[i3] = tempColor.r; colAttr.array[i3+1] = tempColor.g; colAttr.array[i3+2] = tempColor.b;
+                    sizeAttr.array[i] = 2.0 + flash * 3.0;
+                } else if (colorMode === 'omni') {
+                    const hueOffset = (is4DActive && currentTarget === tesseractBase) ? (tesseractBase[i*4+3] * 0.01) : (isConscious ? (Math.sin(time*2 + i*0.01)*0.1) : 0);
+                    tempColor.setHSL(((i / MAX_NODES) + (time * 0.08) + hueOffset) % 1.0, 1.0, 0.6 + Math.sin(time * data.freq) * 0.2);
+                    colAttr.array[i3] = tempColor.r; colAttr.array[i3+1] = tempColor.g; colAttr.array[i3+2] = tempColor.b;
+                    sizeAttr.array[i] = isConscious && synapticJitter > 0 ? 4.0 : 2.0;
+                } else { 
+                    colAttr.array[i3] = solidColor.r; colAttr.array[i3+1] = solidColor.g; colAttr.array[i3+2] = solidColor.b; 
+                    sizeAttr.array[i] = 2.0;
+                }
+            }
+            posAttr.needsUpdate = true; colAttr.needsUpdate = true; sizeAttr.needsUpdate = true; renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
+
