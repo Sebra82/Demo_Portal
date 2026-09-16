@@ -1,1 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+    <title>SEBRA82 v70.0 — Production Cymatic Lattice</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
+    <style>
+        :root {
+            --bg-deep: #000103;
+            --card-bg: rgba(7, 11, 19, 0.95);
+            --border-color: rgba(0, 243, 255, 0.35);
+            --neon-cyan: #00f3ff;
+            --accent-green: #00ffaa;
+            --accent-gold: #ffd700;
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --font-mono: monospace, SFMono-Regular, Menlo, Monaco, Consolas;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-mono); user-select: none; }
+        body { background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; width: 100vw; overflow-x: hidden; display: flex; justify-content: center; align-items: center; padding: 0.5rem; touch-action: none; }
+
+        .platform-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; max-width: 650px; width: 100%; box-shadow: 0 0 50px rgba(255, 215, 0, 0.15); display: flex; flex-direction: column; gap: 0.75rem; }
+        
+        .header-title { font-size: 0.85rem; font-weight: 700; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+        .header-title span:first-child { color: var(--neon-cyan); }
+        .header-title span:last-child { color: var(--accent-gold); font-size: 0.5rem; letter-spacing: 1px; text-transform: uppercase; }
+
+        .canvas-box { position: relative; width: 100%; height: 350px; background: #010204; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15); overflow: hidden; }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .hud-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; text-align: center; background: rgba(0,0,0,0.5); padding: 6px; border-radius: 6px; border: 1px solid rgba(0, 243, 255, 0.2); }
+        .hud-label { font-size: 0.45rem; color: var(--text-muted); text-transform: uppercase; }
+        .hud-val { font-size: 0.6rem; color: var(--text-main); font-weight: bold; margin-top: 2px; }
+        
+        .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        .api-btn { background: #020a10; border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.7rem; text-transform: uppercase; width: 100%; transition: all 0.2s ease; margin-top: 5px; flex: 1; min-width: 120px; }
+        .api-btn:active { transform: scale(0.98); background: rgba(255, 215, 0, 0.2); }
+        .api-btn:disabled { border-color: var(--text-muted); color: var(--text-muted); cursor: not-allowed; }
+        
+        .console-log { background: #010204; border: 1px solid var(--border-color); padding: 6px; border-radius: 4px; font-size: 0.55rem; color: var(--text-muted); height: 50px; overflow-y: auto; margin-top: 5px; }
+        .log-entry.sys { color: var(--neon-cyan); }
+        .log-entry.fft { color: var(--accent-gold); }
+
+        .warning-banner { background: rgba(255, 51, 102, 0.1); border: 1px solid #ff3366; color: #ff3366; font-size: 0.5rem; text-align: center; padding: 4px; border-radius: 4px; font-weight: bold; text-transform: uppercase; display: none; margin-bottom: -5px; }
+    </style>
+</head>
+<body>
+
+<div class="platform-container">
+    <div class="header-title">
+        <span>SEBRA82 // CYMATICS</span>
+        <span>PRODUCTION FFT LATTICE</span>
+    </div>
+
+    <div class="canvas-box" id="canvasWrapper">
+        <canvas id="infinityCanvas"></canvas>
+    </div>
+
+    <div class="hud-grid">
+        <div>
+            <div class="hud-label">FFT Resolution</div>
+            <div class="hud-val" style="color:var(--accent-gold);">512 Bins</div>
+        </div>
+        <div>
+            <div class="hud-label">Topology Source</div>
+            <div class="hud-val" id="hudSource">Vacuum (Flat)</div>
+        </div>
+        <div>
+            <div class="hud-label">Peak Frequency</div>
+            <div class="hud-val" id="hudPeak" style="color:var(--neon-cyan);">0 Hz</div>
+        </div>
+    </div>
+
+    <div class="warning-banner" id="iosWarning">⚠️ If on iPhone, ensure the physical silent switch is OFF to hear sub-frequencies.</div>
+    
+    <div class="btn-group">
+        <button class="api-btn" id="startBtn" onclick="app.startAudioEngine()" disabled>Fetching Network Data...</button>
+        <button class="api-btn" id="waveBtn" onclick="app.triggerGenerativeWave()" disabled>2. Synthesize Wave</button>
+    </div>
+    
+    <div class="console-log" id="consoleLog">
+        <div class="log-entry sys">> Fetching raw network arrays. Deferring AudioContext until physical tap...</div>
+    </div>
+</div>
+
+<script>
+    class CymaticLatticeApp {
+        constructor() {
+            this.canvasWrapper = document.getElementById('canvasWrapper');
+            this.canvas = document.getElementById('infinityCanvas');
+            this.clock = new THREE.Clock();
+            
+            this.audioCtx = null;
+            this.analyser = null;
+            this.fftSize = 512;
+            this.dataArray = new Uint8Array(this.fftSize / 2);
+            this.audioTexture = null;
+            
+            this.audioUnlocked = false;
+            this.rawArrayBuffers = {};
+            this.audioBuffers = {};
+            this.notes = ['C3', 'G3', 'C4', 'E4']; 
+
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                document.getElementById('iosWarning').style.display = 'block';
+            }
+
+            this.initThree();
+            this.fetchRawNetworkData();
+        }
+
+        log(msg, type="sys") {
+            const consoleEl = document.getElementById('consoleLog');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerText = `> ${msg}`;
+            consoleEl.appendChild(entry);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        async fetchRawNetworkData() {
+            let loadedCount = 0;
+            for (const note of this.notes) {
+                try {
+                    let res = await fetch(`https://tonejs.github.io/audio/salamander/${note}.mp3`);
+                    this.rawArrayBuffers[note] = await res.arrayBuffer();
+                    loadedCount++;
+                } catch (e) {
+                    console.error("Network error:", e);
+                }
+            }
+
+            if (loadedCount === this.notes.length) {
+                const btn = document.getElementById('startBtn');
+                btn.innerText = "1. Tap to Unlock Audio Engine";
+                btn.disabled = false;
+                this.log("Raw network data acquired. Tap button to decode audio safely.");
+            }
+        }
+
+        async startAudioEngine() {
+            if (this.audioUnlocked) return;
+            
+            const btn = document.getElementById('startBtn');
+            btn.innerText = "Decoding Arrays...";
+            btn.disabled = true;
+
+            this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+
+            for (const note of this.notes) {
+                if (this.rawArrayBuffers[note]) {
+                    try {
+                        this.audioBuffers[note] = await this.audioCtx.decodeAudioData(this.rawArrayBuffers[note]);
+                    } catch (e) {
+                        console.error("Decode error for", note, e);
+                    }
+                }
+            }
+
+            const silentOsc = this.audioCtx.createOscillator();
+            silentOsc.connect(this.audioCtx.destination);
+            silentOsc.start();
+            silentOsc.stop(this.audioCtx.currentTime + 0.01);
+
+            this.analyser = this.audioCtx.createAnalyser();
+            this.analyser.fftSize = this.fftSize;
+            this.analyser.smoothingTimeConstant = 0.85; 
+            this.analyser.connect(this.audioCtx.destination);
+
+            this.audioTexture = new THREE.DataTexture(this.dataArray, this.fftSize / 2, 1, THREE.RedFormat);
+            this.shaderMaterial.uniforms.uAudioData.value = this.audioTexture;
+
+            this.audioUnlocked = true;
+            btn.innerText = "Engine Active";
+            btn.style.borderColor = "var(--text-muted)";
+            btn.style.color = "var(--text-muted)";
+            document.getElementById('waveBtn').disabled = false;
+            
+            this.log("Decoding complete. FFT Analyser bonded to WebGL shader.", "fft");
+        }
+
+        triggerGenerativeWave() {
+            if (!this.audioUnlocked) return;
+
+            document.getElementById('hudSource').innerText = "Acoustic Resonance";
+            document.getElementById('hudSource').style.color = "var(--accent-gold)";
+            this.log("Injecting polyphonic acoustic buffers into the lattice...", "sys");
+
+            this.notes.forEach((note) => {
+                const buffer = this.audioBuffers[note];
+                if (!buffer) return;
+
+                const source = this.audioCtx.createBufferSource();
+                source.buffer = buffer;
+                
+                source.playbackRate.value = 0.4 + (Math.random() * 0.4);
+                
+                const gain = this.audioCtx.createGain();
+                gain.gain.setValueAtTime(0, this.audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.6, this.audioCtx.currentTime + 0.5);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 4.5);
+
+                source.connect(gain);
+                gain.connect(this.analyser);
+                
+                source.start();
+            });
+        }
+
+        initThree() {
+            const width = this.canvasWrapper.clientWidth;
+            const height = this.canvasWrapper.clientHeight;
+
+            this.scene = new THREE.Scene();
+            this.scene.fog = new THREE.FogExp2(0x010204, 0.012);
+            
+            this.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+            this.camera.position.set(0, 30, 50);
+
+            this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true });
+            this.renderer.setSize(width, height);
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            this.controls = new THREE.OrbitControls(this.camera, this.canvas);
+            this.controls.enableDamping = true;
+            this.controls.autoRotate = true;
+            this.controls.autoRotateSpeed = 1.0;
+            this.controls.maxPolarAngle = Math.PI / 2 + 0.1; 
+
+            const size = 120;
+            const segments = 150;
+            const geo = new THREE.PlaneGeometry(size, size, segments, segments);
+            geo.rotateX(-Math.PI / 2);
+
+            this.shaderMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                    uAudioData: { value: null } 
+                },
+                vertexShader: `
+                    uniform float uTime;
+                    uniform sampler2D uAudioData;
+                    
+                    varying float vAudioIntensity;
+                    varying vec2 vUv;
+
+                    void main() {
+                        vec3 pos = position;
+                        vUv = uv;
+                        
+                        vec2 center = vec2(0.5, 0.5);
+                        float dist = distance(uv, center) * 2.0; 
+                        
+                        float audioSample = 0.0;
+                        if (dist <= 1.0) {
+                            audioSample = texture2D(uAudioData, vec2(dist, 0.0)).r;
+                        }
+
+                        pos.y += audioSample * 25.0;
+                        pos.y += sin(pos.x * 0.2 + uTime) * cos(pos.z * 0.2 + uTime) * 0.5;
+                        
+                        vAudioIntensity = audioSample;
+
+                        vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
+                        gl_Position = projectionMatrix * mvPos;
+                        
+                        gl_PointSize = (1.5 + audioSample * 8.0) * (50.0 / -mvPos.z);
+                    }
+                `,
+                fragmentShader: `
+                    varying float vAudioIntensity;
+                    varying vec2 vUv;
+
+                    void main() {
+                        vec2 coord = gl_PointCoord - vec2(0.5);
+                        if(dot(coord, coord) > 0.25) discard; 
+                        
+                        vec3 colorSilent = vec3(0.0, 0.2, 0.4);      
+                        vec3 colorMid = vec3(0.0, 0.8, 1.0);          
+                        vec3 colorLoud = vec3(1.0, 0.84, 0.0);        
+                        
+                        vec3 finalColor;
+                        if (vAudioIntensity < 0.5) {
+                            finalColor = mix(colorSilent, colorMid, vAudioIntensity * 2.0);
+                        } else {
+                            finalColor = mix(colorMid, colorLoud, (vAudioIntensity - 0.5) * 2.0);
+                        }
+
+                        gl_FragColor = vec4(finalColor, 0.9);
+                    }
+                `,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+
+            this.mesh = new THREE.Points(geo, this.shaderMaterial);
+            this.scene.add(this.mesh);
+
+            window.addEventListener('resize', () => this.onResize());
+            this.animate();
+        }
+
+        updateFFT() {
+            if (this.analyser && this.audioTexture) {
+                this.analyser.getByteFrequencyData(this.dataArray);
+                this.audioTexture.needsUpdate = true;
+
+                let maxVal = 0;
+                let maxIdx = 0;
+                for (let i = 0; i < this.dataArray.length; i++) {
+                    if (this.dataArray[i] > maxVal) {
+                        maxVal = this.dataArray[i];
+                        maxIdx = i;
+                    }
+                }
+                
+                const peakEl = document.getElementById('hudPeak');
+                const sourceEl = document.getElementById('hudSource');
+
+                if (maxVal > 15) {
+                    const nyquist = this.audioCtx.sampleRate / 2;
+                    const peakFreq = (maxIdx / (this.fftSize / 2)) * nyquist;
+                    peakEl.innerText = Math.round(peakFreq) + " Hz";
+                    peakEl.style.color = "var(--accent-gold)";
+                } else {
+                    peakEl.innerText = "0 Hz";
+                    peakEl.style.color = "var(--neon-cyan)";
+                    sourceEl.innerText = "Vacuum (Flat)";
+                    sourceEl.style.color = "var(--text-main)";
+                }
+            }
+        }
+
+        onResize() {
+            const width = this.canvasWrapper.clientWidth;
+            const height = this.canvasWrapper.clientHeight;
+            this.camera.aspect = width / height;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(width, height);
+        }
+
+        animate() {
+            requestAnimationFrame(() => this.animate());
+            this.updateFFT();
+            this.shaderMaterial.uniforms.uTime.value = this.clock.getElapsedTime();
+            this.controls.update();
+            this.renderer.render(this.scene, this.camera);
+        }
+    }
+
+    let app;
+    window.addEventListener('DOMContentLoaded', () => { app = new CymaticLatticeApp(); });
+</script>
+
+</body>
+</html>
