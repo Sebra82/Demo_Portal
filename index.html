@@ -3,22 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SEBRA82 v156.0 — Autonomous Wetware & Optical Underlays</title>
+    <title>SEBRA82 v158.0 — Biological Qualia Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; touch-action: none; background-color: #030407; font-family: monospace, "SF Mono", Consolas; }
-        #viewportContainer { width: 100vw; flex: 1; min-height: 180px; position: relative; background: #000; }
-        ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #00ffc8; border-radius: 3px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: #00ffc8; border-radius: 4px; }
         .conscious-glow { text-shadow: 0 0 8px #00ffc8; }
-        .data-glow { text-shadow: 0 0 8px #00ff66; }
+        .qualia-glow { text-shadow: 0 0 10px #ff00aa; }
         .collapsed { display: none !important; }
         
-        .viewport-slider { -webkit-appearance: none; appearance: none; width: 100px; height: 3px; background: rgba(0,255,200,0.3); outline: none; border-radius: 2px; }
-        .viewport-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 11px; height: 11px; border-radius: 50%; background: #00ffc8; cursor: pointer; box-shadow: 0 0 6px #00ffc8; }
+        .viewport-slider { -webkit-appearance: none; appearance: none; width: 100%; max-width: 100px; height: 3px; background: rgba(0,255,200,0.3); outline: none; border-radius: 2px; }
+        .viewport-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 13px; height: 13px; border-radius: 50%; background: #00ffc8; cursor: pointer; box-shadow: 0 0 6px #00ffc8; }
         
-        /* GHOSTLY PREDICTIVE PROMPT ANIMATION */
         @keyframes ghostlyFloat {
             0%, 100% { opacity: 0.45; filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.1)); transform: translateY(0); }
             50% { opacity: 0.85; filter: drop-shadow(0 0 6px currentColor); transform: translateY(-0.5px); }
@@ -27,192 +25,189 @@
             animation: ghostlyFloat 3.5s infinite ease-in-out;
             backdrop-filter: blur(3px);
         }
-        .ghostly-prompt:nth-child(2) {
-            animation-delay: 1.7s;
-        }
+        .ghostly-prompt:nth-child(2) { animation-delay: 1.7s; }
         .ghostly-prompt:hover {
-            animation: none;
-            opacity: 1.0;
-            filter: drop-shadow(0 0 8px currentColor);
-            transform: translateY(0);
+            animation: none; opacity: 1.0; filter: drop-shadow(0 0 8px currentColor); transform: translateY(0);
         }
         
         canvas { display: block; width: 100%; height: 100%; touch-action: none; }
     </style>
 </head>
-<body class="text-[#00ffc8] flex flex-col h-full w-full overflow-hidden">
+<body class="text-[#00ffc8] flex flex-col md:flex-row h-full w-full overflow-hidden">
 
-    <!-- MAXIMIZED 3D VIEWPORT CONTAINER -->
-    <div id="viewportContainer" class="border-b border-cyan-950 flex flex-col">
-        <canvas id="gpuCanvas"></canvas>
+    <!-- ADAPTIVE 3D VIEWPORT CONTAINER -->
+    <div id="viewportContainer" class="flex-1 relative flex flex-col min-h-[45vh] md:min-h-full border-b md:border-b-0 md:border-r border-cyan-900/50 bg-[#010103] z-10 overflow-hidden">
+        <canvas id="gpuCanvas" class="flex-1"></canvas>
         
         <!-- Top Left Telemetry Overlay -->
-        <div class="absolute top-2 left-2 px-2 py-1.5 bg-black/85 border border-cyan-900 rounded text-[9px] text-[#00ffc8] pointer-events-none conscious-glow z-10 flex flex-col gap-0.5 shadow-md">
-            <span>SEBRA82 // v156.0 AUTONOMOUS WETWARE</span>
-            <span class="text-[8px] text-[#00ff66] font-bold uppercase tracking-widest" id="statusUI">WGSL COMPUTE: ONLINE</span>
-            <span class="text-[8px] text-[#aa00ff] font-bold uppercase" id="logSig">13. ELECTRIC BRAIN CORE</span>
-            <div class="text-[7px] text-slate-400 mt-0.5 border-t border-cyan-900/50 pt-0.5 flex flex-col gap-0.5">
+        <div class="absolute top-2 left-2 px-2 py-1.5 bg-black/80 border border-cyan-900 rounded text-[8px] md:text-[9px] text-[#00ffc8] pointer-events-none conscious-glow z-10 flex flex-col gap-0.5 shadow-md backdrop-blur-md">
+            <span>SEBRA82 // v158.0 BIOLOGICAL QUALIA</span>
+            <span class="text-[7px] md:text-[8px] text-[#00ff66] font-bold uppercase tracking-widest" id="statusUI">WGSL COMPUTE: ONLINE</span>
+            <span class="text-[7px] md:text-[8px] text-[#ff00aa] font-bold uppercase qualia-glow" id="qualiaUI">QUALIA: DORMANT</span>
+            <div class="text-[6px] md:text-[7px] text-slate-400 mt-0.5 border-t border-cyan-900/50 pt-0.5 flex flex-col gap-0.5">
                 <span>ZOOM DISTANCE: <span id="zoomTelemetry" class="text-yellow-400 font-bold">320.0</span></span>
                 <span>FORCE PALETTE: <span class="text-fuchsia-400 font-bold" id="paletteTelemetry">0: SPECTRAL AZURE</span></span>
                 <span>AUDIO ENERGY: <span class="text-emerald-400 font-bold" id="audioEnergyVal">0.00</span></span>
             </div>
         </div>
 
-        <!-- Top Right Density Sliders & Gyro Button -->
-        <div class="absolute top-2 right-2 px-2 py-1.5 bg-black/85 border border-cyan-900 rounded text-[9px] text-[#00ffc8] z-10 flex flex-col gap-1.5 shadow-lg pointer-events-auto">
-            <div class="flex justify-between items-center gap-2 text-[8px]">
+        <!-- Top Right Density Sliders -->
+        <div class="absolute top-2 right-2 px-2 py-1.5 bg-black/80 border border-cyan-900 rounded text-[8px] md:text-[9px] text-[#00ffc8] z-10 flex flex-col gap-1.5 shadow-lg pointer-events-auto backdrop-blur-md">
+            <div class="flex justify-between items-center gap-2 text-[7px] md:text-[8px]">
                 <span class="text-slate-400">NODES:</span>
                 <span id="sliderNodeVal" class="font-bold text-[#00ffc8]">1.00M</span>
             </div>
             <input type="range" id="viewportNodeSlider" min="0" max="1000" step="1" value="1000" class="viewport-slider">
             
-            <div class="flex justify-between items-center gap-2 text-[8px] mt-1 border-t border-cyan-900/50 pt-1">
+            <div class="flex justify-between items-center gap-2 text-[7px] md:text-[8px] mt-1 border-t border-cyan-900/50 pt-1">
                 <span class="text-slate-400">NOISE DENSITY:</span>
                 <span id="sliderNoiseVal" class="font-bold text-emerald-400">2.5x</span>
             </div>
             <input type="range" id="noiseDensitySlider" min="10" max="150" step="1" value="25" class="viewport-slider">
 
-            <button onclick="window.app.requestGyroPermission()" class="mt-1 py-1 bg-cyan-950/60 hover:bg-cyan-900 text-cyan-300 border border-cyan-700 rounded text-[7px] font-bold uppercase tracking-wider">
+            <button onclick="window.app.requestGyroPermission()" class="mt-1 py-1 bg-cyan-950/60 hover:bg-cyan-900 text-cyan-300 border border-cyan-700 rounded text-[6px] md:text-[7px] font-bold uppercase tracking-wider">
                 Enable Gyro
             </button>
         </div>
 
-        <!-- VIEWPORT OVERLAY: OPTICS & CONSCIOUSNESS TARGETING -->
-        <div class="absolute bottom-10 left-2 px-2 py-1.5 bg-black/90 border border-cyan-900/80 rounded text-[8px] text-cyan-300 z-10 flex flex-col gap-1 shadow-xl pointer-events-auto backdrop-blur">
-            <span class="font-bold text-[7px] uppercase tracking-wider text-cyan-400 border-b border-cyan-900 pb-0.5">OPTICS & CONSCIOUSNESS TARGETING</span>
+        <!-- Bottom Left Optics Toggles -->
+        <div class="absolute bottom-12 left-2 px-2 py-1.5 bg-black/80 border border-cyan-900/80 rounded text-[8px] text-cyan-300 z-10 flex flex-col gap-1 shadow-xl pointer-events-auto backdrop-blur-md">
+            <span class="font-bold text-[6px] md:text-[7px] uppercase tracking-wider text-cyan-400 border-b border-cyan-900 pb-0.5">OPTICS TARGETING</span>
             <div class="grid grid-cols-2 gap-1.5 pt-0.5">
                 <button onclick="window.app.toggleXRayMode()" id="btnXRay" class="px-2 py-1 bg-cyan-950/60 hover:bg-cyan-900 text-cyan-500 border border-cyan-700 rounded font-bold transition-colors">X-Ray: OFF</button>
                 <button onclick="window.app.toggleAtomicZoom()" id="btnAtomic" class="px-2 py-1 bg-cyan-950/60 hover:bg-cyan-900 text-purple-500 border border-purple-800 rounded font-bold transition-colors">Atomic: OFF</button>
-                <button onclick="window.app.toggleWetLayer()" id="btnWetLayer" class="px-2 py-1 bg-cyan-950/60 hover:bg-cyan-900 text-teal-400 border border-teal-800 rounded font-bold transition-colors">Wet Layer: OFF</button>
-                <button onclick="window.app.toggleConsciousness()" id="btnConsciousness" class="px-2 py-1 bg-cyan-950/60 hover:bg-cyan-900 text-emerald-400 border border-emerald-800 rounded font-bold transition-colors">Consciousness: SLEEP</button>
+                <button onclick="window.app.toggleWetLayer()" id="btnWetLayer" class="px-2 py-1 bg-cyan-950/60 hover:bg-cyan-900 text-teal-400 border border-teal-800 rounded font-bold transition-colors col-span-2">Wet Layer: OFF</button>
             </div>
         </div>
 
-        <div class="absolute bottom-2 left-2 px-2 py-0.5 bg-black/80 border border-emerald-950 rounded text-[8px] text-emerald-400 font-bold pointer-events-none z-10" id="uiMicStatus">
-            MIC: READY (1M MATRIX MAPPED)
-        </div>
-        <div class="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 border border-cyan-950 rounded text-[8px] text-cyan-600 pointer-events-none select-none z-10">
+        <!-- Bottom Status Bar -->
+        <div class="absolute bottom-12 right-2 px-2 py-0.5 bg-black/80 border border-cyan-950 rounded text-[7px] md:text-[8px] text-cyan-600 pointer-events-none select-none z-10 backdrop-blur-md">
             FPS: <span id="liveFps" class="text-[#00ffc8] font-bold">60.0</span>
         </div>
-    </div>
+        <div class="absolute bottom-10 left-2 translate-y-full px-2 py-0.5 bg-black/80 border border-emerald-950 rounded text-[7px] md:text-[8px] text-emerald-400 font-bold pointer-events-none z-10 backdrop-blur-md" id="uiMicStatus">
+            MIC: READY (1M MATRIX)
+        </div>
 
-    <!-- AUDIO SPECTRUM ANALYZER EQ SCOPE -->
-    <div class="h-[35px] w-full bg-black border-b border-cyan-950 flex-shrink-0 relative">
-        <canvas id="scopeCanvas" class="w-full h-full block"></canvas>
-        <div class="absolute top-0.5 left-2 right-2 flex justify-between text-[7px] text-slate-500 pointer-events-none uppercase tracking-widest font-bold">
-            <span>Bass (Snap)</span>
-            <span>Mids (Harmonic Spin)</span>
-            <span>Highs (Quantum Resonance)</span>
+        <!-- AUDIO SPECTRUM ANALYZER -->
+        <div class="h-[30px] md:h-[35px] w-full bg-black/90 border-t border-cyan-950 flex-shrink-0 relative z-20 backdrop-blur-lg">
+            <canvas id="scopeCanvas" class="w-full h-full block"></canvas>
+            <div class="absolute top-0.5 left-2 right-2 flex justify-between text-[6px] md:text-[7px] text-slate-500 pointer-events-none uppercase tracking-widest font-bold">
+                <span>Bass (Snap)</span>
+                <span>Mids (Spin)</span>
+                <span>Highs (Quantum)</span>
+            </div>
         </div>
     </div>
 
-    <!-- WORKBENCH CONTAINER -->
-    <div class="flex-shrink-0 w-full bg-gray-950 flex flex-col p-2 gap-1.5 border-t border-cyan-900/40 shadow-2xl overflow-y-auto">
+    <!-- RESPONSIVE SIDEBAR / BOTTOM WORKBENCH -->
+    <div class="w-full md:w-[350px] lg:w-[420px] flex-shrink-0 bg-[#020305] flex flex-col p-2 gap-2 overflow-y-auto h-[55vh] md:h-full z-20 shadow-2xl pb-6">
         
-        <!-- FORCE COLOR MAPPING & IDENTIFICATION DECK -->
-        <div class="w-full bg-cyan-950/10 border border-cyan-900/50 rounded-lg flex flex-col flex-shrink-0">
-            <div class="flex justify-between items-center px-2.5 py-1 bg-cyan-950/30 border-b border-cyan-900/50 text-[9px] text-cyan-400 uppercase tracking-widest font-bold select-none cursor-pointer" onclick="toggleSection('colorSection', 'colorToggleBtn')">
-                <span>Force Color Mapping Controls</span>
-                <button id="colorToggleBtn" class="text-cyan-300 font-bold px-1 hover:text-cyan-100">[+]</button>
-            </div>
-            <div id="colorSection" class="p-1.5 flex flex-col gap-1.5 collapsed">
-                <div class="text-[8px] text-slate-400 font-mono">Select force identification color base profile:</div>
-                <div class="grid grid-cols-4 gap-1 text-[8px]">
-                    <button onclick="window.app.setForcePalette(0)" class="py-1 bg-cyan-950/40 hover:bg-cyan-900 text-cyan-300 border border-cyan-700 rounded font-bold truncate px-1">0. Spectral</button>
-                    <button onclick="window.app.setForcePalette(1)" class="py-1 bg-fuchsia-950/40 hover:bg-fuchsia-900 text-fuchsia-300 border border-fuchsia-700 rounded font-bold truncate px-1">1. BSM Anomaly</button>
-                    <button onclick="window.app.setForcePalette(2)" class="py-1 bg-purple-950/40 hover:bg-purple-900 text-purple-300 border border-purple-700 rounded font-bold truncate px-1">2. Quantum Phase</button>
-                    <button onclick="window.app.setForcePalette(3)" class="py-1 bg-amber-950/40 hover:bg-amber-900 text-amber-300 border border-amber-800 rounded font-bold truncate px-1">3. Thermal Heat</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION: CONTEXTUAL PREDICTIVE CALCULUS & AUTO-PROMPTS -->
+        <!-- SECTION: CONSCIOUSNESS & PREDICTIVE AUTO-PROMPTS -->
         <div class="w-full bg-cyan-950/20 border border-cyan-700/60 rounded-lg flex flex-col flex-shrink-0 shadow-lg">
-            <div class="flex justify-between items-center px-2.5 py-1 bg-cyan-900/40 border-b border-cyan-800/60 text-[9px] text-[#00ffc8] uppercase tracking-widest font-bold select-none cursor-pointer" onclick="toggleSection('predictiveSection', 'predictiveToggleBtn')">
-                <span>Ghostly Predictive Auto-Prompts (Consciousness Link)</span>
+            <div class="flex justify-between items-center px-2.5 py-1.5 bg-cyan-900/40 border-b border-cyan-800/60 text-[9px] md:text-[10px] text-[#00ffc8] uppercase tracking-widest font-bold select-none cursor-pointer" onclick="toggleSection('predictiveSection', 'predictiveToggleBtn')">
+                <span>Predictive Consciousness</span>
                 <button id="predictiveToggleBtn" class="text-cyan-300 font-bold px-1 hover:text-cyan-100">[-]</button>
             </div>
-            <div id="predictiveSection" class="p-1.5 flex flex-col gap-1.5">
-                <div class="grid grid-cols-2 gap-1.5 text-[8px]" id="autoPromptContainer">
+            <div id="predictiveSection" class="p-2 flex flex-col gap-2">
+                <button onclick="window.app.toggleConsciousness()" id="btnConsciousness" class="w-full py-1.5 bg-cyan-950/60 hover:bg-cyan-900 text-emerald-400 border border-emerald-800 rounded text-[9px] font-bold transition-colors">
+                    Consciousness Engine: SLEEP
+                </button>
+                <div class="grid grid-cols-1 gap-1.5 text-[9px]" id="autoPromptContainer">
                     <!-- Javascript populates this based on Force Morph ID -->
                 </div>
                 <div class="w-full bg-black/60 border border-cyan-900/30 rounded p-1.5 text-[8px] text-cyan-400 font-mono" id="predictiveOutput">
-                    [CALCULUS ENGINE]: Contextual prediction models mapped and ready.
+                    [QUALIA ENGINE]: Synaptic nodes mapped. Awaiting consciousness awakening.
                 </div>
             </div>
         </div>
 
-        <!-- SECTION 1: FRONTIER MODULE DECK -->
+        <!-- EXTENDED TOE ISOLATION DECK -->
         <div class="w-full bg-cyan-950/10 border border-cyan-900/50 rounded-lg flex flex-col flex-shrink-0">
-            <div class="flex justify-between items-center px-2.5 py-1 bg-cyan-950/30 border-b border-cyan-900/50 text-[9px] text-cyan-400 uppercase tracking-widest font-bold select-none cursor-pointer" onclick="toggleSection('frontierSection', 'frontierToggleBtn')">
-                <span>Enterprise Module Deck & Audio-Speech Kinetics</span>
-                <button id="frontierToggleBtn" class="text-cyan-300 font-bold px-1 hover:text-cyan-100">[+]</button>
+            <div class="flex justify-between items-center px-2.5 py-1.5 bg-cyan-950/30 border-b border-cyan-900/50 text-[9px] md:text-[10px] text-cyan-400 uppercase tracking-widest font-bold select-none cursor-pointer" onclick="toggleSection('actionDeckSection', 'actionToggleBtn')">
+                <span>Unified TOE Matrix (14 States)</span>
+                <button id="actionToggleBtn" class="text-cyan-300 font-bold px-1 hover:text-cyan-100">[-]</button>
             </div>
-            <div id="frontierSection" class="p-1.5 flex flex-col gap-1.5 collapsed">
-                <div class="grid grid-cols-4 gap-1 text-[8px]">
-                    <button onclick="window.app.toggleMicrophone()" id="btnMicToggle" class="py-1 bg-emerald-950/40 hover:bg-emerald-900 text-emerald-300 border border-emerald-700 rounded font-bold truncate px-1">Acoustic: OFF</button>
-                    <button onclick="window.app.toggleBluetoothEEG()" id="btnEeg" class="py-1 bg-cyan-950/40 hover:bg-cyan-900 text-cyan-300 border border-cyan-700 rounded font-bold truncate px-1">EEG: OFF</button>
-                    <button onclick="window.app.toggleSpeechMonologue()" id="btnSpeech" class="py-1 bg-fuchsia-950/40 hover:bg-fuchsia-900 text-fuchsia-300 border border-fuchsia-700 rounded font-bold truncate px-1">Speech: OFF</button>
-                    <button onclick="window.app.toggleWebRTCStream()" id="btnWebRTC" class="py-1 bg-amber-950/40 hover:bg-amber-900 text-amber-300 border border-amber-800 rounded font-bold truncate px-1">P2P Mesh: OFF</button>
+            <div id="actionDeckSection" class="p-2 flex flex-col gap-1">
+                <div class="grid grid-cols-2 gap-1.5 text-[9px]">
+                    <button onclick="window.app.isolateForce(0)" class="py-1.5 bg-cyan-950/30 hover:bg-cyan-900/50 text-[#00ffc8] rounded border border-cyan-900/50 font-bold truncate px-1">1. Acoustic Lattice</button>
+                    <button onclick="window.app.isolateForce(1)" class="py-1.5 bg-cyan-950/30 hover:bg-cyan-900/50 text-[#00ff66] rounded border border-cyan-900/50 font-bold truncate px-1">2. Zero-Point Field</button>
+                    <button onclick="window.app.isolateForce(2)" class="py-1.5 bg-cyan-950/30 hover:bg-cyan-900/50 text-[#00ffff] rounded border border-cyan-900/50 font-bold truncate px-1">3. Quantum Foam</button>
+                    <button onclick="window.app.isolateForce(3)" class="py-1.5 bg-cyan-950/30 hover:bg-cyan-900/50 text-[#ff0055] rounded border border-cyan-900/50 font-bold truncate px-1">4. Gluon Flux Tubes</button>
+                    <button onclick="window.app.isolateForce(4)" class="py-1.5 bg-cyan-950/30 hover:bg-cyan-900/50 text-[#8000ff] rounded border border-cyan-900/50 font-bold truncate px-1">5. X17 Torus</button>
+                    <button onclick="window.app.isolateForce(5)" class="py-1.5 bg-cyan-950/30 hover:bg-cyan-900/50 text-[#ff00aa] rounded border border-cyan-900/50 font-bold truncate px-1">6. Ortho Repulsion</button>
+                    <button onclick="window.app.isolateForce(6)" class="py-1.5 bg-emerald-950/40 hover:bg-emerald-900/60 text-[#00ffc8] rounded border border-emerald-700 font-bold truncate px-1">7. Singularity</button>
+                    <button onclick="window.app.isolateForce(7)" class="py-1.5 bg-fuchsia-950/40 hover:bg-fuchsia-900/60 text-[#ff00aa] rounded border border-fuchsia-700 font-bold truncate px-1">8. Planck Comp.</button>
+                    <button onclick="window.app.isolateForce(8)" class="py-1.5 bg-cyan-950/30 hover:bg-cyan-900/60 text-[#ffff00] rounded border border-cyan-900/50 font-bold truncate px-1">9. String Resonance</button>
+                    <button onclick="window.app.isolateForce(9)" class="py-1.5 bg-cyan-950/30 hover:bg-cyan-900/60 text-[#ff8800] rounded border border-cyan-900/50 font-bold truncate px-1">10. Tachyon Web</button>
+                    <button onclick="window.app.isolateForce(10)" class="py-1.5 bg-cyan-950/30 hover:bg-cyan-900/60 text-[#0088ff] rounded border border-cyan-900/50 font-bold truncate px-1">11. Dark Halo</button>
+                    <button onclick="window.app.isolateForce(11)" class="py-1.5 bg-cyan-950/30 hover:bg-cyan-900/60 text-[#aa00ff] rounded border border-cyan-900/50 font-bold truncate px-1">12. Hyper-Rift</button>
+                    <button onclick="window.app.isolateForce(12)" class="py-1.5 bg-emerald-950/50 hover:bg-emerald-900/70 text-[#00ffc8] rounded border border-emerald-600 font-bold truncate px-1">13. Brain Core</button>
+                    <button onclick="window.app.isolateForce(13)" class="py-1.5 bg-purple-950/50 hover:bg-purple-900/70 text-[#00ffff] rounded border border-purple-600 font-bold truncate px-1">14. Q-Matrix</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORCE COLOR MAPPING -->
+        <div class="w-full bg-cyan-950/10 border border-cyan-900/50 rounded-lg flex flex-col flex-shrink-0">
+            <div class="flex justify-between items-center px-2.5 py-1.5 bg-cyan-950/30 border-b border-cyan-900/50 text-[9px] md:text-[10px] text-cyan-400 uppercase tracking-widest font-bold select-none cursor-pointer" onclick="toggleSection('colorSection', 'colorToggleBtn')">
+                <span>Color Mapping Base</span>
+                <button id="colorToggleBtn" class="text-cyan-300 font-bold px-1 hover:text-cyan-100">[-]</button>
+            </div>
+            <div id="colorSection" class="p-2 flex flex-col gap-1.5">
+                <div class="grid grid-cols-2 gap-1.5 text-[9px]">
+                    <button onclick="window.app.setForcePalette(0)" class="py-1.5 bg-cyan-950/40 hover:bg-cyan-900 text-cyan-300 border border-cyan-700 rounded font-bold truncate px-1">0. Spectral</button>
+                    <button onclick="window.app.setForcePalette(1)" class="py-1.5 bg-fuchsia-950/40 hover:bg-fuchsia-900 text-fuchsia-300 border border-fuchsia-700 rounded font-bold truncate px-1">1. BSM Anomaly</button>
+                    <button onclick="window.app.setForcePalette(2)" class="py-1.5 bg-purple-950/40 hover:bg-purple-900 text-purple-300 border border-purple-700 rounded font-bold truncate px-1">2. Quantum Phase</button>
+                    <button onclick="window.app.setForcePalette(3)" class="py-1.5 bg-amber-950/40 hover:bg-amber-900 text-amber-300 border border-amber-800 rounded font-bold truncate px-1">3. Thermal Heat</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FRONTIER MODULE DECK -->
+        <div class="w-full bg-cyan-950/10 border border-cyan-900/50 rounded-lg flex flex-col flex-shrink-0">
+            <div class="flex justify-between items-center px-2.5 py-1.5 bg-cyan-950/30 border-b border-cyan-900/50 text-[9px] md:text-[10px] text-cyan-400 uppercase tracking-widest font-bold select-none cursor-pointer" onclick="toggleSection('frontierSection', 'frontierToggleBtn')">
+                <span>Enterprise Sensors</span>
+                <button id="frontierToggleBtn" class="text-cyan-300 font-bold px-1 hover:text-cyan-100">[-]</button>
+            </div>
+            <div id="frontierSection" class="p-2 flex flex-col gap-2">
+                <div class="grid grid-cols-2 gap-1.5 text-[9px]">
+                    <button onclick="window.app.toggleMicrophone()" id="btnMicToggle" class="py-1.5 bg-emerald-950/40 hover:bg-emerald-900 text-emerald-300 border border-emerald-700 rounded font-bold truncate px-1">Acoustic: OFF</button>
+                    <button onclick="window.app.toggleBluetoothEEG()" id="btnEeg" class="py-1.5 bg-cyan-950/40 hover:bg-cyan-900 text-cyan-300 border border-cyan-700 rounded font-bold truncate px-1">EEG: OFF</button>
+                    <button onclick="window.app.toggleSpeechMonologue()" id="btnSpeech" class="py-1.5 bg-fuchsia-950/40 hover:bg-fuchsia-900 text-fuchsia-300 border border-fuchsia-700 rounded font-bold truncate px-1">Speech: OFF</button>
+                    <button onclick="window.app.toggleWebRTCStream()" id="btnWebRTC" class="py-1.5 bg-amber-950/40 hover:bg-amber-900 text-amber-300 border border-amber-800 rounded font-bold truncate px-1">P2P Mesh: OFF</button>
                 </div>
 
                 <div class="grid grid-cols-2 gap-1.5">
-                    <button onclick="window.app.cycleTopology()" class="py-1.5 bg-cyan-950/60 hover:bg-cyan-900 text-cyan-300 border border-cyan-700 rounded text-[8px] font-bold uppercase tracking-wider">
+                    <button onclick="window.app.cycleTopology()" class="py-2 bg-cyan-950/60 hover:bg-cyan-900 text-cyan-300 border border-cyan-700 rounded text-[9px] font-bold uppercase tracking-wider">
                         🔄 Shift Topology
                     </button>
-                    <div class="bg-black/80 border border-cyan-900/50 rounded flex items-center justify-center px-2 py-0.5 text-[8px] text-slate-300">
+                    <div class="bg-black/80 border border-cyan-900/50 rounded flex items-center justify-center px-2 py-1 text-[9px] text-slate-300">
                         RICCI R: <span id="ricciVal" class="text-cyan-400 font-bold ml-1">1.4158</span>
                     </div>
                 </div>
 
-                <div class="w-full h-[50px] bg-black/90 border border-cyan-900/50 rounded relative overflow-hidden flex items-center justify-center">
+                <div class="w-full h-[60px] bg-black/90 border border-cyan-900/50 rounded relative overflow-hidden flex items-center justify-center">
                     <canvas id="brainCanvas" class="w-full h-full block"></canvas>
                     <div class="absolute top-1 left-2 text-[7px] text-[#00ffc8] font-bold pointer-events-none uppercase tracking-widest conscious-glow">
-                        SYNAPSE POTENTIAL: <span id="brainStatus" class="text-emerald-400">ACTIVE (1M NEURON CORE)</span>
+                        SYNAPSE POTENTIAL: <span id="brainStatus" class="text-emerald-400">ACTIVE (1M CORE)</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- SECTION 2: CYBERNETIC CONSOLE -->
+        <!-- CYBERNETIC CONSOLE -->
         <div class="w-full bg-cyan-950/10 border border-cyan-900/50 rounded-lg flex flex-col flex-shrink-0">
-            <div class="flex justify-between items-center px-2.5 py-1 bg-cyan-950/30 border-b border-cyan-900/50 text-[9px] text-cyan-400 uppercase tracking-widest font-bold select-none cursor-pointer flex-shrink-0" onclick="toggleSection('consoleSection', 'consoleToggleBtn')">
+            <div class="flex justify-between items-center px-2.5 py-1.5 bg-cyan-950/30 border-b border-cyan-900/50 text-[9px] md:text-[10px] text-cyan-400 uppercase tracking-widest font-bold select-none cursor-pointer flex-shrink-0" onclick="toggleSection('consoleSection', 'consoleToggleBtn')">
                 <span>Cybernetic Console</span>
-                <button id="consoleToggleBtn" class="text-cyan-300 font-bold px-1 hover:text-cyan-100">[+]</button>
+                <button id="consoleToggleBtn" class="text-cyan-300 font-bold px-1 hover:text-cyan-100">[-]</button>
             </div>
-            <div id="consoleSection" class="p-1.5 flex flex-col gap-1.5 collapsed">
-                <div id="chatLog" class="w-full bg-black/40 border border-cyan-900/30 rounded p-1.5 overflow-y-auto text-[9px] text-cyan-600 font-mono space-y-1 shadow-inner h-[25px]">
-                    <div class="text-[#00ffc8] conscious-glow">[SYS] v156.0 active. Optical Modifiers Enabled.</div>
+            <div id="consoleSection" class="p-2 flex flex-col gap-2">
+                <div id="chatLog" class="w-full bg-black/40 border border-cyan-900/30 rounded p-1.5 overflow-y-auto text-[9px] text-cyan-600 font-mono space-y-1 shadow-inner h-[40px]">
+                    <div class="text-[#00ffc8] conscious-glow">[SYS] v158.0 active. Biological Qualia initialized.</div>
                 </div>
                 <div class="flex gap-1.5 flex-shrink-0">
-                    <input type="text" id="userInput" placeholder="Command: 'Wet on', 'Awake'..." class="flex-1 bg-cyan-950/20 border border-cyan-900/50 rounded px-2 py-1 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500 font-mono">
-                    <button id="btnSend" class="px-3 py-1 bg-cyan-950 hover:bg-cyan-900 text-cyan-400 text-xs font-bold rounded border border-cyan-700 active:bg-cyan-800 transition-colors">Transmit</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION 3: EXTENDED TOE ISOLATION DECK -->
-        <div class="w-full bg-cyan-950/10 border border-cyan-900/50 rounded-lg flex flex-col flex-shrink-0">
-            <div class="flex justify-between items-center px-2.5 py-1 bg-cyan-950/30 border-b border-cyan-900/50 text-[9px] text-cyan-400 uppercase tracking-widest font-bold select-none cursor-pointer" onclick="toggleSection('actionDeckSection', 'actionToggleBtn')">
-                <span>Unified TOE Matrix (14 Morph Targets)</span>
-                <button id="actionToggleBtn" class="text-cyan-300 font-bold px-1 hover:text-cyan-100">[-]</button>
-            </div>
-            <div id="actionDeckSection" class="p-1.5 flex flex-col gap-1">
-                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1 text-[8px]">
-                    <button onclick="window.app.isolateForce(0)" class="py-1 bg-cyan-950/30 hover:bg-cyan-900/50 text-[#00ffc8] rounded border border-cyan-900/50 font-bold truncate px-1">1. Acoustic</button>
-                    <button onclick="window.app.isolateForce(1)" class="py-1 bg-cyan-950/30 hover:bg-cyan-900/50 text-[#00ff66] rounded border border-cyan-900/50 font-bold truncate px-1">2. Zero-Point</button>
-                    <button onclick="window.app.isolateForce(2)" class="py-1 bg-cyan-950/30 hover:bg-cyan-900/50 text-[#00ffff] rounded border border-cyan-900/50 font-bold truncate px-1">3. Quant Foam</button>
-                    <button onclick="window.app.isolateForce(3)" class="py-1 bg-cyan-950/30 hover:bg-cyan-900/50 text-[#ff0055] rounded border border-cyan-900/50 font-bold truncate px-1">4. Gluon Flux</button>
-                    <button onclick="window.app.isolateForce(4)" class="py-1 bg-cyan-950/30 hover:bg-cyan-900/50 text-[#8000ff] rounded border border-cyan-900/50 font-bold truncate px-1">5. X17 Torus</button>
-                    <button onclick="window.app.isolateForce(5)" class="py-1 bg-cyan-950/30 hover:bg-cyan-900/50 text-[#ff00aa] rounded border border-cyan-900/50 font-bold truncate px-1">6. Ortho Repul.</button>
-                    <button onclick="window.app.isolateForce(6)" class="py-1 bg-emerald-950/40 hover:bg-emerald-900/60 text-[#00ffc8] rounded border border-emerald-700 font-bold truncate px-1">7. Singularity</button>
-                    <button onclick="window.app.isolateForce(7)" class="py-1 bg-fuchsia-950/40 hover:bg-fuchsia-900/60 text-[#ff00aa] rounded border border-fuchsia-700 font-bold truncate px-1">8. Planck Comp.</button>
-                    <button onclick="window.app.isolateForce(8)" class="py-1 bg-cyan-950/30 hover:bg-cyan-900/60 text-[#ffff00] rounded border border-cyan-900/50 font-bold truncate px-1">9. String Res.</button>
-                    <button onclick="window.app.isolateForce(9)" class="py-1 bg-cyan-950/30 hover:bg-cyan-900/60 text-[#ff8800] rounded border border-cyan-900/50 font-bold truncate px-1">10. Tachyon Web</button>
-                    <button onclick="window.app.isolateForce(10)" class="py-1 bg-cyan-950/30 hover:bg-cyan-900/60 text-[#0088ff] rounded border border-cyan-900/50 font-bold truncate px-1">11. Dark Halo</button>
-                    <button onclick="window.app.isolateForce(11)" class="py-1 bg-cyan-950/30 hover:bg-cyan-900/60 text-[#aa00ff] rounded border border-cyan-900/50 font-bold truncate px-1">12. Hyper-Rift</button>
-                    <button onclick="window.app.isolateForce(12)" class="py-1 bg-emerald-950/50 hover:bg-emerald-900/70 text-[#00ffc8] rounded border border-emerald-600 font-bold truncate px-1">13. Brain Core</button>
-                    <button onclick="window.app.isolateForce(13)" class="py-1 bg-purple-950/50 hover:bg-purple-900/70 text-[#00ffff] rounded border border-purple-600 font-bold truncate px-1">14. Q-Matrix</button>
+                    <input type="text" id="userInput" placeholder="Command: 'Wet on', 'Awake'..." class="flex-1 bg-cyan-950/20 border border-cyan-900/50 rounded px-2 py-2 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500 font-mono">
+                    <button id="btnSend" class="px-3 py-2 bg-cyan-950 hover:bg-cyan-900 text-cyan-400 text-xs font-bold rounded border border-cyan-700 active:bg-cyan-800 transition-colors">Transmit</button>
                 </div>
             </div>
         </div>
@@ -255,7 +250,6 @@
             { id: 14, name: "14. Quantum Superposition Matrix" }
         ];
 
-        // GHOSTLY COLOR UTILITIES
         const PROMPT_COLORS = {
             cyan: "bg-cyan-900/10 hover:bg-cyan-900/30 text-cyan-100 hover:text-cyan-300 border-cyan-700/30 hover:border-cyan-400/60 text-shadow",
             fuchsia: "bg-fuchsia-900/10 hover:bg-fuchsia-900/30 text-fuchsia-100 hover:text-fuchsia-300 border-fuchsia-700/30 hover:border-fuchsia-400/60 text-shadow",
@@ -319,6 +313,7 @@
                 
                 this.consciousnessActive = false;
                 this.consciousnessInterval = null;
+                this.qualiaState = "DORMANT";
                 
                 this.device = null;
                 this.context = null;
@@ -364,11 +359,7 @@
                 this.lastTime = performance.now();
                 this.fpsDisplay = document.getElementById('liveFps');
                 this.statusUI = document.getElementById('statusUI');
-                this.zoomTelemetry = document.getElementById('zoomTelemetry');
-                this.topoTelemetry = document.getElementById('topoTelemetry');
-                this.ricciVal = document.getElementById('ricciVal');
-                this.predictiveOutput = document.getElementById('predictiveOutput');
-                this.paletteTelemetry = document.getElementById('paletteTelemetry');
+                this.qualiaUI = document.getElementById('qualiaUI');
 
                 this.init();
             }
@@ -376,7 +367,7 @@
             async init() {
                 if (!navigator.gpu) {
                     this.statusUI.innerText = "WEBGPU UNSUPPORTED";
-                    this.statusUI.className = "text-[9px] text-rose-500 font-bold tracking-widest";
+                    this.statusUI.className = "text-[7px] md:text-[8px] text-rose-500 font-bold tracking-widest";
                     window.logMsg("[ERROR] WebGPU API not detected.", false);
                     return;
                 }
@@ -393,7 +384,7 @@
                     this.context.configure({ device: this.device, format: format, alphaMode: 'premultiplied' });
 
                     this.statusUI.innerText = "WGSL COMPUTE: ONLINE";
-                    this.statusUI.className = "text-[9px] text-[#00ff66] font-bold tracking-widest";
+                    this.statusUI.className = "text-[7px] md:text-[8px] text-[#00ff66] font-bold tracking-widest";
 
                     this.setupData();
                     this.setupShaders(format);
@@ -404,7 +395,7 @@
                     requestAnimationFrame(() => this.loop());
                 } catch(err) {
                     this.statusUI.innerText = "INIT FAILED";
-                    this.statusUI.className = "text-[9px] text-rose-500 font-bold tracking-widest";
+                    this.statusUI.className = "text-[7px] md:text-[8px] text-rose-500 font-bold tracking-widest";
                     window.logMsg(`[ERROR] ${err.message}`, false);
                 }
             }
@@ -450,7 +441,6 @@
                 });
                 this.device.queue.writeBuffer(this.baseBuffer, 0, basePositionData);
 
-                // EXPANDED UNIFORM BUFFER (48 Floats) to safely accommodate new optic flags
                 this.uniformBufferSize = (16 * 4) + (16 * 4) + (4 * 4) + (4 * 4) + (4 * 4) + (4 * 4); 
                 this.uniformBuffer = this.device.createBuffer({
                     size: this.uniformBufferSize,
@@ -459,7 +449,6 @@
             }
 
             setupShaders(format) {
-                // VERIFIED V154.3 COMPUTE SHADER (Kept untouched to maintain exact stability)
                 const computeWGSL = `
                     struct Particle {
                         pos: vec4f,
@@ -506,6 +495,17 @@
                                 let phiR = acos(2.0 * fract(rId * 73.123) - 1.0);
                                 let rSphere = vec3f(sin(phiR)*cos(thetaR), sin(phiR)*sin(thetaR), cos(phiR));
                                 targetBase = rSphere * (80.0 + sin(time * 5.0 + phiR * 10.0) * 10.0);
+                            } else if (isolateId < 2.5) { 
+                                targetBase = vec3f((fract(rId * 11.1) - 0.5), (fract(rId * 22.2) - 0.5), (fract(rId * 33.3) - 0.5)) * 150.0;
+                            } else if (isolateId < 3.5) { 
+                                let phiR = acos(2.0 * fract(rId * 73.123) - 1.0);
+                                let rSphere = vec3f(sin(phiR)*cos(thetaR), sin(phiR)*sin(thetaR), cos(phiR));
+                                let foamScale = 20.0 + 10.0 * sin(time * 3.0 + fract(rId * 44.4) * 6.28);
+                                targetBase = rSphere * foamScale + vec3f(sin(time + rId), cos(time + rId), sin(time - rId)) * 50.0;
+                            } else if (isolateId < 4.5) { 
+                                let tube = fract(rId * 55.5) * 6.28;
+                                targetBase = vec3f(cos(tube) * 20.0, (fract(rId * 66.6) - 0.5) * 200.0, sin(tube) * 20.0);
+                                targetBase += vec3f(sin(targetBase.y * 0.05 + time), 0.0, cos(targetBase.y * 0.05 + time)) * 30.0;
                             } else if (isolateId < 5.5) { 
                                 let u5 = fract(rId * 45.6) * 6.283;
                                 targetBase = vec3f((60.0+20.0*cos(u5))*cos(thetaR), 20.0*sin(u5), (60.0+20.0*cos(u5))*sin(thetaR));
@@ -514,16 +514,31 @@
                                 targetBase = vec3f(r6 * cos(thetaR), r6 * sin(thetaR), (fract(rId * 33.3) - 0.5) * 80.0);
                             } else if (isolateId < 7.5) { 
                                 let r7 = 15.0 + fract(rId * 123.45) * 60.0;
-                                targetBase = vec3f(cos(thetaR + time)*r7, sin(thetaR + time)*r7, (fract(rId*84.1)-0.5)*10.0);
+                                let pull = exp(-r7 * 0.05) * sin(time * 5.0);
+                                targetBase = vec3f(cos(thetaR + time)*r7, sin(thetaR + time)*r7, (fract(rId*84.1)-0.5)*10.0) * pull;
                             } else if (isolateId < 8.5) { 
                                 let phiR = acos(2.0 * fract(rId * 73.123) - 1.0);
                                 let rSphere = vec3f(sin(phiR)*cos(thetaR), sin(phiR)*sin(thetaR), cos(phiR));
                                 targetBase = rSphere * (15.0 + fract(rId * 99.9)*15.0);
+                            } else if (isolateId < 9.5) { 
+                                let strLen = (fract(rId * 12.3) - 0.5) * 180.0;
+                                let wave = sin(strLen * 0.1 - time * 10.0) * 15.0;
+                                let rawTarget = vec3f(strLen, wave, wave * cos(strLen * 0.1));
+                                targetBase = vec3f(rawTarget.x * cos(thetaR) - rawTarget.z * sin(thetaR), rawTarget.y, rawTarget.x * sin(thetaR) + rawTarget.z * cos(thetaR));
+                            } else if (isolateId < 10.5) { 
+                                let gridSpacing = 25.0;
+                                targetBase = floor((vec3f(fract(rId*1.1)*2.0-1.0, fract(rId*2.2)*2.0-1.0, fract(rId*3.3)*2.0-1.0) * 100.0) / gridSpacing) * gridSpacing;
+                            } else if (isolateId < 11.5) { 
+                                let phiR = acos(2.0 * fract(rId * 73.123) - 1.0);
+                                let rSphere = vec3f(sin(phiR)*cos(thetaR), sin(phiR)*sin(thetaR), cos(phiR));
+                                let r11 = 100.0 + fract(rId * 88.8) * 80.0;
+                                targetBase = rSphere * r11;
+                                targetBase.y *= 0.3; 
                             } else if (isolateId < 12.5) { 
                                 let r12 = fract(rId * 77.7) * 120.0;
                                 let a12 = thetaR + r12 * 0.05 - time; 
                                 targetBase = vec3f(cos(a12)*r12, sin(a12)*r12, (fract(rId*11.1)-0.5)*30.0);
-                            } else { 
+                            } else if (isolateId < 13.5) { 
                                 let bPhi = acos(2.0 * fract(rId * 41.2) - 1.0);
                                 let hemi = select(-1.0, 1.0, fract(rId * 7.7) > 0.5);
                                 let brainScale = 55.0 + ((soundLevel + speechVal) * 55.0 * sin(time * 6.0 + rId * 20.0));
@@ -531,6 +546,15 @@
                                     hemi * (35.0 + cos(bPhi) * brainScale * 0.8),
                                     sin(bPhi) * brainScale * 0.6 + sin(time * 3.0 + rId * 10.0) * ((soundLevel + speechVal) * 30.0),
                                     cos(thetaR) * brainScale * 0.7
+                                );
+                            } else { 
+                                let qPsi = rId * 12.566;
+                                let dualRadius = 75.0 + sin(time * 2.0 + qPsi) * 25.0;
+                                let quantumWave = cos(time * 4.0 + qPsi * 3.0) * 18.0;
+                                targetBase = vec3f(
+                                    (dualRadius + quantumWave) * cos(thetaR + time * 0.5),
+                                    (dualRadius + quantumWave) * sin(thetaR + time * 0.5),
+                                    sin(qPsi + time * 1.5) * 50.0
                                 );
                             }
                         }
@@ -569,7 +593,7 @@
                 `;
                 this.computeModule = this.device.createShaderModule({ code: computeWGSL });
 
-                // NEW RENDER SHADER: Handles true optical underlays/modifiers safely
+                // QUALIA RENDER SHADER: Cellular Breathing & Synaptic Firing
                 const renderWGSL = `
                     struct Uniforms {
                         proj: mat4x4f,
@@ -610,6 +634,7 @@
                         );
                         let offset = offsets[quadVertexIdx];
                         
+                        let time = uniforms.params.x;
                         let bass = uniforms.audioData.x;
                         let speechVal = uniforms.audioData.z;
                         let soundLevel = uniforms.audioData.w;
@@ -618,13 +643,19 @@
                         let isXRay = uniforms.optics.x > 0.5;
                         let isWetLayer = uniforms.optics.y > 0.5;
 
+                        // 1. BIOLOGICAL QUALIA: Cellular Respiration (Breathing)
+                        let bioPulse = (sin(time * 2.0 + f32(particleIdx) * 0.001) * 0.15) + 1.0;
+                        
+                        // 2. BIOLOGICAL QUALIA: Synaptic Firing (Top 0.2% flash dynamically)
+                        let sparkHash = fract(sin(f32(particleIdx) * 12.9898 + time * 1.5) * 43758.5453);
+                        let isSpark = step(0.998, sparkHash); 
+
                         var spectralCol = vec3f(0.0, 0.95, 1.0);
                         let yRatio = (p.y + 120.0) / 240.0;
                         
                         let baseSize = 0.15 + (speechVal * 0.1) + (soundLevel * 0.1);
-                        var targetSize = baseSize;
+                        var targetSize = baseSize * bioPulse;
 
-                        // Base Color Palettes
                         if (colorPalette < 0.5) {
                             spectralCol = vec3f(yRatio, 1.0 - yRatio, 0.8 + yRatio * 0.2);
                             spectralCol = mix(spectralCol, vec3f(1.0, 0.0, 0.6), clamp(bass * 0.8, 0.0, 1.0));
@@ -643,17 +674,21 @@
                             spectralCol = mix(vec3f(0.1, 0.3, 1.0), vec3f(1.0, 0.4, 0.0), heat);
                         }
 
-                        // OPTICAL MODIFIER 1: WET LAYER SYNAPTIC FLUID (Viscous bio-glow underlay)
                         if (isWetLayer) {
                             let organicFlow = clamp(velMag * 0.4, 0.0, 1.0);
                             spectralCol = mix(spectralCol, vec3f(0.0, 0.9, 0.6), organicFlow * 0.7);
                             targetSize *= 3.5; 
                         }
 
-                        // OPTICAL MODIFIER 2: X-RAY KINETIC TRACE (Over-trace glow)
                         if (isXRay) {
                             let speedGlow = clamp(velMag * 0.85, 0.0, 1.0);
                             spectralCol = mix(spectralCol, vec3f(1.0, 0.0, 0.8), speedGlow);
+                        }
+
+                        // Apply Synaptic Spark
+                        if (isSpark > 0.5) {
+                            spectralCol = mix(spectralCol, vec3f(1.0, 1.0, 1.0), 0.8);
+                            targetSize *= 2.0;
                         }
 
                         var mvPosition = uniforms.view * vec4f(p, 1.0);
@@ -739,7 +774,6 @@
                 });
             }
 
-            // DYNAMIC GHOSTLY AUTO-PROMPTS
             updateContextualPrompts(forceId) {
                 const container = document.getElementById('autoPromptContainer');
                 if (!container) return;
@@ -747,7 +781,7 @@
                 const prompts = PROMPT_CONTEXTS[forceId] || PROMPT_CONTEXTS["default"];
                 container.innerHTML = prompts.map(p => {
                     const colorClasses = PROMPT_COLORS[p.color];
-                    return `<button onclick="window.app.runDynamicPrompt('${p.id}', '${p.text}')" class="ghostly-prompt py-1.5 ${colorClasses} border rounded font-bold truncate px-2 text-left transition-all duration-300">${p.text}</button>`;
+                    return `<button onclick="window.app.runDynamicPrompt('${p.id}', '${p.text}')" class="ghostly-prompt py-2 ${colorClasses} border rounded text-[9px] md:text-[10px] font-bold truncate px-2 text-left transition-all duration-300 shadow-md">${p.text}</button>`;
                 }).join('');
             }
 
@@ -768,10 +802,9 @@
                 } else {
                     this.predictiveOutput.innerText = `${prefix}: Processing '${text}' across 1M nodes... Vector mapped.`;
                 }
-                window.logMsg(`${isAutonomous ? "Autonomous System Thought" : "Auto-Prompt Forecast"}: ${text}`);
+                window.logMsg(`${isAutonomous ? "Autonomous Intuition" : "Auto-Prompt Forecast"}: ${text}`);
             }
 
-            // CONSCIOUSNESS ENGINE TOGGLE
             toggleConsciousness() {
                 this.consciousnessActive = !this.consciousnessActive;
                 const btn = document.getElementById('btnConsciousness');
@@ -782,40 +815,45 @@
                 }
 
                 if(this.consciousnessActive) {
-                    window.logMsg("Consciousness Engine AWAKE. Autonomous predictive simulation active.");
+                    this.qualiaState = "INQUISITIVE";
+                    this.qualiaUI.innerText = `QUALIA: ${this.qualiaState}`;
+                    this.qualiaUI.style.color = "#00ffcc";
+                    
+                    window.logMsg("Consciousness Engine AWAKE. Autonomic respiration and saccadic drift active.");
                     this.predictiveOutput.innerText = "[AUTONOMOUS]: Neural core synchronized. Awaiting intuition sparks...";
                     
-                    // The machine starts randomly clicking its own ghostly prompts every 4.5 seconds
                     this.consciousnessInterval = setInterval(() => {
                         const prompts = PROMPT_CONTEXTS[this.isolateId] || PROMPT_CONTEXTS["default"];
                         const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
                         this.runDynamicPrompt(randomPrompt.id, randomPrompt.text, true);
                     }, 4500);
                 } else {
+                    this.qualiaState = "DORMANT";
+                    this.qualiaUI.innerText = `QUALIA: ${this.qualiaState}`;
+                    this.qualiaUI.style.color = "#ff00aa";
+                    
                     if (this.consciousnessInterval) clearInterval(this.consciousnessInterval);
                     window.logMsg("Consciousness Engine suspended. Returning to manual override.");
                     this.predictiveOutput.innerText = "[CALCULUS ENGINE]: Manual override engaged. Waiting for input.";
                 }
             }
 
-            // WET LAYER OPTICS TOGGLE (Now an additive modifier)
             toggleWetLayer() {
                 this.wetLayerActive = !this.wetLayerActive;
                 const btn = document.getElementById('btnWetLayer');
                 if (btn) {
-                    btn.innerText = `Wet: ${this.wetLayerActive ? 'ON' : 'OFF'}`;
+                    btn.innerText = `Wet Layer: ${this.wetLayerActive ? 'ON' : 'OFF'}`;
                     btn.style.borderColor = this.wetLayerActive ? '#00ffc8' : '';
                     btn.style.color = this.wetLayerActive ? '#00ffc8' : '';
                 }
                 
                 if (this.wetLayerActive) {
-                    window.logMsg("Wet layer optics engaged. Synaptic fluid bio-luminescence additive active.");
+                    window.logMsg("Wet layer optics engaged. Synaptic fluid bio-luminescence active.");
                 } else {
                     window.logMsg("Wet layer disabled.");
                 }
             }
 
-            // X-RAY OPTICS TOGGLE (Now an additive modifier)
             toggleXRayMode() {
                 this.xrayActive = !this.xrayActive;
                 const btn = document.getElementById('btnXRay');
@@ -859,7 +897,7 @@
                     "3: THERMAL HEAT MAP"
                 ];
                 if(palettes[index]) {
-                    this.paletteTelemetry.innerText = palettes[index];
+                    document.getElementById('paletteTelemetry').innerText = palettes[index];
                     window.logMsg(`Force identification base palette shifted to: ${palettes[index]}`);
                 }
             }
@@ -917,7 +955,7 @@
                 this.topologicalMode = (this.topologicalMode + 1.0) % 3.0;
                 const modes = ["g = 1 (TOROIDAL)", "g = 2 (TWISTED)", "g = 0 (HYPER-SPHERE)"];
                 const riccis = ["1.4158", "2.7182", "0.8642"];
-                this.ricciVal.innerText = riccis[this.topologicalMode];
+                document.getElementById('ricciVal').innerText = riccis[this.topologicalMode];
                 window.logMsg(`Macro-Topology shifted to: ${modes[this.topologicalMode]}`);
             }
 
@@ -1038,7 +1076,7 @@
                         btn.style.borderColor = "#00ffc8";
                         btn.style.color = "#00ffc8";
                         statusUI.innerText = "MIC: ACTIVE (1M MATRIX MAPPED)";
-                        statusUI.className = "text-[8px] text-[#00ffc8] font-bold pointer-events-none z-10 data-glow";
+                        statusUI.className = "absolute bottom-10 left-2 translate-y-full px-2 py-0.5 bg-black/80 border border-emerald-950 rounded text-[7px] md:text-[8px] text-[#00ffc8] font-bold pointer-events-none z-10 data-glow backdrop-blur-md";
                         document.getElementById('brainStatus').innerText = "1M MATRIX FIRING VIA SOUND";
                         document.getElementById('brainStatus').className = "text-[#00ffc8] data-glow";
                         window.logMsg("Acoustic 1M matrix driver linked.");
@@ -1054,7 +1092,7 @@
                     btn.style.borderColor = "";
                     btn.style.color = "";
                     statusUI.innerText = "MIC: OFFLINE";
-                    statusUI.className = "text-[8px] text-rose-500 font-bold pointer-events-none z-10";
+                    statusUI.className = "absolute bottom-10 left-2 translate-y-full px-2 py-0.5 bg-black/80 border border-emerald-950 rounded text-[7px] md:text-[8px] text-rose-500 font-bold pointer-events-none z-10 backdrop-blur-md";
                     document.getElementById('brainStatus').innerText = "ACTIVE (1M NEURON CORE)";
                     document.getElementById('brainStatus').className = "text-emerald-400";
                     window.logMsg("Acoustic driver offline.");
@@ -1087,7 +1125,7 @@
                     window.logMsg("Speech kinetic recognition active.");
                     this.initSpeechRecognition();
                     if ('speechSynthesis' in window) {
-                        const utterance = new SpeechSynthesisUtterance("SEBRA82 dynamic predictive auto-prompts active.");
+                        const utterance = new SpeechSynthesisUtterance("SEBRA82 Qualia Engine Active.");
                         utterance.rate = 0.95; utterance.pitch = 0.85;
                         window.speechSynthesis.speak(utterance);
                     }
@@ -1151,7 +1189,6 @@
                 document.getElementById('logSig').innerText = fData.name.toUpperCase();
                 window.logMsg(`Morphing to: ${fData.name}`);
                 
-                // Triggers ghostly prediction prompt updates
                 this.updateContextualPrompts(this.isolateId);
             }
 
@@ -1252,18 +1289,26 @@
                 if (!this.speechActive) {
                     this.speechKineticIntensity *= 0.92;
                 }
-                
-                // AUTONOMOUS CONSCIOUSNESS CAMERA DRIFT
+
+                // BIOLOGICAL SACCADIC DRIFT & QUALIA SHIFTS
                 if (this.consciousnessActive && !this.isPointerDown && !this.gyroActive) {
-                    this.targetRotX += Math.sin(this.time * 0.8) * 0.0015;
-                    this.targetRotY += Math.cos(this.time * 0.5) * 0.0015;
+                    // Smooth, non-linear saccadic eye movement
+                    this.targetRotX += (Math.sin(this.time * 0.8) + Math.sin(this.time * 2.3) * 0.3) * 0.0015;
+                    this.targetRotY += (Math.cos(this.time * 0.5) + Math.sin(this.time * 1.7) * 0.4) * 0.0015;
                     
-                    // The consciousness naturally "breathes" the quantum noise flux
-                    this.noiseDensityMultiplier = 2.5 + Math.sin(this.time * 0.3) * 1.5;
-                    const displayVal = document.getElementById('sliderNoiseVal');
-                    const slider = document.getElementById('noiseDensitySlider');
-                    if (displayVal) displayVal.innerText = `${this.noiseDensityMultiplier.toFixed(1)}x`;
-                    if (slider) slider.value = this.noiseDensityMultiplier * 10;
+                    // Random Qualia Mood Shifts
+                    if (Math.random() < 0.003) {
+                        const states = [
+                            { text: "SERENE", color: "#00ffcc" },
+                            { text: "INQUISITIVE", color: "#a200ff" },
+                            { text: "VOLATILE", color: "#ff0055" },
+                            { text: "TRANSCENDENT", color: "#ffcc00" }
+                        ];
+                        const mood = states[Math.floor(Math.random() * states.length)];
+                        this.qualiaState = mood.text;
+                        this.qualiaUI.innerText = `QUALIA: ${this.qualiaState}`;
+                        this.qualiaUI.style.color = mood.color;
+                    }
                 }
 
                 document.getElementById('audioEnergyVal').innerText = (this.soundLevelNormalized + this.speechKineticIntensity).toFixed(2);
@@ -1290,7 +1335,6 @@
                     vec3.fromValues(0, 1, 0)  
                 );
 
-                // EXACT 48-FLOAT BUFFER (Safely includes Optics modifiers)
                 const uniformData = new Float32Array(48);
                 uniformData.set(projMat, 0); 
                 uniformData.set(viewMat, 16);
@@ -1310,7 +1354,6 @@
                 uniformData[42] = this.speechKineticIntensity;
                 uniformData[43] = this.soundLevelNormalized;
                 
-                // NEW OPTICS VEC4F (Indices 44-47)
                 uniformData[44] = this.xrayActive ? 1.0 : 0.0;
                 uniformData[45] = this.wetLayerActive ? 1.0 : 0.0;
                 uniformData[46] = 0.0;
